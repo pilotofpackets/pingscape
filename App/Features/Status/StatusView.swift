@@ -90,16 +90,14 @@ struct StatusView: View {
     @ViewBuilder
     private func connection(_ snapshot: NetworkSnapshot) -> some View {
         InfoSection(title: "Connection") {
+            if let ipv4 = snapshot.primaryIPv4 {
+                addressRows(ipv4)
+            }
             if let gateway = snapshot.localGateway4 {
                 DataRow(label: "Default gateway", value: gateway, monospaced: true, sensitive: true)
             }
-            if let ipv4 = snapshot.primaryIPv4 {
-                DataRow(label: "IPv4 address", value: ipv4.withPrefix, monospaced: true, sensitive: true)
-            }
             if let ipv6 = snapshot.primaryIPv6 {
-                DataRow(
-                    label: "IPv6 address", value: ipv6.withPrefix, monospaced: true, sensitive: true,
-                    stacked: true)
+                addressRows(ipv6)
             }
             if !snapshot.dnsServers.isEmpty {
                 DataRow(
@@ -107,6 +105,22 @@ struct StatusView: View {
                     monospaced: true, sensitive: true)
             }
             DataRow(label: "Proxy", value: proxyDescription(snapshot.proxy))
+        }
+    }
+
+    /// An IPv4 address and its subnet mask as two rows, so each fits on one
+    /// line. An IPv6 address keeps its prefix and may wrap.
+    @ViewBuilder
+    private func addressRows(_ address: InterfaceAddress) -> some View {
+        if address.isIPv6 {
+            DataRow(
+                label: "IPv6 address", value: address.withPrefix, monospaced: true, sensitive: true,
+                stacked: true)
+        } else {
+            DataRow(label: "IP address", value: address.ip, monospaced: true, sensitive: true)
+            if let mask = address.netmask ?? address.prefixLength.map(IPv4.netmask(fromPrefix:)) {
+                DataRow(label: "Subnet mask", value: mask, monospaced: true)
+            }
         }
     }
 
@@ -165,9 +179,10 @@ struct StatusView: View {
                         : String(localized: "Active · Split tunnel"))
                 ForEach(snapshot.vpnInterfaces) { tunnel in
                     DataRow(label: "Interface", value: tunnel.name, monospaced: true)
-                    if let address = tunnel.usableAddresses.first(where: { !$0.isIPv6 }) ?? tunnel.usableAddresses.first {
-                        DataRow(
-                            label: "Address", value: address.withPrefix, monospaced: true, sensitive: true)
+                    if let address = tunnel.usableAddresses.first(where: { !$0.isIPv6 })
+                        ?? tunnel.usableAddresses.first
+                    {
+                        addressRows(address)
                     }
                     if let mtu = tunnel.mtu {
                         DataRow(label: "MTU", value: String(mtu))

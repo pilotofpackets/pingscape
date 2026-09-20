@@ -51,6 +51,8 @@ struct DataRow: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.trailing)
         }
+        // Wrap to a second line rather than cut a value with "…".
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     private var stackedLayout: some View {

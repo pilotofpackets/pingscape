@@ -49,22 +49,6 @@
         }
       }
     },
-    "Address": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Address"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adresse"
-          }
-        }
-      }
-    },
     "Allow": {
       "localizations": {
         "en": {
@@ -225,18 +209,18 @@
         }
       }
     },
-    "IPv4 address": {
+    "IP address": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "IPv4 address"
+            "value": "IP address"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "IPv4-Adresse"
+            "value": "IP-Adresse"
           }
         }
       }
@@ -621,6 +605,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Status"
+          }
+        }
+      }
+    },
+    "Subnet mask": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subnet mask"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subnetzmaske"
           }
         }
       }
