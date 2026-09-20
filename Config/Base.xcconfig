@@ -1,0 +1,6 @@
+// Shared build settings.
+// Your signing team goes into Config/Local.xcconfig (not committed):
+//   DEVELOPMENT_TEAM = ABCDE12345
+#include? "Local.xcconfig"
+
+CODE_SIGN_STYLE = Automatic

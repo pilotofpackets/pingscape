@@ -1,0 +1,94 @@
+name: Pingscape
+
+options:
+  bundleIdPrefix: app.pingscape
+  deploymentTarget:
+    iOS: "18.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+  generateEmptyDirectories: false
+
+configFiles:
+  Debug: Config/Debug.xcconfig
+  Release: Config/Release.xcconfig
+
+packages:
+  NetKit:
+    path: Packages/NetKit
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+targets:
+  Pingscape:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    dependencies:
+      - package: NetKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pingscape.ios
+        PRODUCT_NAME: Pingscape
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Pingscape
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleLocalizations: [en, de]
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        ITSAppUsesNonExemptEncryption: false
+        NSLocationWhenInUseUsageDescription: Pingscape reads the name of your Wi-Fi network, which iOS only allows with location permission. Your location is not used or stored.
+        NSLocalNetworkUsageDescription: Pingscape looks for devices on your local network so it can list them. Results stay on your device.
+        NSBonjourServices:
+          - _http._tcp
+          - _https._tcp
+          - _airplay._tcp
+          - _raop._tcp
+          - _hap._tcp
+          - _googlecast._tcp
+          - _ipp._tcp
+          - _ipps._tcp
+          - _printer._tcp
+          - _smb._tcp
+          - _afpovertcp._tcp
+          - _ssh._tcp
+          - _sftp-ssh._tcp
+          - _companion-link._tcp
+          - _device-info._tcp
+          - _workstation._tcp
+          - _matter._tcp
+          - _meshcop._udp
+          - _spotify-connect._tcp
+          - _sonos._tcp
+    entitlements:
+      path: App/Pingscape.entitlements
+      properties:
+        com.apple.developer.networking.wifi-info: true
+
+schemes:
+  Pingscape:
+    build:
+      targets:
+        Pingscape: all
+    run:
+      config: Debug
+    archive:
+      config: Release
