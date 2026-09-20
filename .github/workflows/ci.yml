@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # Liquid Glass needs the iOS 26 SDK or newer, so use a macOS 26 image.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Test NetKit
+        run: swift test --package-path Packages/NetKit
+
+      - name: Generate the Xcode project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Build the app for the simulator
+        run: |
+          xcodebuild \
+            -project Pingscape.xcodeproj \
+            -scheme Pingscape \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            build CODE_SIGNING_ALLOWED=NO

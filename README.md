@@ -4,7 +4,7 @@
 
 Display only. No account, no ads, no tracking, no backend.
 
-> **Status:** early development. There is no code to build yet.
+> **Status:** early development. The overview screen works (connection, Wi-Fi, VPN, cellular). LAN, Live and Tools are not built yet.
 
 ## Planned
 
@@ -17,6 +17,10 @@ Display only. No account, no ads, no tracking, no backend.
 - **Tools:** ping, traceroute, DNS, whois, ports, TLS, HTTP timing, subnet calculator
 
 Native SwiftUI, iOS 18 or later, Liquid Glass on iOS 26 and later. English and German.
+
+## Build
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). In short: `brew install xcodegen`, `xcodegen generate`, open `Pingscape.xcodeproj`. Launch with `-demo` to use fixture data in the simulator.
 
 ## Principles
 
