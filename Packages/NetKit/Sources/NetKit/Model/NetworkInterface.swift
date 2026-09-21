@@ -30,30 +30,44 @@ public struct NetworkInterface: Sendable, Hashable, Codable, Identifiable {
     public let name: String
     public let kind: InterfaceKind
     public let isUp: Bool
+    public let flags: InterfaceFlags
     public let mtu: Int?
     public let addresses: [InterfaceAddress]
-    /// Bytes since boot. The system keeps 32-bit counters here, so they wrap
-    /// after 4 GiB. 64-bit counters are a separate step.
+    /// Bytes and packets since boot, from the 64-bit counters. `nil` if the
+    /// system did not deliver them.
     public let receivedBytes: UInt64?
     public let sentBytes: UInt64?
+    public let receivedPackets: UInt64?
+    public let sentPackets: UInt64?
 
+    /// `flags` defaults to a plain up-and-running interface (or none if `isUp`
+    /// is false), which is what tests and fixtures usually mean.
     public init(
         name: String,
         kind: InterfaceKind? = nil,
         isUp: Bool = true,
+        flags: InterfaceFlags? = nil,
         mtu: Int? = nil,
         addresses: [InterfaceAddress] = [],
         receivedBytes: UInt64? = nil,
-        sentBytes: UInt64? = nil
+        sentBytes: UInt64? = nil,
+        receivedPackets: UInt64? = nil,
+        sentPackets: UInt64? = nil
     ) {
         self.name = name
         self.kind = kind ?? InterfaceKind(interfaceName: name)
         self.isUp = isUp
+        self.flags = flags ?? (isUp ? [.up, .running] : [])
         self.mtu = mtu
         self.addresses = addresses
         self.receivedBytes = receivedBytes
         self.sentBytes = sentBytes
+        self.receivedPackets = receivedPackets
+        self.sentPackets = sentPackets
     }
+
+    /// Up and running: the interface has a link and carries traffic.
+    public var isRunning: Bool { flags.contains([.up, .running]) }
 
     public var usableAddresses: [InterfaceAddress] { addresses.filter(\.isUsable) }
     public var ipv4Addresses: [InterfaceAddress] { usableAddresses.filter { !$0.isIPv6 } }

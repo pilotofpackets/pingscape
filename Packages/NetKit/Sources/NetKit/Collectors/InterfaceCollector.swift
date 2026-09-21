@@ -3,10 +3,8 @@ import Darwin
 /// Reads all network interfaces with their addresses (`getifaddrs`).
 public enum InterfaceCollector {
     private struct Builder {
-        var isUp: Bool
+        var flags: InterfaceFlags
         var mtu: Int?
-        var received: UInt64?
-        var sent: UInt64?
         var addresses: [InterfaceAddress] = []
     }
 
@@ -17,6 +15,7 @@ public enum InterfaceCollector {
 
         var order: [String] = []
         var builders: [String: Builder] = [:]
+        let counters = InterfaceCounterCollector.collect()
 
         var cursor = head
         while let entry = cursor {
@@ -26,17 +25,16 @@ public enum InterfaceCollector {
 
             if builders[name] == nil {
                 order.append(name)
-                builders[name] = Builder(isUp: (ifa.ifa_flags & UInt32(IFF_UP)) != 0)
+                builders[name] = Builder(flags: InterfaceFlags(rawValue: ifa.ifa_flags))
             }
             guard let sa = ifa.ifa_addr else { continue }
             let family = Int32(sa.pointee.sa_family)
 
             if family == AF_LINK {
+                // The 32-bit counters in `if_data` wrap after 4 GiB, so only the
+                // MTU is read here. The counters come from `InterfaceCounterCollector`.
                 if let data = ifa.ifa_data {
-                    let counters = data.assumingMemoryBound(to: if_data.self).pointee
-                    builders[name]?.mtu = Int(counters.ifi_mtu)
-                    builders[name]?.received = UInt64(counters.ifi_ibytes)
-                    builders[name]?.sent = UInt64(counters.ifi_obytes)
+                    builders[name]?.mtu = Int(data.assumingMemoryBound(to: if_data.self).pointee.ifi_mtu)
                 }
                 continue
             }
@@ -56,13 +54,17 @@ public enum InterfaceCollector {
 
         return order.compactMap { name in
             guard let builder = builders[name] else { return nil }
+            let traffic = counters[Int(if_nametoindex(name))]
             return NetworkInterface(
                 name: name,
-                isUp: builder.isUp,
+                isUp: builder.flags.contains(.up),
+                flags: builder.flags,
                 mtu: builder.mtu,
                 addresses: builder.addresses,
-                receivedBytes: builder.received,
-                sentBytes: builder.sent)
+                receivedBytes: traffic?.receivedBytes,
+                sentBytes: traffic?.sentBytes,
+                receivedPackets: traffic?.receivedPackets,
+                sentPackets: traffic?.sentPackets)
         }
     }
 }
