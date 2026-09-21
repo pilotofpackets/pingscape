@@ -12,11 +12,15 @@ public enum LocalNetworkAccess: String, Sendable, Equatable {
 ///
 /// iOS has no call that reads the permission. The first Bonjour browse asks
 /// the user, and a browse without permission ends in the "waiting" state with
-/// a DNS policy error. This starts one browse and reads which of the two happens.
+/// a DNS policy error (after a short "ready"). This starts one browse and reads
+/// which of the two happens.
 /// A browse of a type listed in `NSBonjourServices` is what makes iOS ask.
 public enum LocalNetworkPermission {
     /// `kDNSServiceErr_PolicyDenied`
     static let policyDenied = -65570
+
+    /// How long a browse must stay without the policy error after `ready`.
+    static let readyGraceSeconds = 0.5
 
     /// Waits for the answer, also while the permission dialog is open.
     public static func check(timeoutSeconds: Double = 60) async -> LocalNetworkAccess {
@@ -29,8 +33,13 @@ public enum LocalNetworkPermission {
                 browser.stateUpdateHandler = { state in
                     switch state {
                     case .ready:
-                        box.finish(.allowed)
-                        browser.cancel()
+                        // A refused browse reports `ready` first and, in the same
+                        // instant, `waiting` with the policy error (seen on iOS 27,
+                        // both within 3 ms). So "ready" alone proves nothing.
+                        queue.asyncAfter(deadline: .now() + readyGraceSeconds) {
+                            box.finish(.allowed)
+                            browser.cancel()
+                        }
                     case .waiting(let error):
                         if case .dns(let code) = error, Int(code) == policyDenied {
                             box.finish(.denied)
