@@ -1,3 +1,4 @@
+import NetKit
 import SwiftUI
 
 /// A titled group of rows on a plain, opaque surface.
@@ -5,7 +6,11 @@ import SwiftUI
 /// With `details:` the header gets a "Details ›" link that pushes the value
 /// onto the enclosing `NavigationStack`.
 struct InfoSection<Trailing: View, Content: View>: View {
-    let title: LocalizedStringKey
+    @Environment(PrivacyMask.self) private var mask
+    @State private var rows: [RowRecord] = []
+    @State private var sectionID = UUID()
+
+    let title: LocalizedStringResource
     @ViewBuilder let trailing: Trailing
     @ViewBuilder let content: Content
 
@@ -22,19 +27,42 @@ struct InfoSection<Trailing: View, Content: View>: View {
             }
             .padding(.horizontal, 16)
             InfoCard { content }
+                .environment(\.copySection, CopySectionAction(id: sectionID, perform: copy))
+                .onPreferenceChange(RowRecordsKey.self) { rows = $0 }
+                // The rows belong to this section and go no further up.
+                .transformPreference(RowRecordsKey.self) { $0 = [] }
+                .preference(key: SectionRecordsKey.self, value: rows.isEmpty ? [] : [record])
         }
+    }
+
+    private var record: SectionRecord {
+        SectionRecord(title: String(localized: title), rows: rows)
+    }
+
+    private func copy() {
+        Pasteboard.copy(ReportFormatter.text(of: record.reportSection, masked: mask.isMasked))
+    }
+}
+
+extension SectionRecord {
+    var reportSection: ReportSection {
+        ReportSection(
+            title: title,
+            rows: rows.map {
+                ReportRow(label: $0.label, value: $0.value, isSensitive: $0.sensitive, isPreformatted: $0.preformatted)
+            })
     }
 }
 
 extension InfoSection where Trailing == EmptyView {
-    init(title: LocalizedStringKey, @ViewBuilder content: () -> Content) {
+    init(title: LocalizedStringResource, @ViewBuilder content: () -> Content) {
         self.init(title: title, trailing: { EmptyView() }, content: content)
     }
 }
 
 extension InfoSection {
     init<Value: Hashable>(
-        title: LocalizedStringKey, details value: Value, @ViewBuilder content: () -> Content
+        title: LocalizedStringResource, details value: Value, @ViewBuilder content: () -> Content
     ) where Trailing == DetailsLink<Value> {
         self.init(title: title, trailing: { DetailsLink(value: value) }, content: content)
     }

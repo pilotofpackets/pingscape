@@ -57,6 +57,13 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: public.app-category.utilities
         NSLocationWhenInUseUsageDescription: Pingscape reads the name of your Wi-Fi network, which iOS only allows with location permission. Your location is not used or stored.
+        # Plain HTTP only to local addresses (a router's web page, the UPnP
+        # description) and to Apple's captive portal probe, which has no HTTPS.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            captive.apple.com:
+              NSExceptionAllowsInsecureHTTPLoads: true
         NSLocalNetworkUsageDescription: Pingscape looks for devices on your local network so it can list them. Results stay on your device.
         NSBonjourServices:
           - _http._tcp

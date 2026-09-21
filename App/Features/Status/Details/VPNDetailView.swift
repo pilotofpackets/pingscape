@@ -17,7 +17,7 @@ struct VPNDetailView: View {
                 }
                 let tunnels = snapshot.vpnInterfaces
                 ForEach(tunnels) { tunnel in
-                    let title: LocalizedStringKey =
+                    let title: LocalizedStringResource =
                         tunnels.count > 1 ? "Tunnel · \(tunnel.name)" : "Tunnel"
                     InfoSection(title: title) {
                         DataRow(label: "Interface", value: tunnel.name, monospaced: true)

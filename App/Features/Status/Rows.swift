@@ -58,3 +58,48 @@ struct TrafficSection: View {
         }
     }
 }
+
+/// A value that is loaded on request: "Load" before, a spinner while loading,
+/// the value after, "Try again" after a failure. A value that does not exist
+/// (no IPv6) leaves the row out.
+struct LoadableRow: View {
+    let label: LocalizedStringResource
+    let state: LoadState<String>
+    var monospaced = true
+    var sensitive = true
+    var stacked = false
+    let load: () -> Void
+
+    var body: some View {
+        switch state {
+        case .loaded(let value):
+            DataRow(label: label, value: value, monospaced: monospaced, sensitive: sensitive, stacked: stacked)
+        case .loading:
+            LoadingRow(label: label)
+        case .notLoaded:
+            PermissionRow(label: label, buttonTitle: "Load", action: load)
+        case .failed:
+            PermissionRow(label: label, buttonTitle: "Try again", action: load)
+        case .unavailable:
+            EmptyView()
+        }
+    }
+}
+
+/// A row while its value loads. It keeps its height, so nothing jumps.
+struct LoadingRow: View {
+    let label: LocalizedStringResource
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Text(label)
+            Spacer(minLength: 8)
+            ProgressView()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 11)
+        .frame(minHeight: 44)
+        .accessibilityElement(children: .combine)
+        .accessibilityValue(Text("Loading"))
+    }
+}

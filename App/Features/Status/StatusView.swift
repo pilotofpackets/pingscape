@@ -4,7 +4,10 @@ import SwiftUI
 struct StatusView: View {
     @Environment(SnapshotStore.self) private var store
     @Environment(PrivacyMask.self) private var mask
+    @Environment(ExternalStore.self) private var external
+    @Environment(AppNavigation.self) private var navigation
     @State private var path = DemoLaunch.overviewPath
+    @State private var sections: [SectionRecord] = []
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -36,7 +39,16 @@ struct StatusView: View {
                 .padding(.bottom, 24)
             }
             .background(Color(.systemGroupedBackground))
-            .refreshable { await store.refresh() }
+            .refreshable {
+                external.load(force: true)
+                await store.refresh()
+            }
+            .onPreferenceChange(SectionRecordsKey.self) { sections = $0 }
+            .onChange(of: navigation.overviewRequest, initial: true) { _, request in
+                guard let request else { return }
+                path = [request]
+                navigation.overviewRequest = nil
+            }
             .navigationTitle("Overview")
             .navigationDestination(for: OverviewDestination.self) { destination in
                 switch destination {
@@ -46,10 +58,19 @@ struct StatusView: View {
                 case .routing: RoutingView()
                 case .dns: DNSProxyView()
                 case .interfaces: InterfacesView()
+                case .external: ExternalView()
+                case .allRoutes: AllRoutesView()
                 case .interface(let name): InterfaceDetailView(name: name)
                 }
             }
             .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    ShareLink(item: reportText) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .accessibilityLabel("Share report")
+                    .disabled(sections.isEmpty)
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         mask.isMasked.toggle()
@@ -63,10 +84,22 @@ struct StatusView: View {
         }
     }
 
+    /// The overview as text: exactly the rows on screen, and the hidden values
+    /// stay hidden. External values are in it only if they are loaded.
+    private var reportText: String {
+        ReportFormatter.text(
+            header: DeviceInfo.reportHeader(at: store.snapshot?.takenAt ?? Date()),
+            sections: sections.reportSections, masked: mask.isMasked)
+    }
+
     // MARK: Hero
 
     private func heroSubtitle(_ snapshot: NetworkSnapshot) -> String? {
         var parts: [String] = []
+        // The system's own reason, if it gives one. Otherwise nothing is said.
+        if !snapshot.isOnline, let reason = snapshot.path?.unsatisfiedReason?.text {
+            parts.append(reason)
+        }
         if case .value(let wifi) = snapshot.wifi {
             let name = mask.shown(wifi.ssid)
             parts.append(String(localized: "via Wi-Fi “\(name)”"))
@@ -120,6 +153,10 @@ struct StatusView: View {
                 DataRow(
                     label: "DNS servers", value: snapshot.dnsServers.joined(separator: "\n"),
                     monospaced: true, sensitive: true)
+            }
+            LoadableRow(label: "External IPv4", state: external.ipv4) { external.load(userRequested: true) }
+            LoadableRow(label: "External IPv6", state: external.ipv6, stacked: true) {
+                external.load(userRequested: true)
             }
             DataRow(
                 label: "Proxy", value: proxyDescription(snapshot.proxy),
@@ -204,16 +241,10 @@ struct StatusView: View {
                 LinkRow(label: "Routing", value: OverviewDestination.routing)
             }
             LinkRow(label: "DNS and Proxy", value: OverviewDestination.dns)
+            LinkRow(label: "External", value: OverviewDestination.external)
             LinkRow(
                 label: "Interfaces", detail: String(snapshot.interfaces.count),
                 value: OverviewDestination.interfaces)
         }
-    }
-}
-
-extension NetworkSnapshot {
-    /// Online if the system says so, otherwise if any local interface has an address.
-    fileprivate var isOnline: Bool {
-        path?.isOnline ?? (primaryInterface != nil)
     }
 }

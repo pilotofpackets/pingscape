@@ -1,3 +1,4 @@
+import NetKit
 import SwiftUI
 
 /// The frame of a detail page: sections on the grouped background.
@@ -6,8 +7,10 @@ import SwiftUI
 /// stops) closes itself instead of showing an empty page.
 struct DetailPage<Content: View>: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(PrivacyMask.self) private var mask
+    @State private var sections: [SectionRecord] = []
 
-    let title: LocalizedStringKey
+    let title: LocalizedStringResource
     var isAvailable = true
     @ViewBuilder let content: Content
 
@@ -21,8 +24,26 @@ struct DetailPage<Content: View>: View {
             .padding(.bottom, 24)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle(title)
+        .navigationTitle(Text(title))
         .navigationBarTitleDisplayMode(.inline)
+        .onPreferenceChange(SectionRecordsKey.self) { sections = $0 }
+        .toolbar {
+            if !sections.isEmpty {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Button {
+                            Pasteboard.copy(
+                                ReportFormatter.text(header: [], sections: sections.reportSections, masked: mask.isMasked))
+                        } label: {
+                            Label("Copy page", systemImage: "doc.on.doc")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                    .accessibilityLabel("More")
+                }
+            }
+        }
         .onChange(of: isAvailable) { _, available in
             if !available { dismiss() }
         }

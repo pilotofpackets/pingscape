@@ -8,7 +8,7 @@ import SwiftUI
 struct DataRow: View {
     @Environment(PrivacyMask.self) private var mask
 
-    let label: LocalizedStringKey
+    let label: LocalizedStringResource
     let value: String
     var monospaced = false
     /// Addresses and network names. Hidden while the mask is on.
@@ -34,13 +34,15 @@ struct DataRow: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
         .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .contextMenu { RowCopyMenu(value: value) }
         .accessibilityElement(children: .combine)
+        .recordRow(label: label, value: value, sensitive: sensitive)
     }
 
     private var valueText: some View {
         Text(shown)
             .font(monospaced ? .system(.body, design: .monospaced) : .body)
-            .textSelection(.enabled)
     }
 
     private var inlineLayout: some View {
@@ -71,7 +73,7 @@ struct DataRow: View {
 /// A row whose value is a status: a dot and a short text. Like `DataRow`, it
 /// stacks label above status when they do not fit on one line.
 struct StatusRow: View {
-    let label: LocalizedStringKey
+    let label: LocalizedStringResource
     let text: String
     var tone: StatusDot.Tone = .good
 
@@ -100,14 +102,17 @@ struct StatusRow: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
         .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .contextMenu { RowCopyMenu(value: text) }
         .accessibilityElement(children: .combine)
+        .recordRow(label: label, value: text)
     }
 }
 
 /// A row that asks for a permission.
 struct PermissionRow: View {
-    let label: LocalizedStringKey
-    let buttonTitle: LocalizedStringKey
+    let label: LocalizedStringResource
+    let buttonTitle: LocalizedStringResource
     let action: () -> Void
 
     private var button: some View {

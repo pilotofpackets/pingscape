@@ -4,17 +4,18 @@
 
 Display only. No account, no ads, no tracking, no backend.
 
-> **Status:** early development. The overview screen works (connection, Wi-Fi, VPN, cellular). LAN, Live and Tools are not built yet.
+> **Status:** all planned screens are built and checked in the simulator and on a Mac. Not yet checked on a real iPhone: Wi-Fi name, cellular, VPN detection with WireGuard and IKEv2, and the Local Network behaviour. Expect rough edges there.
 
-## Planned
+## Features
 
-- **Overview:** online status, gateway, DNS, proxy, public IP (on request)
-- **Wi-Fi:** SSID, BSSID, vendor, security, addresses, latency to the router
+- **Overview:** online status, gateway, DNS, proxy, public IP and provider (only with your consent). Every value can be copied, the overview can be shared as a text report, and "Hide values" keeps addresses out of screenshots.
+- **Wi-Fi:** SSID, BSSID, vendor, security, addresses, latency to the router, router details over UPnP
 - **Cellular and SIM:** radio technology per SIM, addresses, data counters
 - **VPN and tunnels:** whether a VPN is active, tunnel address, MTU, full or split tunnel
-- **LAN:** ping sweep and Bonjour discovery of devices on the local network
-- **Live:** throughput per interface, latency, jitter and loss
-- **Tools:** ping, traceroute, DNS, whois, ports, TLS, HTTP timing, subnet calculator
+- **LAN:** ping sweep and Bonjour discovery of devices on the local network, with a thorough mode that also probes a few TCP ports
+- **Live:** throughput per interface, latency, jitter and loss, and a timeline of network changes (foreground only, kept in memory)
+- **Tools:** ping, traceroute, DNS, whois and RDAP, ports, TLS certificate, HTTP timing, subnet calculator, OUI lookup
+- **Diagnostic dump:** the raw collector data as JSON, with addresses replaced, for reporting a wrong reading
 
 Native SwiftUI, iOS 18 or later, Liquid Glass on iOS 26 and later. English and German.
 

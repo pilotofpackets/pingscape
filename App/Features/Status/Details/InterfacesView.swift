@@ -83,7 +83,7 @@ struct InterfaceDetailView: View {
 
     var body: some View {
         let interface = store.snapshot?.interfaces.first { $0.name == name }
-        DetailPage(title: LocalizedStringKey(name), isAvailable: interface != nil || store.snapshot == nil) {
+        DetailPage(title: LocalizedStringResource(stringLiteral: name), isAvailable: interface != nil || store.snapshot == nil) {
             if let interface {
                 InfoSection(title: "Interface") {
                     StatusRow(

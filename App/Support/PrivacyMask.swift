@@ -1,4 +1,5 @@
 import Foundation
+import NetKit
 import Observation
 
 /// Hides sensitive values (addresses, network names) for screenshots.
@@ -11,7 +12,7 @@ final class PrivacyMask {
 
     /// What stands in for a hidden value. A fixed length, so the length of an
     /// address does not give away whether it is IPv4 or IPv6.
-    nonisolated static let placeholder = "•••••••"
+    nonisolated static let placeholder = ReportFormatter.placeholder
 
     var isMasked = UserDefaults.standard.bool(forKey: PrivacyMask.hideByDefaultKey)
 

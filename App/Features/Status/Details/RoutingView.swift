@@ -13,6 +13,9 @@ struct RoutingView: View {
                             label: "Status",
                             text: path.isOnline ? String(localized: "Online") : String(localized: "Offline"),
                             tone: path.isOnline ? .good : .critical)
+                        if let active = Self.activeInterface(snapshot) {
+                            DataRow(label: "Active via", value: active)
+                        }
                         // Only what is set. A "No" would be noise.
                         if path.isExpensive {
                             DataRow(label: "Metered connection", value: String(localized: "Yes"))
@@ -20,16 +23,34 @@ struct RoutingView: View {
                         if path.isConstrained {
                             DataRow(label: "Low Data Mode", value: String(localized: "On"))
                         }
+                        // The system's own list, next to the table below. If the two
+                        // differ, both are shown, without a comment.
+                        if !path.gateways.isEmpty {
+                            DataRow(
+                                label: "Gateways per system", value: path.gateways.joined(separator: "\n"),
+                                monospaced: true, sensitive: true)
+                        }
                     }
                 }
                 let routes = Self.sorted(snapshot.defaultRoutes)
                 if !routes.isEmpty {
                     InfoSection(title: "Default routes") {
                         ForEach(routes, id: \.self) { RouteRow(route: $0) }
+                        LinkRow(label: "All routes", value: OverviewDestination.allRoutes)
                     }
                 }
             }
         }
+    }
+
+    /// The interface whose default route carries the traffic, with what it is.
+    static func activeInterface(_ snapshot: NetworkSnapshot) -> String? {
+        guard let name = snapshot.defaultRoutes.first(where: { $0.isActive && !$0.isIPv6 })?.interfaceName
+            ?? snapshot.defaultRoutes.first(where: \.isActive)?.interfaceName
+        else { return nil }
+        let kind = snapshot.interfaces.first { $0.name == name }?.kind
+        if let label = kind?.label { return "\(label) (\(name))" }
+        return name
     }
 
     /// IPv4 before IPv6, and within one family the route that carries the
@@ -88,7 +109,17 @@ private struct RouteRow: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
         .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .contextMenu { RowCopyMenu(value: summary) }
         .accessibilityElement(children: .combine)
+        .recordRow(
+            label: LocalizedStringResource(stringLiteral: "\(route.isIPv6 ? "IPv6" : "IPv4") \(route.interfaceName)"),
+            value: summary, sensitive: route.gateway != nil)
+    }
+
+    private var summary: String {
+        [route.gateway.map { "via \($0)" }, route.isActive ? String(localized: "Carries traffic") : nil]
+            .compactMap { $0 }.joined(separator: " · ")
     }
 }
 

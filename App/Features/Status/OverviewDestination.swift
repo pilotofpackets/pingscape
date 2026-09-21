@@ -6,5 +6,7 @@ enum OverviewDestination: Hashable {
     case routing
     case dns
     case interfaces
+    case external
+    case allRoutes
     case interface(String)
 }

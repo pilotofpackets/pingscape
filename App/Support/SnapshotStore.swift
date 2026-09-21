@@ -1,3 +1,4 @@
+import CoreTelephony
 import Foundation
 import NetKit
 import Observation
@@ -9,6 +10,11 @@ final class SnapshotStore {
     private(set) var snapshot: NetworkSnapshot?
     private(set) var oui = OUIRegistry()
     private(set) var isRefreshing = false
+    /// Changes seen while the app runs, newest first. Only in memory.
+    private(set) var timeline = TimelineLog()
+    /// Counts network path changes, so other parts can react to them.
+    private(set) var pathChanges = 0
+    private(set) var cellularAccess = CellularDataAccess.current
 
     private let provider: any NetworkSnapshotProviding
     let location = LocationPermission()
@@ -25,7 +31,17 @@ final class SnapshotStore {
         async let registry = Self.loadRegistry()
         await refresh()
         oui = await registry
+        // The system posts this when the radio technology changes (4G to 5G).
+        let radio = Task { [weak self] in
+            for await _ in NotificationCenter.default.notifications(
+                named: .CTServiceRadioAccessTechnologyDidChange)
+            {
+                await self?.refresh()
+            }
+        }
+        defer { radio.cancel() }
         for await _ in PathCollector.changes() {
+            pathChanges += 1
             await refresh()
         }
     }
@@ -34,7 +50,10 @@ final class SnapshotStore {
         guard !isRefreshing else { return }
         isRefreshing = true
         defer { isRefreshing = false }
-        snapshot = await provider.snapshot()
+        let next = await provider.snapshot()
+        timeline.record(from: snapshot, to: next)
+        snapshot = next
+        cellularAccess = CellularDataAccess.current
     }
 
     private nonisolated static func loadRegistry() async -> OUIRegistry {

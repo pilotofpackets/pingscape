@@ -22,6 +22,18 @@ struct CellularDetailView: View {
                     }
                     TrafficSection(interface: data)
                 }
+                switch store.cellularAccess {
+                case .allowed:
+                    InfoSection(title: "System") {
+                        DataRow(label: "Mobile data for Pingscape", value: String(localized: "Allowed"))
+                    }
+                case .restricted:
+                    InfoSection(title: "System") {
+                        DataRow(label: "Mobile data for Pingscape", value: String(localized: "Off"))
+                    }
+                case .unknown:
+                    EmptyView()
+                }
             }
         }
     }
@@ -37,7 +49,7 @@ extension NetworkSnapshot {
 
 extension CellularService {
     /// "Data SIM", "Second SIM", or "Other SIM" if there are more than two.
-    func title(among total: Int) -> LocalizedStringKey {
+    func title(among total: Int) -> LocalizedStringResource {
         if isDataService { return "Data SIM" }
         return total > 2 ? "Other SIM" : "Second SIM"
     }
