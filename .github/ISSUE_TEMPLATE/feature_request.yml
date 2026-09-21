@@ -1,0 +1,11 @@
+name: Idea or feature request
+description: Suggest something Pingscape could show.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see?
+      description: Pingscape shows only what iOS actually provides. If you know the public API that returns the value, please name it.
+    validations:
+      required: true

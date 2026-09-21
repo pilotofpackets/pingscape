@@ -1,0 +1,33 @@
+name: Bug report
+description: Something shows a wrong value, or the app misbehaves.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and iOS version
+      placeholder: iPhone 16, iOS 26.1
+    validations:
+      required: true
+  - type: dropdown
+    id: connection
+    attributes:
+      label: Connection
+      multiple: true
+      options: [Wi-Fi, Cellular, VPN active, Personal Hotspot, Ethernet adapter]
+  - type: textarea
+    id: vpn
+    attributes:
+      label: VPN (if relevant)
+      description: Which VPN app or profile, and whether it is a full or split tunnel.
+  - type: markdown
+    attributes:
+      value: |
+        Please blur or replace addresses and network names you do not want to share. The eye button in the app hides them for screenshots.

@@ -34,8 +34,10 @@ swift test --package-path Packages/NetKit
 
 Add a test for every rule you add. Bugs in the VPN detection are best reproduced with a fixture (a hand-built snapshot in `Tests/NetKitTests`).
 
-## Pull requests
+## Contributing
 
-- Keep them focused.
-- Code, comments and commit messages are in English. User-facing strings go into `App/Resources/Localizable.xcstrings` in English and German.
-- Explain in the description how you checked the change (device, iOS version).
+Issues are welcome: bug reports, wrong values (especially VPN detection on your setup) and ideas. Use the templates.
+
+Pull requests are switched off on this repository for now, and only the maintainer changes the code. You can read everything, fork the repository and work on your own branch in your fork, under the terms of the [MIT license](LICENSE). If you have a fix or a fixture, open an issue and link to your branch.
+
+Code, comments and commit messages are in English. User-facing strings go into `App/Resources/Localizable.xcstrings` in English and German.
