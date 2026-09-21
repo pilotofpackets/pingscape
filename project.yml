@@ -55,6 +55,7 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         ITSAppUsesNonExemptEncryption: false
+        LSApplicationCategoryType: public.app-category.utilities
         NSLocationWhenInUseUsageDescription: Pingscape reads the name of your Wi-Fi network, which iOS only allows with location permission. Your location is not used or stored.
         NSLocalNetworkUsageDescription: Pingscape looks for devices on your local network so it can list them. Results stay on your device.
         NSBonjourServices:
