@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datenschutz · Pingscape</title>
+<meta name="description" content="Was Pingscape mit deinen Daten macht: Nichts wird erhoben, und jede Anfrage, die dein Gerät verlässt, ist aufgelistet.">
+<link rel="stylesheet" href="../style.css">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" href="../apple-touch-icon.png">
+<link rel="alternate" hreflang="en" href="https://pingscape.app/privacy.html">
+<link rel="alternate" hreflang="de" href="https://pingscape.app/de/privacy.html">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="brand" href="./"><img src="../img/icon.png" alt="" width="34" height="34">Pingscape</a>
+<nav aria-label="Hauptnavigation"><a href="./">Start</a><a href="privacy.html" aria-current="page">Datenschutz</a><a href="support.html">Support</a><a href="impressum.html">Impressum</a><a href="../privacy.html" hreflang="en" lang="en">English</a></nav>
+</div></header>
+<main><div class="wrap">
+<h1>Datenschutz</h1>
+<p class="small">Stand: 21.09.2026</p>
+<p class="lead">Pingscape hat kein Konto, keine Analyse, keine Werbung und keinen eigenen Server. Der Entwickler erhebt keine Daten über dich.</p>
+
+<h2>Verantwortlich</h2>
+<p>Niklas Temp, die Kontaktdaten stehen im <a href="impressum.html">Impressum</a>. Fragen zum Datenschutz kannst du auch als <a href="https://github.com/pilotofpackets/pingscape/issues">Issue auf GitHub</a> stellen.</p>
+
+<h2>Was die App auf deinem Gerät tut</h2>
+<p>Pingscape liest den Netzwerkzustand deines Geräts (Schnittstellen, Adressen, Routen, DNS-Server, Proxy, WLAN- und Mobilfunkstatus) und zeigt ihn auf dem Bildschirm. Ergebnisse und Verläufe liegen nur im Speicher und sind weg, wenn die App beendet wird. Die App speichert einige Einstellungen auf deinem Gerät (etwa „Werte standardmäßig verbergen“, die Einheit für den Durchsatz und ob du externen Abfragen zugestimmt hast). Sonst wird nichts gespeichert.</p>
+
+<h2>Berechtigungen</h2>
+<table>
+<tr><th>Berechtigung</th><th>Wofür</th></tr>
+<tr><td>Ortung (wenn in Benutzung)</td><td>iOS gibt den Namen des verbundenen WLANs nur an Apps weiter, die diese Berechtigung haben. Pingscape liest, nutzt und speichert deinen Standort nicht.</td></tr>
+<tr><td>Lokales Netzwerk</td><td>Um Geräte in deinem eigenen Netz zu suchen und deinen Router nach sich selbst zu fragen. Die Ergebnisse bleiben auf deinem Gerät.</td></tr>
+</table>
+
+<h2>Anfragen, die dein Gerät verlassen</h2>
+<h3>Öffentliche IP-Adresse und Provider (nur mit deiner Zustimmung)</h3>
+<p>Das ist aus, bis du zustimmst, in der Frage beim ersten Start oder mit dem Schalter „Externe Abfragen“ unter Über. Ein Tipp auf „Laden“ funktioniert auch einmalig, ohne den Schalter einzuschalten. Diese Server werden gefragt:</p>
+<table>
+<tr><th>Server</th><th>Zweck</th></tr>
+<tr><td><code>api.ipify.org</code>, <code>api6.ipify.org</code> (<a href="https://www.ipify.org">ipify</a>)</td><td>Liefern deine öffentliche IPv4- und IPv6-Adresse.</td></tr>
+<tr><td><code>stat.ripe.net</code> (RIPEstat, <a href="https://www.ripe.net">RIPE NCC</a>)</td><td>Bekommt deine öffentliche IP-Adresse und liefert das autonome System und dessen Inhaber. Die App nennt sich mit <code>sourceapp=pingscape</code>.</td></tr>
+<tr><td>Dein System-DNS-Server</td><td>Wird nach dem Namen gefragt, der zu deiner öffentlichen IP-Adresse gehört.</td></tr>
+</table>
+<p>Jeder dieser Server sieht deine öffentliche IP-Adresse, wie bei jeder Anfrage im Internet. Sonst wird nichts gesendet: keine Gerätedaten und kein Standort. Wie diese Dienste mit Anfragen umgehen, beschreiben ihre Betreiber. Darauf hat Pingscape keinen Einfluss.</p>
+
+<h3>Nur wenn du es startest</h3>
+<p>Jedes Werkzeug sendet, was du eingetippt hast, und sonst nichts, und nur wenn du auf Start tippst:</p>
+<ul>
+<li>Ping, Traceroute, Ports, TLS und HTTP-Timing gehen an das Ziel, das du eingegeben hast.</li>
+<li>DNS geht an den Server, den du wählst: den des Systems, 1.1.1.1, 8.8.8.8, 9.9.9.9 oder einen eigenen.</li>
+<li>Traceroute fragt deinen DNS-Server nach den Namen der Router auf dem Weg. Das kannst du abschalten.</li>
+<li>Whois geht an <code>whois.iana.org</code> und weiter an das Register, das für den Namen zuständig ist. RDAP geht an <code>data.iana.org</code> (welches Register antwortet) und dann an dieses Register.</li>
+<li>„Internet prüfen“ auf der Seite Extern fragt <code>captive.apple.com</code>.</li>
+<li>Der optionale Internet-Ping im Live-Tab ist standardmäßig aus. Schaltest du ihn ein, pingt er einmal pro Sekunde den Host, den du einträgst.</li>
+</ul>
+
+<h3>In deinem lokalen Netz</h3>
+<p>Die Gerätesuche pingt die Adressen deines eigenen Netzes und hört auf Bonjour. Dein Router wird nach seiner UPnP-Beschreibung gefragt. Dieser Verkehr bleibt in deinem Netz.</p>
+
+<h2>Kurzbefehle und Widget</h2>
+<p>Die Aktionen in Kurzbefehle laufen, wenn du sie startest, und geben dir ihr Ergebnis zurück. Das Widget liest, ob das Gerät online ist, worüber und ob ein VPN aktiv ist, und zeigt, wann es gelesen wurde. Beides sendet nichts irgendwohin.</p>
+
+<h2>Diagnose-Dump und Teilen</h2>
+<p>Berichte, Listen und der Diagnose-Dump werden nur geteilt, wenn du sie über das System-Teilen-Blatt teilst. Standardmäßig ersetzt der Diagnose-Dump Adressen und Namen. Was du mit einer geteilten Datei machst, liegt bei dir.</p>
+
+<h2>Diese Webseite</h2>
+<p>Die Seite liegt bei GitHub Pages. GitHub verarbeitet die IP-Adressen der Besucher in seinen Server-Protokollen. Die Seite selbst setzt keine Cookies, führt keine Skripte aus, nutzt keine Analyse und lädt keine Schriften oder Bilder von anderen Servern.</p>
+
+<h2>Deine Rechte</h2>
+<p>Weil der Entwickler keine personenbezogenen Daten über dich erhebt oder speichert, gibt es nichts nachzuschlagen oder zu löschen. Bist du anderer Meinung oder hast eine Frage, schreib an die Adresse im <a href="impressum.html">Impressum</a>.</p>
+
+<h2>Änderungen</h2>
+<p>Sendet eine neue Version mehr, werden diese Seite und die Datei <a href="https://github.com/pilotofpackets/pingscape/blob/main/PRIVACY.md">PRIVACY.md</a> im Quellcode geändert, bevor die Version erscheint. Die Änderungshistorie der Datei ist öffentlich.</p>
+</div></main>
+<footer class="site"><div class="wrap">
+<span>© 2026 Niklas Temp · MIT License</span>
+<span><a href="https://github.com/pilotofpackets/pingscape">GitHub</a> · <a href="https://github.com/pilotofpackets/pingscape/issues">Fehler melden</a></span>
+</div></footer>
+</body>
+</html>

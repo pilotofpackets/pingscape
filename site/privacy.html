@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · Pingscape</title>
+<meta name="description" content="What Pingscape does with your data: nothing is collected, and every request that leaves your device is listed.">
+<link rel="stylesheet" href="style.css">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="apple-touch-icon.png">
+<link rel="alternate" hreflang="en" href="https://pingscape.app/privacy.html">
+<link rel="alternate" hreflang="de" href="https://pingscape.app/de/privacy.html">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="brand" href="./"><img src="img/icon.png" alt="" width="34" height="34">Pingscape</a>
+<nav aria-label="Main"><a href="./">Home</a><a href="privacy.html" aria-current="page">Privacy</a><a href="support.html">Support</a><a href="impressum.html">Legal notice</a><a href="de/privacy.html" hreflang="de" lang="de">Deutsch</a></nav>
+</div></header>
+<main><div class="wrap">
+<h1>Privacy</h1>
+<p class="small">Last updated: 2026-09-21</p>
+<p class="lead">Pingscape has no account, no analytics, no advertising and no server of its own. The developer collects no data about you.</p>
+
+<h2>Who is responsible</h2>
+<p>Niklas Temp, see the <a href="impressum.html">legal notice</a> for the contact details. Questions about privacy can also be opened as an <a href="https://github.com/pilotofpackets/pingscape/issues">issue on GitHub</a>.</p>
+
+<h2>What the app does on your device</h2>
+<p>Pingscape reads the network state of your device (interfaces, addresses, routes, DNS servers, proxy, Wi-Fi and cellular status) and shows it on screen. Results and histories live only in memory and are gone when the app ends. The app stores a few settings on your device (for example “hide values by default”, the unit for throughput and whether you agreed to external requests). Nothing else is stored.</p>
+
+<h2>Permissions</h2>
+<table>
+<tr><th>Permission</th><th>What for</th></tr>
+<tr><td>Location (while in use)</td><td>iOS only lets an app read the name of the Wi-Fi network it is connected to if it has this permission. Pingscape does not read, use or store your location.</td></tr>
+<tr><td>Local network</td><td>To look for devices on your own network and to ask your router about itself. The results stay on your device.</td></tr>
+</table>
+
+<h2>Requests that leave your device</h2>
+<h3>Public IP address and provider (only if you agree)</h3>
+<p>This is off until you agree to it, in a question at first launch or with the switch “External requests” under About. A tap on “Load” also works once, without switching it on. These servers are asked:</p>
+<table>
+<tr><th>Server</th><th>Purpose</th></tr>
+<tr><td><code>api.ipify.org</code>, <code>api6.ipify.org</code> (<a href="https://www.ipify.org">ipify</a>)</td><td>Return your public IPv4 and IPv6 address.</td></tr>
+<tr><td><code>stat.ripe.net</code> (RIPEstat, <a href="https://www.ripe.net">RIPE NCC</a>)</td><td>Gets your public IP address and returns the autonomous system and its holder. The app names itself with <code>sourceapp=pingscape</code>.</td></tr>
+<tr><td>Your system DNS server</td><td>Is asked for the name that belongs to your public IP address.</td></tr>
+</table>
+<p>Each of these servers sees your public IP address, as with any request on the internet. Nothing else is sent: no device data and no location. How these services handle requests is described by their operators; Pingscape has no influence on that.</p>
+
+<h3>Only when you start it</h3>
+<p>Every tool sends what you typed and nothing else, and only when you tap Start:</p>
+<ul>
+<li>Ping, traceroute, ports, TLS and HTTP timing go to the target you entered.</li>
+<li>DNS goes to the server you choose: your system’s, 1.1.1.1, 8.8.8.8, 9.9.9.9 or one of your own.</li>
+<li>Traceroute asks your DNS server for the names of the routers on the way. You can switch that off.</li>
+<li>Whois goes to <code>whois.iana.org</code> and on to the registry responsible for the name. RDAP goes to <code>data.iana.org</code> (which registry answers) and then to that registry.</li>
+<li>“Check internet” on the External page asks <code>captive.apple.com</code>.</li>
+<li>The optional internet ping in the Live tab is off by default. When you switch it on, it pings the host you enter once a second.</li>
+</ul>
+
+<h3>On your local network</h3>
+<p>The device search pings the addresses of your own network and listens for Bonjour. Your router is asked for its UPnP description. This traffic stays inside your network.</p>
+
+<h2>Shortcuts and widget</h2>
+<p>The Shortcuts actions run when you start them and return their result to you. The widget reads whether the device is online, over what and whether a VPN is active, and shows the time it was read. Neither sends anything anywhere.</p>
+
+<h2>Diagnostic dump and sharing</h2>
+<p>Reports, lists and the diagnostic dump are only shared when you choose to share them, using the system share sheet. By default the diagnostic dump replaces addresses and names. What you do with a shared file is up to you.</p>
+
+<h2>This website</h2>
+<p>This site is hosted on GitHub Pages. GitHub processes the IP addresses of visitors in its server logs. The site itself sets no cookies, runs no scripts, uses no analytics and loads no fonts or images from other servers.</p>
+
+<h2>Your rights</h2>
+<p>Because the developer does not collect or store personal data about you, there is nothing to look up or delete. If you disagree, or have a question, contact the address in the <a href="impressum.html">legal notice</a>.</p>
+
+<h2>Changes</h2>
+<p>If a new version sends more, this page and the <a href="https://github.com/pilotofpackets/pingscape/blob/main/PRIVACY.md">PRIVACY.md</a> in the source code are changed before that version is released. The history of the file is public.</p>
+</div></main>
+<footer class="site"><div class="wrap">
+<span>© 2026 Niklas Temp · MIT License</span>
+<span><a href="https://github.com/pilotofpackets/pingscape">GitHub</a> · <a href="https://github.com/pilotofpackets/pingscape/issues">Issues</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support · Pingscape</title>
+<meta name="description" content="Antworten auf häufige Fragen zu Pingscape und wie du ein Problem meldest.">
+<link rel="stylesheet" href="../style.css">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" href="../apple-touch-icon.png">
+<link rel="alternate" hreflang="en" href="https://pingscape.app/support.html">
+<link rel="alternate" hreflang="de" href="https://pingscape.app/de/support.html">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="brand" href="./"><img src="../img/icon.png" alt="" width="34" height="34">Pingscape</a>
+<nav aria-label="Hauptnavigation"><a href="./">Start</a><a href="privacy.html">Datenschutz</a><a href="support.html" aria-current="page">Support</a><a href="impressum.html">Impressum</a><a href="../support.html" hreflang="en" lang="en">English</a></nav>
+</div></header>
+<main><div class="wrap">
+<h1>Support</h1>
+<p class="lead">Antworten auf häufige Fragen und der Weg, ein Problem zu melden.</p>
+<h2>Ein Problem oder eine Idee melden</h2>
+<p>Eröffne ein <a href="https://github.com/pilotofpackets/pingscape/issues/new/choose">Issue auf GitHub</a>. Dafür brauchst du ein kostenloses GitHub-Konto. Nenne bitte dein iPhone-Modell und die iOS-Version, ob du im WLAN oder im Mobilfunk warst und welche VPN-App und welches Protokoll du nutzt, falls eines.</p>
+<div class="note"><strong>Wenn ein Wert falsch aussieht</strong> (zum Beispiel der VPN-Status), hänge einen Diagnose-Dump an: Öffne <em>Über → Diagnose-Dump</em> und teile die Datei. In der Standardeinstellung ersetzt er Adressen und Namen, du kannst ihn also gefahrlos anhängen. Der Entwickler kann damit nachbauen, was dein Gerät gesehen hat.</div>
+<h2>Häufige Fragen</h2>
+<details><summary>Warum fragt Pingscape nach meinem Standort?</summary><p>iOS gibt den Namen des WLANs nur an Apps weiter, die den Standort nutzen dürfen. Pingscape braucht die Berechtigung nur dafür. Es liest, nutzt und speichert deinen Standort nicht. Ohne sie geht alles andere weiter, nur der WLAN-Name fehlt.</p></details>
+<details><summary>Warum fragt sie nach dem lokalen Netzwerk?</summary><p>Um die Geräte in deinem Netz aufzulisten und deinen Router nach sich selbst zu fragen. iOS fragt einmal, wenn du im LAN-Tab zum ersten Mal auf „Suchen“ tippst. Hast du abgelehnt, schalte es unter Einstellungen → Pingscape ein.</p></details>
+<details><summary>In der Geräteliste fehlen einige meiner Geräte.</summary><p>Geräte werden gefunden, wenn sie auf einen Ping antworten oder sich über Bonjour melden. Manche Geräte antworten nicht auf Ping (zum Beispiel Telefone im Standby oder Geräte hinter einer Firewall). Der Modus „Gründlich“ probiert bei solchen Geräten zusätzlich einige Ports und fängt noch ein paar mehr. Pingscape rät keine Geräte, die es nicht sieht.</p></details>
+<details><summary>Warum ist das LAN leer, wenn mein VPN an ist?</summary><p>Ein VPN, das den gesamten Verkehr trägt, trennt dein Gerät oft vom lokalen Netz. Pingscape zeigt dazu einen Hinweis.</p></details>
+<details><summary>Was macht „Werte verbergen“?</summary><p>Es verbirgt Adressen und Netzwerknamen (WLAN-Name, IP-Adressen, Subnetzmaske, Gateway, DNS, MAC-Adressen, Gerätenamen) auf dem Bildschirm und in geteilten Berichten, damit du einen Screenshot teilen kannst. Drücke lange auf einen einzelnen Wert, um den echten zu kopieren.</p></details>
+<details><summary>Welche Server kontaktiert die App?</summary><p>Standardmäßig keinen. Die <a href="privacy.html">Datenschutzseite</a> nennt jede Anfrage, und jede beginnt erst, wenn du sie erlaubst oder startest.</p></details>
+<details><summary>Läuft die App auf dem iPad?</summary><p>Ja. Die Netzwerkdaten dort sind die des iPads. Der WLAN-Name und die Mobilfunkdaten hängen davon ab, was das Gerät hat und erlaubt.</p></details>
+<details><summary>Ist sie wirklich kostenlos?</summary><p>Ja. Es gibt keinen Kauf, kein Abo und keine Werbung. Die App ist Open Source unter der MIT-Lizenz.</p></details>
+<details><summary>Warum fehlt ein Wert oder ein Abschnitt?</summary><p>Pingscape zeigt nur, was iOS liefert. Sagt iOS einer App etwas nicht (zum Beispiel die Signalstärke des WLANs oder den Namen des Netzbetreibers), gibt es dafür keine Zeile statt einer Vermutung.</p></details>
+<h2>Quellcode</h2>
+<p><a href="https://github.com/pilotofpackets/pingscape">github.com/pilotofpackets/pingscape</a>. Wenn du helfen willst, lies <a href="https://github.com/pilotofpackets/pingscape/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+</div></main>
+<footer class="site"><div class="wrap">
+<span>© 2026 Niklas Temp · MIT License</span>
+<span><a href="https://github.com/pilotofpackets/pingscape">GitHub</a> · <a href="https://github.com/pilotofpackets/pingscape/issues">Fehler melden</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pingscape: Network & Ping for iPhone</title>
+<meta name="description" content="Pingscape shows your connection, Wi-Fi, cellular, VPN, DNS and the devices on your network. Free, open source, no account, no tracking.">
+<link rel="stylesheet" href="style.css">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="apple-touch-icon.png">
+<link rel="alternate" hreflang="en" href="https://pingscape.app/">
+<link rel="alternate" hreflang="de" href="https://pingscape.app/de/">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="brand" href="./"><img src="img/icon.png" alt="" width="34" height="34">Pingscape</a>
+<nav aria-label="Main"><a href="./" aria-current="page">Home</a><a href="privacy.html">Privacy</a><a href="support.html">Support</a><a href="impressum.html">Legal notice</a><a href="de/" hreflang="de" lang="de">Deutsch</a></nav>
+</div></header>
+<main><div class="wrap">
+<section class="hero">
+<img class="icon" src="img/icon.png" alt="Pingscape app icon" width="96" height="96">
+<h1>Pingscape</h1>
+<p class="lead">Network &amp; Ping for iPhone. See your connection clearly: Wi-Fi, cellular, VPN, DNS and the devices on your network.</p>
+<p>A free, open-source app that shows as much network information as iOS allows. It only displays: it changes nothing on your device or network. No account, no ads, no tracking, no server of ours.</p>
+<div class="actions">
+<span class="button">Coming soon to the App Store</span>
+<a class="button secondary" href="https://github.com/pilotofpackets/pingscape">Source code on GitHub</a>
+</div>
+</section>
+<div class="shots">
+<figure><img src="img/overview.png" alt="The overview screen with connection, Wi-Fi and VPN" loading="lazy"><figcaption>Overview</figcaption></figure>
+<figure><img src="img/lan.png" alt="The list of devices found on the local network" loading="lazy"><figcaption>LAN</figcaption></figure>
+<figure><img src="img/live.png" alt="Live charts for throughput and latency" loading="lazy"><figcaption>Live</figcaption></figure>
+<figure><img src="img/tools.png" alt="The traceroute tool with hops and round-trip times" loading="lazy"><figcaption>Tools</figcaption></figure>
+</div>
+<p class="small">The screenshots show demo data, not a real network.</p>
+<h2>What it shows</h2>
+<div class="grid">
+<div class="card"><h3>Overview</h3><p>Online status, IP address, subnet mask, gateway, DNS, proxy and, if you allow it, your public IP address and provider.</p></div>
+<div class="card"><h3>Wi-Fi</h3><p>Network name, BSSID, vendor, security, addresses and the latency to your router.</p></div>
+<div class="card"><h3>VPN and tunnels</h3><p>Whether a VPN is active, its address and MTU, and whether all traffic or only part of it goes through.</p></div>
+<div class="card"><h3>Cellular</h3><p>Radio technology per SIM, the address of the mobile connection and data counters.</p></div>
+<div class="card"><h3>LAN</h3><p>A ping sweep and Bonjour list the devices on your network, with their services.</p></div>
+<div class="card"><h3>Live</h3><p>Throughput, latency, jitter and loss as they happen, and a timeline of network changes.</p></div>
+<div class="card"><h3>Tools</h3><p>Ping, traceroute, DNS, whois and RDAP, ports, TLS certificate, HTTP timing, subnet calculator, vendor lookup.</p></div>
+<div class="card"><h3>Shortcuts and widget</h3><p>Ask for the network status or a VPN check in Shortcuts and Siri. A widget shows the state and the time it was read.</p></div>
+</div>
+<h2>How it is built</h2>
+<ul>
+<li><strong>Only real data.</strong> Pingscape shows what iOS actually delivers. Nothing is guessed, and a value that is missing is simply not shown.</li>
+<li><strong>Private by default.</strong> Everything runs on your device. Requests to the internet happen only when you allow or start them, and the <a href="privacy.html">privacy page</a> lists every one of them.</li>
+<li><strong>Public Apple APIs only,</strong> no third-party libraries, no analytics.</li>
+<li><strong>Open source</strong> under the MIT License. Read the code, build it yourself, or send a fix.</li>
+<li>English and German. Works on every iPhone and on iPad, in light and dark mode and with large text.</li>
+</ul>
+<h2>Questions</h2>
+<p>See <a href="support.html">Support</a> for answers and for how to report a problem.</p>
+</div></main>
+<footer class="site"><div class="wrap">
+<span>© 2026 Niklas Temp · MIT License</span>
+<span><a href="https://github.com/pilotofpackets/pingscape">GitHub</a> · <a href="https://github.com/pilotofpackets/pingscape/issues">Issues</a></span>
+</div></footer>
+</body>
+</html>

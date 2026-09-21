@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support · Pingscape</title>
+<meta name="description" content="Answers to common questions about Pingscape and how to report a problem.">
+<link rel="stylesheet" href="style.css">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="apple-touch-icon.png">
+<link rel="alternate" hreflang="en" href="https://pingscape.app/support.html">
+<link rel="alternate" hreflang="de" href="https://pingscape.app/de/support.html">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="brand" href="./"><img src="img/icon.png" alt="" width="34" height="34">Pingscape</a>
+<nav aria-label="Main"><a href="./">Home</a><a href="privacy.html">Privacy</a><a href="support.html" aria-current="page">Support</a><a href="impressum.html">Legal notice</a><a href="de/support.html" hreflang="de" lang="de">Deutsch</a></nav>
+</div></header>
+<main><div class="wrap">
+<h1>Support</h1>
+<p class="lead">Answers to common questions, and how to report a problem.</p>
+<h2>Report a problem or an idea</h2>
+<p>Open an <a href="https://github.com/pilotofpackets/pingscape/issues/new/choose">issue on GitHub</a>. A free GitHub account is needed. Please say which iPhone and iOS version you use, whether you were on Wi-Fi or cellular, and which VPN app and protocol you use, if any.</p>
+<div class="note"><strong>If a value looks wrong</strong> (for example the VPN state), attach a diagnostic dump: open <em>About → Diagnostic dump</em> and share the file. With the default setting it replaces addresses and names, so it is safe to attach. It lets the developer rebuild what your device saw.</div>
+<h2>Common questions</h2>
+<details><summary>Why does Pingscape ask for my location?</summary><p>iOS only gives the name of the Wi-Fi network to apps that may use the location. Pingscape needs the permission for that one reason. It does not read, use or store your location. Without it, everything else still works and the Wi-Fi name is just missing.</p></details>
+<details><summary>Why does it ask for the local network?</summary><p>To list the devices on your network and to ask your router about itself. iOS asks once, when you first tap “Search” in the LAN tab. If you said no, turn it on under Settings → Pingscape.</p></details>
+<details><summary>The list of devices is missing some of mine.</summary><p>Devices are found when they answer a ping or announce themselves over Bonjour. Some devices do not answer a ping (for example phones in standby, or devices behind a firewall). The “Thorough” mode also tries a few ports on such devices and catches some more. Pingscape does not guess devices it cannot see.</p></details>
+<details><summary>Why is the LAN empty while my VPN is on?</summary><p>A VPN that carries all traffic often cuts your device off from the local network. Pingscape shows a note when this is the case.</p></details>
+<details><summary>What does “Hide values” do?</summary><p>It hides addresses and network names (Wi-Fi name, IP addresses, subnet mask, gateway, DNS, MAC addresses, device names) on screen and in shared reports, so you can share a screenshot. Long-press a single value to copy the real one.</p></details>
+<details><summary>Which servers does the app contact?</summary><p>By default none. The <a href="privacy.html">privacy page</a> lists every request, and each one starts only when you allow or start it.</p></details>
+<details><summary>Does the app work on iPad?</summary><p>Yes. Network information there is that of the iPad. The Wi-Fi name and cellular details depend on what the device has and allows.</p></details>
+<details><summary>Is it really free?</summary><p>Yes. There is no purchase, no subscription and no advertising. It is open source under the MIT License.</p></details>
+<details><summary>Why is a value or a section missing?</summary><p>Pingscape shows only what iOS delivers. If iOS does not tell an app something (for example the signal strength of Wi-Fi, or the carrier name), Pingscape has no such row rather than a guess.</p></details>
+<h2>Source code</h2>
+<p><a href="https://github.com/pilotofpackets/pingscape">github.com/pilotofpackets/pingscape</a>. See <a href="https://github.com/pilotofpackets/pingscape/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> if you want to help.</p>
+</div></main>
+<footer class="site"><div class="wrap">
+<span>© 2026 Niklas Temp · MIT License</span>
+<span><a href="https://github.com/pilotofpackets/pingscape">GitHub</a> · <a href="https://github.com/pilotofpackets/pingscape/issues">Issues</a></span>
+</div></footer>
+</body>
+</html>
