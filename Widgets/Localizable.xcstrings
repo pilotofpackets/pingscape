@@ -3,13 +3,31 @@
   "strings": {
     "Online": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Online"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Online"
           }
         },
-        "de": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En línea"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En ligne"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Online"
@@ -19,13 +37,31 @@
     },
     "Offline": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Offline"
           }
         },
-        "de": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin conexión"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hors ligne"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Offline"
@@ -35,112 +71,238 @@
     },
     "via Wi-Fi": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "über WLAN"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "via Wi-Fi"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "über WLAN"
+            "value": "vía Wi-Fi"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "via le Wi-Fi"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tramite Wi-Fi"
           }
         }
       }
     },
     "via Cellular": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "über Mobilfunk"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "via Cellular"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "über Mobilfunk"
+            "value": "vía red móvil"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "via le réseau cellulaire"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tramite rete cellulare"
           }
         }
       }
     },
     "via Ethernet": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "über Ethernet"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "via Ethernet"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "über Ethernet"
+            "value": "vía Ethernet"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "via Ethernet"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tramite Ethernet"
           }
         }
       }
     },
     "VPN active": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VPN aktiv"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "VPN active"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "VPN aktiv"
+            "value": "VPN activa"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VPN actif"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VPN attiva"
           }
         }
       }
     },
     "As of %@": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stand %@"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "As of %@"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stand %@"
+            "value": "Actualizado: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relevé à %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiornamento: %@"
           }
         }
       }
     },
     "Network status": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzwerkstatus"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Network status"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Netzwerkstatus"
+            "value": "Estado de la red"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "État du réseau"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stato della rete"
           }
         }
       }
     },
     "Whether the device is online, over what, and whether a VPN is active. It shows the time it was read.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ob das Gerät online ist, worüber und ob ein VPN aktiv ist. Das Widget zeigt, wann es gelesen wurde."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Whether the device is online, over what, and whether a VPN is active. It shows the time it was read."
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ob das Gerät online ist, worüber und ob ein VPN aktiv ist. Das Widget zeigt, wann es gelesen wurde."
+            "value": "Indica si el dispositivo está en línea, a través de qué y si hay una VPN activa. El widget muestra cuándo se leyó."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indique si l’appareil est en ligne, via quoi, et si un VPN est actif. Le widget affiche l’heure de la lecture."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indica se il dispositivo è online, tramite cosa e se è attiva una VPN. Il widget mostra quando è stato letto."
           }
         }
       }

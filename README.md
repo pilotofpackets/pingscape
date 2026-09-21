@@ -18,7 +18,7 @@ Display only. No account, no ads, no tracking, no backend.
 - **Shortcuts and widget:** network status, VPN check and ping for Shortcuts and Siri, and a status widget that shows the time it was read
 - **Diagnostic dump:** the raw collector data as JSON, with addresses replaced, for reporting a wrong reading
 
-Native SwiftUI, iOS 18 or later, Liquid Glass on iOS 26 and later, iPhone and iPad. English and German.
+Native SwiftUI, iOS 18 or later, Liquid Glass on iOS 26 and later, iPhone and iPad. English, German, French, Spanish and Italian (the French, Spanish and Italian texts have not been checked by native speakers yet, corrections are welcome as issues).
 
 ## Build
 

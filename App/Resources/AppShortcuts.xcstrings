@@ -3,48 +3,102 @@
   "strings": {
     "Network status in ${applicationName}": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzwerkstatus in ${applicationName}\n${applicationName} Netzwerkstatus"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Network status in ${applicationName}\n${applicationName} network status"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Netzwerkstatus in ${applicationName}\n${applicationName} Netzwerkstatus"
+            "value": "Estado de la red en ${applicationName}\nEstado de red de ${applicationName}"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "État du réseau dans ${applicationName}\nÉtat du réseau ${applicationName}"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stato della rete in ${applicationName}\nStato della rete di ${applicationName}"
           }
         }
       }
     },
     "Is a VPN active in ${applicationName}": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ist ein VPN aktiv in ${applicationName}\n${applicationName} VPN-Status"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Is a VPN active in ${applicationName}\n${applicationName} VPN status"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ist ein VPN aktiv in ${applicationName}\n${applicationName} VPN-Status"
+            "value": "VPN activa en ${applicationName}\nEstado de la VPN de ${applicationName}"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VPN actif dans ${applicationName}\nStatut VPN ${applicationName}"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VPN attiva in ${applicationName}\nStato VPN di ${applicationName}"
           }
         }
       }
     },
     "Ping a host with ${applicationName}": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit ${applicationName} einen Host anpingen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Ping a host with ${applicationName}"
           }
         },
-        "de": {
+        "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mit ${applicationName} einen Host anpingen"
+            "value": "Hacer ping a un host con ${applicationName}"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoyer un ping à un hôte avec ${applicationName}"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fai il ping a un host con ${applicationName}"
           }
         }
       }

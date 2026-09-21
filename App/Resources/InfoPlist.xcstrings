@@ -15,6 +15,24 @@
             "state" : "translated",
             "value" : "Pingscape"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape"
+          }
         }
       }
     },
@@ -22,9 +40,33 @@
       "comment" : "Bundle name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Pingscape"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Pingscape"
           }
         }
@@ -44,6 +86,24 @@
             "state" : "translated",
             "value" : "Pingscape looks for devices on your local network so it can list them. Results stay on your device."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape busca dispositivos en tu red local para mostrarlos en una lista. Los resultados se quedan en tu dispositivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape recherche les appareils de votre réseau local afin de les lister. Les résultats restent sur votre appareil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape cerca i dispositivi nella tua rete locale per elencarli. I risultati restano sul tuo dispositivo."
+          }
         }
       }
     },
@@ -60,6 +120,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pingscape reads the name of your Wi-Fi network, which iOS only allows with location permission. Your location is not used or stored."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape lee el nombre de tu red Wi-Fi, algo que iOS solo permite con el permiso de ubicación. Tu ubicación no se usa ni se guarda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape lit le nom de votre réseau Wi-Fi, ce qu’iOS n’autorise qu’avec l’accès à la localisation. Votre position n’est ni utilisée ni enregistrée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape legge il nome della tua rete Wi-Fi, cosa che iOS consente solo con l’autorizzazione alla posizione. La tua posizione non viene usata né salvata."
           }
         }
       }
