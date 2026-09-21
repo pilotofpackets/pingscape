@@ -31,4 +31,8 @@ Each of these servers sees your public IP address, as with any internet request.
 
 **On your local network.** The device search pings addresses of your own network and listens for Bonjour. The router's own address is asked for its UPnP description. This never leaves your network.
 
+**Shortcuts and widget.** The Shortcuts actions (network status, VPN check, ping) run when you start them and return their result to you. The status widget reads whether the device is online, over what and whether a VPN is active, and shows the time it was read. Neither sends anything anywhere except the ping you ask for.
+
+The full policy, in English and German, is on the website: `pingscape.app/privacy.html`.
+
 The app's [privacy manifest](App/Resources/PrivacyInfo.xcprivacy) declares that no data is collected and nothing is used for tracking.

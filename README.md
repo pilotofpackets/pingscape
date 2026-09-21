@@ -15,9 +15,10 @@ Display only. No account, no ads, no tracking, no backend.
 - **LAN:** ping sweep and Bonjour discovery of devices on the local network, with a thorough mode that also probes a few TCP ports
 - **Live:** throughput per interface, latency, jitter and loss, and a timeline of network changes (foreground only, kept in memory)
 - **Tools:** ping, traceroute, DNS, whois and RDAP, ports, TLS certificate, HTTP timing, subnet calculator, OUI lookup
+- **Shortcuts and widget:** network status, VPN check and ping for Shortcuts and Siri, and a status widget that shows the time it was read
 - **Diagnostic dump:** the raw collector data as JSON, with addresses replaced, for reporting a wrong reading
 
-Native SwiftUI, iOS 18 or later, Liquid Glass on iOS 26 and later. English and German.
+Native SwiftUI, iOS 18 or later, Liquid Glass on iOS 26 and later, iPhone and iPad. English and German.
 
 ## Build
 
