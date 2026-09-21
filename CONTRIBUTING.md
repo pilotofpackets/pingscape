@@ -24,6 +24,14 @@ To run on a device, copy `Config/Local.xcconfig.example` to `Config/Local.xcconf
 
 The simulator shows the network of your Mac, not of an iPhone. Launch with the argument `-demo` to use fixture data instead.
 
+## Versions and releases
+
+Versions follow [Semantic Versioning](https://semver.org): `MAJOR.MINOR.PATCH`. While the major version is 0 the app is still in development, and 1.0.0 is the first public release. New features raise the minor version, fixes raise the patch version.
+
+- The version is `MARKETING_VERSION` in `project.yml`.
+- The build number is the number of commits, written into the app at build time by `scripts/set-build-number.sh`. It is never edited by hand.
+- Releases are tagged `vMAJOR.MINOR.PATCH`. `scripts/release.sh 0.2.0` sets the version, commits it if it changed and creates the annotated tag. Push it with `git push origin main v0.2.0`.
+
 ## Test
 
 All network logic lives in the `NetKit` package and is tested on the Mac:
