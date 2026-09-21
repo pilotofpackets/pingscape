@@ -1,0 +1,98 @@
+{
+  "fill": {
+    "linear-gradient": [
+      "srgb:0.09020,0.28627,0.30196,1.00000",
+      "srgb:0.02353,0.10980,0.11765,1.00000"
+    ],
+    "orientation": {
+      "start": {
+        "x": 0.5,
+        "y": 0
+      },
+      "stop": {
+        "x": 0.5,
+        "y": 1
+      }
+    }
+  },
+  "fill-specializations": [
+    {
+      "appearance": "dark",
+      "value": {
+        "linear-gradient": [
+          "srgb:0.06,0.16,0.17,1.00000",
+          "srgb:0.01,0.05,0.06,1.00000"
+        ],
+        "orientation": {
+          "start": {
+            "x": 0.5,
+            "y": 0
+          },
+          "stop": {
+            "x": 0.5,
+            "y": 1
+          }
+        }
+      }
+    }
+  ],
+  "groups": [
+    {
+      "layers": [
+        {
+          "image-name": "glow.svg",
+          "name": "glow",
+          "glass": false
+        }
+      ],
+      "shadow": {
+        "kind": "none",
+        "opacity": 0
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      }
+    },
+    {
+      "layers": [
+        {
+          "glass": true,
+          "image-name": "dot.svg",
+          "name": "dot"
+        },
+        {
+          "glass": true,
+          "image-name": "ripple-inner.svg",
+          "name": "ripple-inner"
+        },
+        {
+          "glass": true,
+          "image-name": "ripple-middle.svg",
+          "name": "ripple-middle",
+          "opacity": 0.72
+        },
+        {
+          "glass": true,
+          "image-name": "ripple-outer.svg",
+          "name": "ripple-outer",
+          "opacity": 0.42
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.4
+      }
+    }
+  ],
+  "supported-platforms": {
+    "circles": [
+      "watchOS"
+    ],
+    "squares": "shared"
+  }
+}
