@@ -78,6 +78,16 @@ struct ReportTests {
         #expect(NAT64Collector.prefix(fromSynthesized: other) == nil)
         #expect(NAT64Collector.prefix(fromSynthesized: [1, 2, 3]) == nil)
     }
+
+    /// Seen on an iPhone in a plain IPv4 Wi-Fi: the resolver answered
+    /// `::ffff:192.0.0.170`, which is no NAT64 prefix.
+    @Test func ignoresIPv4MappedAnswers() {
+        var mapped = [UInt8](repeating: 0, count: 16)
+        mapped[10] = 0xFF
+        mapped[11] = 0xFF
+        mapped.replaceSubrange(12..<16, with: [192, 0, 0, 170])
+        #expect(NAT64Collector.prefix(fromSynthesized: mapped) == nil)
+    }
 }
 
 @Suite("Raw text in reports")

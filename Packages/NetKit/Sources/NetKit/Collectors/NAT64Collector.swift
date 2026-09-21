@@ -29,11 +29,15 @@ public enum NAT64Collector {
     }
 
     /// The prefix of a synthesized address, or `nil` if its last four bytes are
-    /// not one of the two addresses of `ipv4only.arpa`.
+    /// not one of the two addresses of `ipv4only.arpa`, or if the address is an
+    /// IPv4-mapped one (`::ffff:192.0.0.170`). On a network without NAT64 the
+    /// resolver of iOS returns those, and their "prefix" is no network's prefix.
     static func prefix(fromSynthesized bytes: [UInt8]) -> String? {
         guard bytes.count == 16, Array(bytes[12...14]) == [192, 0, 0], bytes[15] == 170 || bytes[15] == 171 else {
             return nil
         }
+        let ipv4Mapped: [UInt8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff]
+        guard Array(bytes[0..<12]) != ipv4Mapped else { return nil }
         var network = bytes
         for index in 12..<16 { network[index] = 0 }
         var text = [CChar](repeating: 0, count: Int(INET6_ADDRSTRLEN))
