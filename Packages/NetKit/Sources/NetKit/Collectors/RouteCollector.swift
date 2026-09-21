@@ -56,10 +56,10 @@ public enum RouteMessageParser {
                 guard cursor + 1 < offset + length else { break }
                 let saLength = Int(buffer[cursor])
                 if bit == 0 {
-                    isDefault = isUnspecified(buffer, at: cursor, end: offset + length)
+                    isDefault = isUnspecifiedAddress(buffer, at: cursor, end: offset + length)
                 } else if flags & flagGateway != 0 {
                     // Without RTF_GATEWAY this is a link address, not a router.
-                    gateway = address(buffer, at: cursor, end: offset + length)
+                    gateway = ipAddress(buffer, at: cursor, end: offset + length)
                 }
                 cursor += saLength > 0 ? (saLength + 3) & ~3 : 4
             }
@@ -76,7 +76,7 @@ public enum RouteMessageParser {
     }
 
     /// A default route can also be written with `sa_len` 0.
-    private static func isUnspecified(_ buffer: [UInt8], at start: Int, end: Int) -> Bool {
+    static func isUnspecifiedAddress(_ buffer: [UInt8], at start: Int, end: Int) -> Bool {
         let length = Int(buffer[start])
         if length == 0 { return true }
         switch Int32(buffer[start + 1]) {
@@ -91,7 +91,7 @@ public enum RouteMessageParser {
         }
     }
 
-    private static func address(_ buffer: [UInt8], at start: Int, end: Int) -> String? {
+    static func ipAddress(_ buffer: [UInt8], at start: Int, end: Int) -> String? {
         switch Int32(buffer[start + 1]) {
         case AF_INET:
             guard start + 8 <= end else { return nil }
@@ -128,9 +128,21 @@ public enum RouteCollector {
     }
 
     public static func defaultRoutes(family: Int32) -> [DefaultRoute] {
+        guard let buffer = dump(family: family) else { return [] }
+        return RouteMessageParser.defaultRoutes(
+            in: buffer, isIPv6: family == AF_INET6, interfaceName: interfaceName(index:))
+    }
+
+    static func allRoutes(family: Int32) -> [RouteEntry] {
+        guard let buffer = dump(family: family) else { return [] }
+        return RouteMessageParser.routes(in: buffer, isIPv6: family == AF_INET6, interfaceName: interfaceName(index:))
+    }
+
+    /// The raw table dump of one address family.
+    private static func dump(family: Int32) -> [UInt8]? {
         var mib: [Int32] = [ctlNet, pfRoute, 0, family, netRtDump, 0]
         var needed = 0
-        guard sysctl(&mib, 6, nil, &needed, nil, 0) == 0, needed > 0 else { return [] }
+        guard sysctl(&mib, 6, nil, &needed, nil, 0) == 0, needed > 0 else { return nil }
 
         // The table can grow between the two calls. Leave some room.
         needed += needed / 4
@@ -139,12 +151,8 @@ public enum RouteCollector {
             guard let base = raw.baseAddress else { return false }
             return sysctl(&mib, 6, base, &needed, nil, 0) == 0
         }
-        guard ok, needed > 0 else { return [] }
-
-        return RouteMessageParser.defaultRoutes(
-            in: Array(buffer[..<needed]),
-            isIPv6: family == AF_INET6,
-            interfaceName: interfaceName(index:))
+        guard ok, needed > 0 else { return nil }
+        return Array(buffer[..<needed])
     }
 
     private static func interfaceName(index: Int) -> String? {

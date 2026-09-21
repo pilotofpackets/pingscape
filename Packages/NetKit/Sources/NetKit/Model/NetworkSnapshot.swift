@@ -1,5 +1,14 @@
 import Foundation
 
+/// Why the system says the network is not reachable (`NWPath.unsatisfiedReason`).
+public enum UnsatisfiedReason: String, Sendable, Hashable, Codable {
+    case notAvailable
+    case cellularDenied
+    case wifiDenied
+    case localNetworkDenied
+    case vpnInactive
+}
+
 /// The reachability state the system reports (`NWPath`).
 public struct PathSummary: Sendable, Hashable, Codable {
     public let isOnline: Bool
@@ -10,6 +19,10 @@ public struct PathSummary: Sendable, Hashable, Codable {
     public let isExpensive: Bool
     /// Low Data Mode.
     public let isConstrained: Bool
+    /// The gateways the system lists for the path, as a cross-check for the routing table.
+    public let gateways: [String]
+    /// Only set while the path is not satisfied and the system names a reason.
+    public let unsatisfiedReason: UnsatisfiedReason?
 
     public init(
         isOnline: Bool,
@@ -17,7 +30,9 @@ public struct PathSummary: Sendable, Hashable, Codable {
         supportsIPv6: Bool = true,
         supportsDNS: Bool = true,
         isExpensive: Bool = false,
-        isConstrained: Bool = false
+        isConstrained: Bool = false,
+        gateways: [String] = [],
+        unsatisfiedReason: UnsatisfiedReason? = nil
     ) {
         self.isOnline = isOnline
         self.supportsIPv4 = supportsIPv4
@@ -25,6 +40,21 @@ public struct PathSummary: Sendable, Hashable, Codable {
         self.supportsDNS = supportsDNS
         self.isExpensive = isExpensive
         self.isConstrained = isConstrained
+        self.gateways = gateways
+        self.unsatisfiedReason = unsatisfiedReason
+    }
+
+    // Dumps written before `gateways` and `unsatisfiedReason` existed stay readable.
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        isOnline = try container.decode(Bool.self, forKey: .isOnline)
+        supportsIPv4 = try container.decode(Bool.self, forKey: .supportsIPv4)
+        supportsIPv6 = try container.decode(Bool.self, forKey: .supportsIPv6)
+        supportsDNS = try container.decode(Bool.self, forKey: .supportsDNS)
+        isExpensive = try container.decode(Bool.self, forKey: .isExpensive)
+        isConstrained = try container.decode(Bool.self, forKey: .isConstrained)
+        gateways = try container.decodeIfPresent([String].self, forKey: .gateways) ?? []
+        unsatisfiedReason = try container.decodeIfPresent(UnsatisfiedReason.self, forKey: .unsatisfiedReason)
     }
 }
 
@@ -33,7 +63,7 @@ public struct PathSummary: Sendable, Hashable, Codable {
 /// A value type on purpose: collectors fill it, the UI reads it, and tests
 /// build it from fixtures. All derived facts (primary interface, VPN, gateway)
 /// live in `NetworkSnapshot+Derived.swift` as pure functions.
-public struct NetworkSnapshot: Sendable {
+public struct NetworkSnapshot: Sendable, Codable {
     public var takenAt: Date
     public var path: PathSummary?
     public var interfaces: [NetworkInterface]

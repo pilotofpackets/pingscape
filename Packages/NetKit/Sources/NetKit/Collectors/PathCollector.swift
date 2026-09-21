@@ -33,7 +33,9 @@ public enum PathCollector {
                         supportsIPv6: path.supportsIPv6,
                         supportsDNS: path.supportsDNS,
                         isExpensive: path.isExpensive,
-                        isConstrained: path.isConstrained))
+                        isConstrained: path.isConstrained,
+                        gateways: path.gateways.compactMap(gatewayText),
+                        unsatisfiedReason: path.status == .satisfied ? nil : reason(path.unsatisfiedReason)))
                 monitor.cancel()
             }
             let queue = DispatchQueue(label: "app.pingscape.path")
@@ -42,6 +44,22 @@ public enum PathCollector {
                 once.resume(nil)
                 monitor.cancel()
             }
+        }
+    }
+
+    private static func gatewayText(_ endpoint: NWEndpoint) -> String? {
+        guard case .hostPort(let host, _) = endpoint else { return nil }
+        return "\(host)".split(separator: "%").first.map(String.init)
+    }
+
+    private static func reason(_ reason: NWPath.UnsatisfiedReason) -> UnsatisfiedReason? {
+        switch reason {
+        case .notAvailable: .notAvailable
+        case .cellularDenied: .cellularDenied
+        case .wifiDenied: .wifiDenied
+        case .localNetworkDenied: .localNetworkDenied
+        case .vpnInactive: .vpnInactive
+        @unknown default: nil
         }
     }
 

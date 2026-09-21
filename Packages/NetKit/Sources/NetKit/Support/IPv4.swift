@@ -52,14 +52,20 @@ public struct IPv4Range: Sendable, Hashable {
         return IPv4.toString(network | hostBits)
     }
 
-    /// Usable host addresses, without network and broadcast address.
+    /// Usable host addresses, without network and broadcast address. A /31
+    /// has two (RFC 3021), a /32 one.
     public var hostCount: Int {
-        prefix >= 31 ? 1 : (1 << (32 - prefix)) - 2
+        switch prefix {
+        case 32: 1
+        case 31: 2
+        default: (1 << (32 - prefix)) - 2
+        }
     }
 
     /// The host addresses, capped so a large network cannot flood the sweep.
     public func hosts(limit: Int = 1024) -> [String] {
-        if prefix >= 31 { return [IPv4.toString(network)] }
+        if prefix == 32 { return [IPv4.toString(network)] }
+        if prefix == 31 { return [IPv4.toString(network), IPv4.toString(network + 1)] }
         let count = min(hostCount, limit)
         return (0..<count).map { IPv4.toString(network + 1 + UInt32($0)) }
     }
