@@ -1,0 +1,54 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Network status in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network status in ${applicationName}\n${applicationName} network status"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzwerkstatus in ${applicationName}\n${applicationName} Netzwerkstatus"
+          }
+        }
+      }
+    },
+    "Is a VPN active in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Is a VPN active in ${applicationName}\n${applicationName} VPN status"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ist ein VPN aktiv in ${applicationName}\n${applicationName} VPN-Status"
+          }
+        }
+      }
+    },
+    "Ping a host with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ping a host with ${applicationName}"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit ${applicationName} einen Host anpingen"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

@@ -1,0 +1,150 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Online": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Online"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Online"
+          }
+        }
+      }
+    },
+    "Offline": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline"
+          }
+        }
+      }
+    },
+    "via Wi-Fi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "via Wi-Fi"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "über WLAN"
+          }
+        }
+      }
+    },
+    "via Cellular": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "via Cellular"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "über Mobilfunk"
+          }
+        }
+      }
+    },
+    "via Ethernet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "via Ethernet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "über Ethernet"
+          }
+        }
+      }
+    },
+    "VPN active": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VPN active"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VPN aktiv"
+          }
+        }
+      }
+    },
+    "As of %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As of %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stand %@"
+          }
+        }
+      }
+    },
+    "Network status": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network status"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzwerkstatus"
+          }
+        }
+      }
+    },
+    "Whether the device is online, over what, and whether a VPN is active. It shows the time it was read.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Whether the device is online, over what, and whether a VPN is active. It shows the time it was read."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ob das Gerät online ist, worüber und ob ein VPN aktiv ist. Das Widget zeigt, wann es gelesen wurde."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

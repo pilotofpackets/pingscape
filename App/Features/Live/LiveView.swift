@@ -22,6 +22,7 @@ struct LiveView: View {
                         ProgressView().frame(maxWidth: .infinity, minHeight: 240)
                     }
                 }
+                .readableContentWidth()
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
                 .padding(.bottom, 24)

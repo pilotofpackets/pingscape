@@ -56,6 +56,7 @@ struct ToolsView: View {
                     content
                         .padding(.horizontal, 16)
                 }
+                .readableContentWidth()
                 .padding(.top, 8)
                 // Room for the floating button.
                 .padding(.bottom, control == nil ? 24 : 88)

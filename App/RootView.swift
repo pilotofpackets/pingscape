@@ -23,6 +23,7 @@ struct RootView: View {
             Tab("Tools", systemImage: "wrench.and.screwdriver", value: AppTab.tools) { ToolsView() }
             Tab("About", systemImage: "info.circle", value: AppTab.about) { AboutView() }
         }
+        .tabViewStyle(.sidebarAdaptable)
         .modifier(MinimizeTabBarOnScroll())
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
@@ -73,7 +74,7 @@ struct ExternalPromptSheet: View {
                 Text("Show public IP and provider?")
                     .font(.title2.bold())
                 Text(
-                    "For this, Pingscape asks two services on the internet: one for your public IP address and RIPEstat (RIPE NCC) for the provider and organization. Only your public IP address is sent. There is no server of ours. You can change this at any time under About."
+                    "For this, Pingscape asks two services on the internet: ipify (ipify.org) for your public IP address, and RIPEstat (RIPE NCC) for the provider and organization. Each of them sees your public IP address, as with any request, and nothing else is sent. There is no server of ours. You can change this at any time under About."
                 )
                 .foregroundStyle(.secondary)
                 Button {

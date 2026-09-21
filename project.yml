@@ -20,7 +20,8 @@ settings:
   base:
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "0.2.0"
+    # Fallback only: scripts/set-build-number.sh writes the commit count at build time.
     CURRENT_PROJECT_VERSION: "1"
     ENABLE_USER_SCRIPT_SANDBOXING: YES
 
@@ -32,6 +33,7 @@ targets:
       - path: App
     dependencies:
       - package: NetKit
+      - target: PingscapeWidgets
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.pingscape.ios
@@ -42,6 +44,12 @@ targets:
         LOCALIZATION_PREFERS_STRING_CATALOGS: YES
         SWIFT_EMIT_LOC_STRINGS: YES
         GENERATE_INFOPLIST_FILE: NO
+        # The build number script reads .git, which the sandbox would block.
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    postBuildScripts:
+      - name: Set build number from git
+        script: '"${SRCROOT}/scripts/set-build-number.sh"'
+        basedOnDependencyAnalysis: false
     info:
       path: App/Info.plist
       properties:
@@ -90,6 +98,39 @@ targets:
       path: App/Pingscape.entitlements
       properties:
         com.apple.developer.networking.wifi-info: true
+
+  PingscapeWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets
+    dependencies:
+      - package: NetKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pingscape.ios.widgets
+        PRODUCT_NAME: PingscapeWidgets
+        TARGETED_DEVICE_FAMILY: "1,2"
+        LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
+        GENERATE_INFOPLIST_FILE: NO
+        SKIP_INSTALL: YES
+        # The build number script reads .git, which the sandbox would block.
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    # An extension must carry the same build number as the app that embeds it.
+    postBuildScripts:
+      - name: Set build number from git
+        script: '"${SRCROOT}/scripts/set-build-number.sh"'
+        basedOnDependencyAnalysis: false
+    info:
+      path: Widgets/Info.plist
+      properties:
+        CFBundleDisplayName: Pingscape
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleLocalizations: [en, de]
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
 
 schemes:
   Pingscape:

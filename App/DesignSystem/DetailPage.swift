@@ -19,6 +19,7 @@ struct DetailPage<Content: View>: View {
             VStack(spacing: 24) {
                 content
             }
+            .readableContentWidth()
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
