@@ -49,6 +49,16 @@ targets:
     postBuildScripts:
       - name: Set build number from git
         script: '"${SRCROOT}/scripts/set-build-number.sh"'
+        # Naming the processed Info.plist as input makes Xcode run the script after
+        # that file is written. Without it the order is a race, and the extension
+        # kept build number 1 while the app got the commit count.
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
+        basedOnDependencyAnalysis: false
+      - name: Check build numbers of extensions
+        script: '"${SRCROOT}/scripts/check-build-numbers.sh"'
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
         basedOnDependencyAnalysis: false
     info:
       path: App/Info.plist
@@ -121,6 +131,11 @@ targets:
     postBuildScripts:
       - name: Set build number from git
         script: '"${SRCROOT}/scripts/set-build-number.sh"'
+        # Naming the processed Info.plist as input makes Xcode run the script after
+        # that file is written. Without it the order is a race, and the extension
+        # kept build number 1 while the app got the commit count.
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
         basedOnDependencyAnalysis: false
     info:
       path: Widgets/Info.plist

@@ -29,7 +29,7 @@ The simulator shows the network of your Mac, not of an iPhone. Launch with the a
 Versions follow [Semantic Versioning](https://semver.org): `MAJOR.MINOR.PATCH`. While the major version is 0 the app is still in development, and 1.0.0 is the first public release. New features raise the minor version, fixes raise the patch version.
 
 - The version is `MARKETING_VERSION` in `project.yml`.
-- The build number is the number of commits, written into the app at build time by `scripts/set-build-number.sh`. It is never edited by hand.
+- The build number is the number of commits, written into the app and the widget at build time by `scripts/set-build-number.sh`. It is never edited by hand. `scripts/check-build-numbers.sh` fails the build if an extension and the app differ.
 - Releases are tagged `vMAJOR.MINOR.PATCH`. `scripts/release.sh 0.2.0` sets the version, commits it if it changed and creates the annotated tag. Push it with `git push origin main v0.2.0`.
 
 ## Test
