@@ -17,6 +17,22 @@
         }
       }
     },
+    "Active": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktiv"
+          }
+        }
+      }
+    },
     "Active · Full tunnel": {
       "localizations": {
         "en": {
@@ -49,6 +65,38 @@
         }
       }
     },
+    "Addresses": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Addresses"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressen"
+          }
+        }
+      }
+    },
+    "All interfaces": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All interfaces"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Interfaces"
+          }
+        }
+      }
+    },
     "Allow": {
       "localizations": {
         "en": {
@@ -65,6 +113,38 @@
         }
       }
     },
+    "Allowed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowed"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erlaubt"
+          }
+        }
+      }
+    },
+    "As of %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As of %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stand %@"
+          }
+        }
+      }
+    },
     "BSSID": {
       "localizations": {
         "en": {
@@ -77,6 +157,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "BSSID"
+          }
+        }
+      }
+    },
+    "Carries traffic": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Carries traffic"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trägt Verkehr"
           }
         }
       }
@@ -129,6 +225,38 @@
         }
       }
     },
+    "DNS and Proxy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS and Proxy"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS und Proxy"
+          }
+        }
+      }
+    },
+    "DNS server": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS server"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS-Server"
+          }
+        }
+      }
+    },
     "DNS servers": {
       "localizations": {
         "en": {
@@ -161,6 +289,38 @@
         }
       }
     },
+    "Data connection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Data connection"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datenverbindung"
+          }
+        }
+      }
+    },
+    "Data since restart": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Data since restart"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daten seit Neustart"
+          }
+        }
+      }
+    },
     "Default gateway": {
       "localizations": {
         "en": {
@@ -173,6 +333,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Standard-Gateway"
+          }
+        }
+      }
+    },
+    "Default routes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Default routes"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard-Routen"
+          }
+        }
+      }
+    },
+    "Details": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        }
+      }
+    },
+    "Ethernet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ethernet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ethernet"
           }
         }
       }
@@ -193,6 +401,70 @@
         }
       }
     },
+    "Flags": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flags"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flags"
+          }
+        }
+      }
+    },
+    "Full tunnel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Full tunnel"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voll-Tunnel"
+          }
+        }
+      }
+    },
+    "Gateway": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gateway"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gateway"
+          }
+        }
+      }
+    },
+    "HTTP proxy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTP proxy"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTP-Proxy"
+          }
+        }
+      }
+    },
     "Hide values": {
       "localizations": {
         "en": {
@@ -205,6 +477,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Werte verbergen"
+          }
+        }
+      }
+    },
+    "Hide values by default": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide values by default"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Werte standardmäßig verbergen"
           }
         }
       }
@@ -257,6 +545,38 @@
         }
       }
     },
+    "Interfaces": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interfaces"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interfaces"
+          }
+        }
+      }
+    },
+    "Joined automatically": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Joined automatically"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch verbunden"
+          }
+        }
+      }
+    },
     "LAN": {
       "localizations": {
         "en": {
@@ -305,6 +625,54 @@
         }
       }
     },
+    "Location": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Location"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ortung"
+          }
+        }
+      }
+    },
+    "Loopback": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loopback"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loopback"
+          }
+        }
+      }
+    },
+    "Low Data Mode": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Data Mode"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datensparmodus"
+          }
+        }
+      }
+    },
     "MTU": {
       "localizations": {
         "en": {
@@ -321,6 +689,22 @@
         }
       }
     },
+    "Metered connection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metered connection"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kostenpflichtige Verbindung"
+          }
+        }
+      }
+    },
     "Name (SSID)": {
       "localizations": {
         "en": {
@@ -333,6 +717,86 @@
           "stringUnit": {
             "state": "translated",
             "value": "Name (SSID)"
+          }
+        }
+      }
+    },
+    "Network": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzwerk"
+          }
+        }
+      }
+    },
+    "No": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nein"
+          }
+        }
+      }
+    },
+    "Not allowed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not allowed"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht erlaubt"
+          }
+        }
+      }
+    },
+    "Not asked yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not asked yet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nicht gefragt"
+          }
+        }
+      }
+    },
+    "Not running": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not running"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Läuft nicht"
           }
         }
       }
@@ -401,6 +865,22 @@
         }
       }
     },
+    "Only needed to read the name of your Wi-Fi network. Pingscape does not use your location.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only needed to read the name of your Wi-Fi network. Pingscape does not use your location."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur nötig, um den Namen deines WLANs zu lesen. Pingscape nutzt deinen Standort nicht."
+          }
+        }
+      }
+    },
     "Open": {
       "localizations": {
         "en": {
@@ -413,6 +893,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Offen"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen öffnen"
           }
         }
       }
@@ -465,6 +961,70 @@
         }
       }
     },
+    "Packets received": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Packets received"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pakete empfangen"
+          }
+        }
+      }
+    },
+    "Packets sent": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Packets sent"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pakete gesendet"
+          }
+        }
+      }
+    },
+    "Permissions": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permissions"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berechtigungen"
+          }
+        }
+      }
+    },
+    "Personal Hotspot": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personal Hotspot"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persönlicher Hotspot"
+          }
+        }
+      }
+    },
     "Pingscape": {
       "localizations": {
         "en": {
@@ -477,6 +1037,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pingscape"
+          }
+        }
+      }
+    },
+    "Port": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Port"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Port"
           }
         }
       }
@@ -529,6 +1105,54 @@
         }
       }
     },
+    "Proxy auto-configuration": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Proxy auto-configuration"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Proxy-Autokonfiguration"
+          }
+        }
+      }
+    },
+    "Radio technology": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Radio technology"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Funktechnik"
+          }
+        }
+      }
+    },
+    "Received": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Received"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empfangen"
+          }
+        }
+      }
+    },
     "Report an issue": {
       "localizations": {
         "en": {
@@ -541,6 +1165,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fehler melden"
+          }
+        }
+      }
+    },
+    "Routing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Routing"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Routing"
+          }
+        }
+      }
+    },
+    "Running": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Läuft"
+          }
+        }
+      }
+    },
+    "Scope": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scope"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umfang"
           }
         }
       }
@@ -577,6 +1249,38 @@
         }
       }
     },
+    "Sent": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sent"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesendet"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen"
+          }
+        }
+      }
+    },
     "Source code on GitHub": {
       "localizations": {
         "en": {
@@ -589,6 +1293,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quellcode auf GitHub"
+          }
+        }
+      }
+    },
+    "Split tunnel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Split tunnel"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Split-Tunnel"
           }
         }
       }
@@ -625,6 +1345,38 @@
         }
       }
     },
+    "System path": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System path"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pfad (System)"
+          }
+        }
+      }
+    },
+    "Technical details": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Technical details"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Technische Details"
+          }
+        }
+      }
+    },
     "Tools": {
       "localizations": {
         "en": {
@@ -637,6 +1389,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Werkzeuge"
+          }
+        }
+      }
+    },
+    "Tunnel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tunnel"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tunnel"
+          }
+        }
+      }
+    },
+    "Tunnel · %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tunnel · %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tunnel · %@"
           }
         }
       }
@@ -733,6 +1517,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "WLAN-Name"
+          }
+        }
+      }
+    },
+    "Yes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ja"
+          }
+        }
+      }
+    },
+    "iOS only gives the name of your Wi-Fi network to apps that may use your location. Pingscape does not use your location.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS only gives the name of your Wi-Fi network to apps that may use your location. Pingscape does not use your location."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS gibt den Namen deines WLANs nur an Apps weiter, die deinen Standort nutzen dürfen. Pingscape nutzt deinen Standort nicht."
           }
         }
       }

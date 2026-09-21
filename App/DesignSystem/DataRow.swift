@@ -17,7 +17,7 @@ struct DataRow: View {
     var stacked = false
 
     private var shown: String {
-        sensitive && mask.isMasked ? "•••••••" : value
+        sensitive ? mask.shown(value) : value
     }
 
     var body: some View {
@@ -68,20 +68,34 @@ struct DataRow: View {
     }
 }
 
-/// A row whose value is a status: a dot and a short text.
+/// A row whose value is a status: a dot and a short text. Like `DataRow`, it
+/// stacks label above status when they do not fit on one line.
 struct StatusRow: View {
     let label: LocalizedStringKey
     let text: String
     var tone: StatusDot.Tone = .good
 
+    private var status: some View {
+        HStack(spacing: 8) {
+            StatusDot(tone: tone)
+            Text(text)
+        }
+    }
+
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 16) {
-            Text(label)
-            Spacer(minLength: 8)
-            HStack(spacing: 8) {
-                StatusDot(tone: tone)
-                Text(text).multilineTextAlignment(.trailing)
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: 16) {
+                Text(label)
+                Spacer(minLength: 8)
+                status
             }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                status
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
@@ -96,13 +110,24 @@ struct PermissionRow: View {
     let buttonTitle: LocalizedStringKey
     let action: () -> Void
 
+    private var button: some View {
+        Button(buttonTitle, action: action)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.capsule)
+    }
+
     var body: some View {
-        HStack(spacing: 16) {
-            Text(label)
-            Spacer(minLength: 8)
-            Button(buttonTitle, action: action)
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.capsule)
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 16) {
+                Text(label)
+                Spacer(minLength: 8)
+                button
+            }
+            VStack(alignment: .leading, spacing: 8) {
+                Text(label)
+                button
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 6)

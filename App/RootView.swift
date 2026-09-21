@@ -1,22 +1,27 @@
 import SwiftUI
 
+enum AppTab: String, Hashable {
+    case overview, lan, live, tools, about
+}
+
 struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(SnapshotStore.self) private var store
+    @State private var selection = DemoLaunch.tab
 
     var body: some View {
-        TabView {
-            Tab("Overview", systemImage: "square.grid.2x2") { StatusView() }
-            Tab("LAN", systemImage: "network") {
+        TabView(selection: $selection) {
+            Tab("Overview", systemImage: "square.grid.2x2", value: AppTab.overview) { StatusView() }
+            Tab("LAN", systemImage: "network", value: AppTab.lan) {
                 PlaceholderView(title: "LAN", systemImage: "network")
             }
-            Tab("Live", systemImage: "waveform.path.ecg") {
+            Tab("Live", systemImage: "waveform.path.ecg", value: AppTab.live) {
                 PlaceholderView(title: "Live", systemImage: "waveform.path.ecg")
             }
-            Tab("Tools", systemImage: "wrench.and.screwdriver") {
+            Tab("Tools", systemImage: "wrench.and.screwdriver", value: AppTab.tools) {
                 PlaceholderView(title: "Tools", systemImage: "wrench.and.screwdriver")
             }
-            Tab("About", systemImage: "info.circle") { AboutView() }
+            Tab("About", systemImage: "info.circle", value: AppTab.about) { AboutView() }
         }
         .modifier(MinimizeTabBarOnScroll())
         .onChange(of: scenePhase) { _, phase in

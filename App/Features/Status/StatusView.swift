@@ -4,9 +4,10 @@ import SwiftUI
 struct StatusView: View {
     @Environment(SnapshotStore.self) private var store
     @Environment(PrivacyMask.self) private var mask
+    @State private var path = DemoLaunch.overviewPath
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 VStack(spacing: 24) {
                     if let snapshot = store.snapshot {
@@ -20,6 +21,11 @@ struct StatusView: View {
                         wifi(snapshot)
                         vpn(snapshot)
                         cellular(snapshot)
+                        technicalDetails(snapshot)
+                        Text("As of \(snapshot.takenAt.formatted(date: .omitted, time: .standard))")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
                     } else {
                         ProgressView()
                             .frame(maxWidth: .infinity, minHeight: 240)
@@ -32,6 +38,17 @@ struct StatusView: View {
             .background(Color(.systemGroupedBackground))
             .refreshable { await store.refresh() }
             .navigationTitle("Overview")
+            .navigationDestination(for: OverviewDestination.self) { destination in
+                switch destination {
+                case .wifi: WiFiDetailView()
+                case .vpn: VPNDetailView()
+                case .cellular: CellularDetailView()
+                case .routing: RoutingView()
+                case .dns: DNSProxyView()
+                case .interfaces: InterfacesView()
+                case .interface(let name): InterfaceDetailView(name: name)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -51,7 +68,7 @@ struct StatusView: View {
     private func heroSubtitle(_ snapshot: NetworkSnapshot) -> String? {
         var parts: [String] = []
         if case .value(let wifi) = snapshot.wifi {
-            let name = mask.isMasked ? "•••••••" : wifi.ssid
+            let name = mask.shown(wifi.ssid)
             parts.append(String(localized: "via Wi-Fi “\(name)”"))
         } else if snapshot.primaryInterface?.kind == .wifi {
             parts.append(String(localized: "via Wi-Fi"))
@@ -91,36 +108,22 @@ struct StatusView: View {
     private func connection(_ snapshot: NetworkSnapshot) -> some View {
         InfoSection(title: "Connection") {
             if let ipv4 = snapshot.primaryIPv4 {
-                addressRows(ipv4)
+                Rows.address(ipv4)
             }
             if let gateway = snapshot.localGateway4 {
                 DataRow(label: "Default gateway", value: gateway, monospaced: true, sensitive: true)
             }
             if let ipv6 = snapshot.primaryIPv6 {
-                addressRows(ipv6)
+                Rows.address(ipv6)
             }
             if !snapshot.dnsServers.isEmpty {
                 DataRow(
                     label: "DNS servers", value: snapshot.dnsServers.joined(separator: "\n"),
                     monospaced: true, sensitive: true)
             }
-            DataRow(label: "Proxy", value: proxyDescription(snapshot.proxy))
-        }
-    }
-
-    /// An IPv4 address and its subnet mask as two rows, so each fits on one
-    /// line. An IPv6 address keeps its prefix and may wrap.
-    @ViewBuilder
-    private func addressRows(_ address: InterfaceAddress) -> some View {
-        if address.isIPv6 {
             DataRow(
-                label: "IPv6 address", value: address.withPrefix, monospaced: true, sensitive: true,
-                stacked: true)
-        } else {
-            DataRow(label: "IP address", value: address.ip, monospaced: true, sensitive: true)
-            if let mask = address.netmask ?? address.prefixLength.map(IPv4.netmask(fromPrefix:)) {
-                DataRow(label: "Subnet mask", value: mask, monospaced: true)
-            }
+                label: "Proxy", value: proxyDescription(snapshot.proxy),
+                monospaced: snapshot.proxy.isEnabled, sensitive: snapshot.proxy.isEnabled)
         }
     }
 
@@ -135,7 +138,7 @@ struct StatusView: View {
     private func wifi(_ snapshot: NetworkSnapshot) -> some View {
         switch snapshot.wifi {
         case .value(let info):
-            InfoSection(title: "Wi-Fi") {
+            InfoSection(title: "Wi-Fi", details: OverviewDestination.wifi) {
                 DataRow(label: "Name (SSID)", value: info.ssid, sensitive: true)
                 if let bssid = info.bssid {
                     DataRow(label: "BSSID", value: bssid, monospaced: true, sensitive: true)
@@ -143,35 +146,23 @@ struct StatusView: View {
                         DataRow(label: "Vendor", value: vendor)
                     }
                 }
-                if let security = securityLabel(info.security) {
+                if let security = info.security.label {
                     DataRow(label: "Security", value: security)
                 }
             }
         case .needsPermission:
             InfoSection(title: "Wi-Fi") {
-                PermissionRow(label: "Wi-Fi name", buttonTitle: "Allow") {
-                    store.location.request()
-                }
+                WiFiPermissionPrompt()
             }
         case .loading, .failed, .none:
             EmptyView()
         }
     }
 
-    private func securityLabel(_ security: WiFiSecurity) -> String? {
-        switch security {
-        case .open: String(localized: "Open")
-        case .wep: "WEP"
-        case .personal: "WPA2/WPA3 Personal"
-        case .enterprise: "WPA2/WPA3 Enterprise"
-        case .unknown: nil
-        }
-    }
-
     @ViewBuilder
     private func vpn(_ snapshot: NetworkSnapshot) -> some View {
         if let scope = snapshot.tunnelScope {
-            InfoSection(title: "VPN and Tunnel") {
+            InfoSection(title: "VPN and Tunnel", details: OverviewDestination.vpn) {
                 StatusRow(
                     label: "Status",
                     text: scope == .full
@@ -182,7 +173,7 @@ struct StatusView: View {
                     if let address = tunnel.usableAddresses.first(where: { !$0.isIPv6 })
                         ?? tunnel.usableAddresses.first
                     {
-                        addressRows(address)
+                        Rows.address(address)
                     }
                     if let mtu = tunnel.mtu {
                         DataRow(label: "MTU", value: String(mtu))
@@ -194,20 +185,29 @@ struct StatusView: View {
 
     @ViewBuilder
     private func cellular(_ snapshot: NetworkSnapshot) -> some View {
-        if !snapshot.cellularServices.isEmpty {
-            InfoSection(title: "Cellular") {
-                ForEach(snapshot.cellularServices) { service in
+        let services = snapshot.knownCellularServices
+        if !services.isEmpty {
+            InfoSection(title: "Cellular", details: OverviewDestination.cellular) {
+                ForEach(services) { service in
                     StatusRow(
-                        label: cellularLabel(service, total: snapshot.cellularServices.count),
+                        label: service.title(among: snapshot.cellularServices.count),
                         text: service.technology.label)
                 }
             }
         }
     }
 
-    private func cellularLabel(_ service: CellularService, total: Int) -> LocalizedStringKey {
-        if service.isDataService { return "Data SIM" }
-        return total > 2 ? "Other SIM" : "Second SIM"
+    /// The pages for people who want to see how the connection is built.
+    private func technicalDetails(_ snapshot: NetworkSnapshot) -> some View {
+        InfoSection(title: "Technical details") {
+            if !snapshot.defaultRoutes.isEmpty || snapshot.path != nil {
+                LinkRow(label: "Routing", value: OverviewDestination.routing)
+            }
+            LinkRow(label: "DNS and Proxy", value: OverviewDestination.dns)
+            LinkRow(
+                label: "Interfaces", detail: String(snapshot.interfaces.count),
+                value: OverviewDestination.interfaces)
+        }
     }
 }
 
