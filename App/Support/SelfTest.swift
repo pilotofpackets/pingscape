@@ -1,6 +1,7 @@
 #if DEBUG
 import CoreLocation
 import Foundation
+import Network
 import NetKit
 
 /// A headless check for a real device, for the device tests in the test plan.
@@ -37,6 +38,8 @@ enum SelfTest {
         let provider = LiveSnapshotProvider(locationAuthorized: { LocationAccess.isAuthorized })
         let snapshot = await provider.snapshot()
         describe(snapshot)
+        writeDump(snapshot)
+        await pathInterfaces()
         await network(snapshot)
         if asks { await localNetwork(snapshot) }
         log("intent status-text lines=\(StatusText.make(snapshot).split(separator: "\n").count) vpn=\(snapshot.isVPNActive)")
@@ -44,7 +47,61 @@ enum SelfTest {
         log("end")
     }
 
+    /// `-selftest-dump name` writes an anonymized diagnostic dump to
+    /// `Documents/dump-name.json`, to be turned into a test fixture.
+    private static func writeDump(_ snapshot: NetworkSnapshot) {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let flag = arguments.firstIndex(of: "-selftest-dump"), flag + 1 < arguments.count else { return }
+        let name = arguments[flag + 1]
+        let dump = DiagnosticDump(
+            snapshot: snapshot, app: .init(version: DeviceInfo.appVersion, build: DeviceInfo.appBuild),
+            device: .init(model: DeviceInfo.modelIdentifier, os: DeviceInfo.systemVersion), anonymize: true)
+        guard let data = try? dump.json(),
+            let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        else { return log("dump failed") }
+        let url = documents.appendingPathComponent("dump-\(name).json")
+        try? data.write(to: url, options: .atomic)
+        log("dump written dump-\(name).json \(data.count) bytes")
+    }
+
+    /// Which interfaces the system itself names in `NWPath`, to compare with the
+    /// interface list (which of the `pdp_ip` interfaces is the data connection).
+    private static func pathInterfaces() async {
+        let monitors: [(String, NWPathMonitor)] = [
+            ("any", NWPathMonitor()), ("cellular", NWPathMonitor(requiredInterfaceType: .cellular)),
+            ("wifi", NWPathMonitor(requiredInterfaceType: .wifi)),
+        ]
+        for (label, monitor) in monitors {
+            let stream = AsyncStream<NWPath> { continuation in
+                monitor.pathUpdateHandler = { continuation.yield($0) }
+                monitor.start(queue: .global())
+                continuation.onTermination = { _ in monitor.cancel() }
+            }
+            for await path in stream {
+                let names = path.availableInterfaces.map { "\($0.name):\($0.type)" }.joined(separator: ",")
+                log("path-interfaces \(label) status=\(path.status) available=\(names)")
+                break
+            }
+        }
+    }
+
     // MARK: What the collectors see
+
+    /// The class of an address, never the address itself.
+    private static func addressClass(_ ip: String) -> String {
+        let lower = ip.lowercased()
+        if lower.contains(":") {
+            if lower.hasPrefix("fc") || lower.hasPrefix("fd") { return "unique-local-v6" }
+            if lower.hasPrefix("::ffff:") { return "v4-mapped" }
+            if let first = lower.first, "23".contains(first) { return "global-v6" }
+            return "other-v6"
+        }
+        let parts = ip.split(separator: ".").compactMap { Int($0) }
+        guard parts.count == 4 else { return "other-v4" }
+        if parts[0] == 10 || (parts[0] == 172 && (16...31).contains(parts[1])) || (parts[0] == 192 && parts[1] == 168) { return "private-v4" }
+        if parts[0] == 100 && (64...127).contains(parts[1]) { return "shared-v4" }
+        return "public-v4"
+    }
 
     private static func describe(_ snapshot: NetworkSnapshot) {
         if let path = snapshot.path {
@@ -55,6 +112,10 @@ enum SelfTest {
         for interface in snapshot.interfaces {
             let counters = interface.receivedBytes.map { "rx=\($0) tx=\(interface.sentBytes ?? 0)" } ?? "counters=none"
             log("interface \(interface.name) kind=\(interface.kind.rawValue) up=\(interface.isUp) flags=\(interface.flags.names.joined(separator: ",")) mtu=\(interface.mtu ?? 0) v4=\(interface.ipv4Addresses.count) v6=\(interface.ipv6Addresses.count) usable=\(interface.hasUsableAddress) vpn=\(snapshot.isVPN(interface)) \(counters)")
+        }
+        for interface in snapshot.interfaces where [.tunnel, .ipsec].contains(interface.kind) && interface.hasUsableAddress {
+            let classes = interface.usableAddresses.map { "\(addressClass($0.ip))/\($0.prefixLength.map(String.init) ?? "-")" }
+            log("tunnel-addresses \(interface.name) \(classes.joined(separator: ","))")
         }
         for route in snapshot.defaultRoutes {
             log("default-route \(route.isIPv6 ? "v6" : "v4") via=\(route.interfaceName) active=\(route.isActive) gateway=\(route.gateway != nil)")
@@ -131,7 +192,33 @@ enum SelfTest {
 
     // MARK: Local network (asks the user)
 
+    /// What a raw Bonjour browse reports over a few seconds, to see how a refusal
+    /// of the Local Network permission shows up on this iOS version.
+    private static func rawBrowse() async {
+        let browser = NWBrowser(for: .bonjour(type: "_http._tcp", domain: "local."), using: .tcp)
+        let start = Date()
+        let lines = LockedLines()
+        browser.stateUpdateHandler = { state in
+            lines.add("t=\(Int(Date().timeIntervalSince(start) * 1000))ms state=\(state)")
+        }
+        browser.browseResultsChangedHandler = { results, changes in
+            lines.add("t=\(Int(Date().timeIntervalSince(start) * 1000))ms results=\(results.count) changes=\(changes.count)")
+        }
+        browser.start(queue: .global())
+        try? await Task.sleep(for: .seconds(8))
+        browser.cancel()
+        for line in lines.all { log("raw-browse \(line)") }
+    }
+
+    private final class LockedLines: @unchecked Sendable {
+        private let lock = NSLock()
+        private var storage: [String] = []
+        func add(_ line: String) { lock.lock(); storage.append(line); lock.unlock() }
+        var all: [String] { lock.lock(); defer { lock.unlock() }; return storage }
+    }
+
     private static func localNetwork(_ snapshot: NetworkSnapshot) async {
+        await rawBrowse()
         let (access, ms) = await timed { await LocalNetworkPermission.check(timeoutSeconds: 60) }
         log("local-network permission=\(access) after \(Int(ms)) ms")
         if let gateway = snapshot.localGateway4, let address = ResolvedAddress(literal: gateway) {

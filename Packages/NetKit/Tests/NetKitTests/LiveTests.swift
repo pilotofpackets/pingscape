@@ -135,6 +135,7 @@ struct TimelineTests {
     @Test func recordsTheVPNComingUp() {
         var withVPN = wifiSnapshot()
         withVPN.interfaces.append(NetworkInterface(name: "utun4", addresses: [InterfaceAddress(ip: "10.250.10.1", isIPv6: false, prefixLength: 32)]))
+        withVPN.vpnServiceInterfaces = ["utun4"]
         var log = TimelineLog()
         log.record(from: wifiSnapshot(), to: withVPN)
         #expect(log.entries.map(\.change) == [.vpn(isActive: true)])

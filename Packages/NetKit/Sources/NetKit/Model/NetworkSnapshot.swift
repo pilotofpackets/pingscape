@@ -23,6 +23,18 @@ public struct PathSummary: Sendable, Hashable, Codable {
     public let gateways: [String]
     /// Only set while the path is not satisfied and the system names a reason.
     public let unsatisfiedReason: UnsatisfiedReason?
+    /// The interface the system uses for cellular (`pdp_ip0`), from a path
+    /// monitor that asks for cellular only. An iPhone has several `pdp_ip`
+    /// interfaces (IMS, second SIM), and only this one is the data connection.
+    public let cellularInterface: String?
+
+    /// A copy that knows which interface is the cellular one.
+    func with(cellularInterface: String?) -> PathSummary {
+        PathSummary(
+            isOnline: isOnline, supportsIPv4: supportsIPv4, supportsIPv6: supportsIPv6, supportsDNS: supportsDNS,
+            isExpensive: isExpensive, isConstrained: isConstrained, gateways: gateways,
+            unsatisfiedReason: unsatisfiedReason, cellularInterface: cellularInterface)
+    }
 
     public init(
         isOnline: Bool,
@@ -32,7 +44,8 @@ public struct PathSummary: Sendable, Hashable, Codable {
         isExpensive: Bool = false,
         isConstrained: Bool = false,
         gateways: [String] = [],
-        unsatisfiedReason: UnsatisfiedReason? = nil
+        unsatisfiedReason: UnsatisfiedReason? = nil,
+        cellularInterface: String? = nil
     ) {
         self.isOnline = isOnline
         self.supportsIPv4 = supportsIPv4
@@ -40,11 +53,12 @@ public struct PathSummary: Sendable, Hashable, Codable {
         self.supportsDNS = supportsDNS
         self.isExpensive = isExpensive
         self.isConstrained = isConstrained
+        self.cellularInterface = cellularInterface
         self.gateways = gateways
         self.unsatisfiedReason = unsatisfiedReason
     }
 
-    // Dumps written before `gateways` and `unsatisfiedReason` existed stay readable.
+    // Dumps written before `gateways`, `unsatisfiedReason` and `cellularInterface` existed stay readable.
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         isOnline = try container.decode(Bool.self, forKey: .isOnline)
@@ -55,6 +69,7 @@ public struct PathSummary: Sendable, Hashable, Codable {
         isConstrained = try container.decode(Bool.self, forKey: .isConstrained)
         gateways = try container.decodeIfPresent([String].self, forKey: .gateways) ?? []
         unsatisfiedReason = try container.decodeIfPresent(UnsatisfiedReason.self, forKey: .unsatisfiedReason)
+        cellularInterface = try container.decodeIfPresent(String.self, forKey: .cellularInterface)
     }
 }
 

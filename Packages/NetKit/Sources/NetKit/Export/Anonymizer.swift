@@ -58,7 +58,8 @@ public struct SnapshotAnonymizer {
             result.path = PathSummary(
                 isOnline: path.isOnline, supportsIPv4: path.supportsIPv4, supportsIPv6: path.supportsIPv6,
                 supportsDNS: path.supportsDNS, isExpensive: path.isExpensive, isConstrained: path.isConstrained,
-                gateways: path.gateways.map { ip($0) }, unsatisfiedReason: path.unsatisfiedReason)
+                gateways: path.gateways.map { ip($0) }, unsatisfiedReason: path.unsatisfiedReason,
+                cellularInterface: path.cellularInterface)
         }
         // External values are not part of a dump.
         result.publicIPv4 = .none

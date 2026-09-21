@@ -1,0 +1,903 @@
+{
+  "anonymized" : true,
+  "app" : {
+    "build" : "19",
+    "version" : "0.2.0"
+  },
+  "derived" : {
+    "carriesTrafficThroughTunnel" : false,
+    "isVPN" : true,
+    "primaryInterface" : "en0",
+    "tunnelScope" : "split",
+    "vpnInterfaces" : [
+      "utun3"
+    ]
+  },
+  "device" : {
+    "model" : "iPhone15,4",
+    "os" : "27.0"
+  },
+  "schemaVersion" : 1,
+  "snapshot" : {
+    "cellularServices" : [
+      {
+        "id" : "service-1",
+        "isDataService" : true,
+        "technology" : "nrNonStandalone"
+      },
+      {
+        "id" : "service-2",
+        "isDataService" : false,
+        "technology" : "edge"
+      }
+    ],
+    "defaultRoutes" : [
+      {
+        "gateway" : "10.223.102.236",
+        "interfaceName" : "en0",
+        "isActive" : true,
+        "isIPv6" : false
+      },
+      {
+        "gateway" : "160.117.12.209",
+        "interfaceName" : "pdp_ip2",
+        "isActive" : false,
+        "isIPv6" : false
+      },
+      {
+        "gateway" : "10.59.114.84",
+        "interfaceName" : "pdp_ip0",
+        "isActive" : false,
+        "isIPv6" : false
+      },
+      {
+        "interfaceName" : "ipsec0",
+        "isActive" : false,
+        "isIPv6" : false
+      },
+      {
+        "interfaceName" : "ipsec6",
+        "isActive" : false,
+        "isIPv6" : false
+      },
+      {
+        "gateway" : "fe80::82dc:9e91:4c48:fd25",
+        "interfaceName" : "pdp_ip1",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "fe80::533:f787:909f:6a7f",
+        "interfaceName" : "pdp_ip0",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "3865:1fde:73f8:4035:2c55:f5a8:c1c3:224f",
+        "interfaceName" : "pdp_ip3",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "fe80::b6c7:49d6:240:74d4",
+        "interfaceName" : "ipsec0",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "fe80::b6c7:49d6:240:74d4",
+        "interfaceName" : "utun0",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "374d:47f1:7c54:7615:784e:9690:6cf:832",
+        "interfaceName" : "ipsec2",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "3865:1fde:73f8:4035:2c55:f5a8:c1c3:224f",
+        "interfaceName" : "ipsec4",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "fe80::b6c7:49d6:240:74d4",
+        "interfaceName" : "utun1",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "fe80::b6c7:49d6:240:74d4",
+        "interfaceName" : "utun2",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "fdbb:7928:3a3d:cbba:ebca:8703:4430:598",
+        "interfaceName" : "utun3",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "374d:47f1:7c54:7615:784e:9690:6cf:832",
+        "interfaceName" : "ipsec7",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "374d:47f1:7c54:7615:784e:9690:6cf:832",
+        "interfaceName" : "ipsec8",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "fe80::b6c7:49d6:240:74d4",
+        "interfaceName" : "ipsec6",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "3865:1fde:73f8:4035:2c55:f5a8:c1c3:224f",
+        "interfaceName" : "ipsec9",
+        "isActive" : false,
+        "isIPv6" : true
+      },
+      {
+        "gateway" : "3865:1fde:73f8:4035:2c55:f5a8:c1c3:224f",
+        "interfaceName" : "ipsec10",
+        "isActive" : false,
+        "isIPv6" : true
+      }
+    ],
+    "dnsServers" : [
+      "10.223.102.236",
+      "10.205.232.167"
+    ],
+    "interfaces" : [
+      {
+        "addresses" : [
+          {
+            "ip" : "127.0.0.1",
+            "isIPv6" : false,
+            "netmask" : "255.0.0.0",
+            "prefixLength" : 8
+          },
+          {
+            "ip" : "::1",
+            "isIPv6" : true,
+            "prefixLength" : 128
+          },
+          {
+            "ip" : "fe80::b6c7:49d6:240:74d5",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32841,
+        "isUp" : true,
+        "kind" : "loopback",
+        "mtu" : 16384,
+        "name" : "lo0",
+        "receivedBytes" : 29069312,
+        "receivedPackets" : 107611,
+        "sentBytes" : 29069312,
+        "sentPackets" : 107611
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 0,
+        "isUp" : false,
+        "kind" : "other",
+        "mtu" : 0,
+        "name" : "XHC0",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::b9c6:4428:a013:389",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "374d:47f1:7c54:7615:639d:9a4b:688f:71b7",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "374d:47f1:7c54:7615:8691:ea97:452b:3788",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "cellular",
+        "mtu" : 1450,
+        "name" : "pdp_ip1",
+        "receivedBytes" : 430080,
+        "receivedPackets" : 1112,
+        "sentBytes" : 368640,
+        "sentPackets" : 1244
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "160.117.12.209",
+            "isIPv6" : false,
+            "netmask" : "255.255.255.255",
+            "prefixLength" : 32
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "cellular",
+        "mtu" : 1450,
+        "name" : "pdp_ip2",
+        "receivedBytes" : 26987520,
+        "receivedPackets" : 69817,
+        "sentBytes" : 15354880,
+        "sentPackets" : 64951
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "10.59.114.84",
+            "isIPv6" : false,
+            "netmask" : "255.255.255.255",
+            "prefixLength" : 32
+          },
+          {
+            "ip" : "fe80::b96c:73c3:e52f:2b45",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "374d:47f4:d4ba:a817:8a84:a017:940f:53a4",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "374d:47f4:d4ba:a817:b81b:7705:f202:5019",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "374d:47f4:d4ba:a817:60cd:199a:d4c1:1bb2",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "cellular",
+        "mtu" : 1450,
+        "name" : "pdp_ip0",
+        "receivedBytes" : 3255132160,
+        "receivedPackets" : 2874411,
+        "sentBytes" : 617772032,
+        "sentPackets" : 1206938
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32784,
+        "isUp" : false,
+        "kind" : "cellular",
+        "mtu" : 1500,
+        "name" : "pdp_ip5",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32784,
+        "isUp" : false,
+        "kind" : "cellular",
+        "mtu" : 1450,
+        "name" : "pdp_ip4",
+        "receivedBytes" : 97280,
+        "receivedPackets" : 242,
+        "sentBytes" : 13312,
+        "sentPackets" : 193
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::af77:93a5:46ef:df81",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "3865:1fde:73f8:4035:25dd:c717:e1e1:f580",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "cellular",
+        "mtu" : 1440,
+        "name" : "pdp_ip3",
+        "receivedBytes" : 12288,
+        "receivedPackets" : 42,
+        "sentBytes" : 6144,
+        "sentPackets" : 42
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32784,
+        "isUp" : false,
+        "kind" : "cellular",
+        "mtu" : 1500,
+        "name" : "pdp_ip6",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32784,
+        "isUp" : false,
+        "kind" : "cellular",
+        "mtu" : 1500,
+        "name" : "pdp_ip7",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32784,
+        "isUp" : false,
+        "kind" : "cellular",
+        "mtu" : 1500,
+        "name" : "pdp_ip8",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32784,
+        "isUp" : false,
+        "kind" : "cellular",
+        "mtu" : 1500,
+        "name" : "pdp_ip9",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32784,
+        "isUp" : false,
+        "kind" : "cellular",
+        "mtu" : 1500,
+        "name" : "pdp_ip10",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::d5ca:a3a5:6bff:4686",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "fd89:bf71:89b3:4309:264e:2c7:2cd2:801a",
+            "isIPv6" : true,
+            "prefixLength" : 128
+          },
+          {
+            "ip" : "55.178.32.214",
+            "isIPv6" : false,
+            "netmask" : "255.255.255.255",
+            "prefixLength" : 32
+          },
+          {
+            "ip" : "fd89:bf71:89b3:4309:264f:26d7:d42f:d8ee",
+            "isIPv6" : true,
+            "prefixLength" : 128
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 1400,
+        "name" : "ipsec0",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 92160,
+        "sentPackets" : 424
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::2ea5:c03:8292:7bc3",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "tunnel",
+        "mtu" : 1500,
+        "name" : "utun0",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 1
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 1500,
+        "name" : "ipsec1",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::78df:a7d1:ef3b:15ca",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "374d:47f1:7c54:7615:639d:9a4b:688f:71b7",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 1500,
+        "name" : "ipsec2",
+        "receivedBytes" : 905216,
+        "receivedPackets" : 1815,
+        "sentBytes" : 228352,
+        "sentPackets" : 758
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::78df:a7d1:ef3b:15ca",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 1500,
+        "name" : "ipsec3",
+        "receivedBytes" : 13312,
+        "receivedPackets" : 132,
+        "sentBytes" : 19456,
+        "sentPackets" : 248
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::f2c0:db81:39f8:a151",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "3865:1fde:73f8:4035:25dd:c717:e1e1:f580",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 1500,
+        "name" : "ipsec4",
+        "receivedBytes" : 2709504,
+        "receivedPackets" : 6336,
+        "sentBytes" : 818176,
+        "sentPackets" : 2352
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 1500,
+        "name" : "ipsec5",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 34850,
+        "isUp" : false,
+        "kind" : "hotspot",
+        "mtu" : 1500,
+        "name" : "ap1",
+        "receivedBytes" : 16225280,
+        "receivedPackets" : 62823,
+        "sentBytes" : 27924480,
+        "sentPackets" : 66429
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::b9ae:21e9:7574:9472",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "10.223.102.171",
+            "isIPv6" : false,
+            "netmask" : "255.255.255.0",
+            "prefixLength" : 24
+          }
+        ],
+        "flags" : 34915,
+        "isUp" : true,
+        "kind" : "wifi",
+        "mtu" : 1500,
+        "name" : "en0",
+        "receivedBytes" : 160339968,
+        "receivedPackets" : 10430750,
+        "sentBytes" : 1237243904,
+        "sentPackets" : 2515788
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::9684:e156:8da7:c2c2",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "tunnel",
+        "mtu" : 2000,
+        "name" : "utun1",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 3
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::3a5:d1da:a487:82ed",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "tunnel",
+        "mtu" : 1000,
+        "name" : "utun2",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 2
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::a642:a414:ee8a:d508",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 34850,
+        "isUp" : false,
+        "kind" : "other",
+        "mtu" : 1500,
+        "name" : "nan0",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 34915,
+        "isUp" : true,
+        "kind" : "other",
+        "mtu" : 1500,
+        "name" : "anpi0",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 34915,
+        "isUp" : true,
+        "kind" : "ethernet",
+        "mtu" : 1500,
+        "name" : "en1",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::9acc:1b72:2e02:99d6",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 34915,
+        "isUp" : true,
+        "kind" : "other",
+        "mtu" : 1500,
+        "name" : "awdl0",
+        "receivedBytes" : 1259520,
+        "receivedPackets" : 1592,
+        "sentBytes" : 883712,
+        "sentPackets" : 5032
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::9acc:1b72:2e02:99d6",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 34915,
+        "isUp" : true,
+        "kind" : "other",
+        "mtu" : 1500,
+        "name" : "llw0",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+
+        ],
+        "flags" : 34915,
+        "isUp" : true,
+        "kind" : "ethernet",
+        "mtu" : 1500,
+        "name" : "en2",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 0
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::78df:a7d1:ef3b:15ca",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "374d:47f1:7c54:7615:639d:9a4b:688f:71b7",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 2000,
+        "name" : "ipsec7",
+        "receivedBytes" : 226304,
+        "receivedPackets" : 777,
+        "sentBytes" : 270336,
+        "sentPackets" : 751
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::78df:a7d1:ef3b:15ca",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "374d:47f1:7c54:7615:639d:9a4b:688f:71b7",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 2000,
+        "name" : "ipsec8",
+        "receivedBytes" : 478208,
+        "receivedPackets" : 678,
+        "sentBytes" : 112640,
+        "sentPackets" : 407
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::b6cc:4412:f73b:8f0e",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "55.178.32.214",
+            "isIPv6" : false,
+            "netmask" : "255.255.255.255",
+            "prefixLength" : 32
+          },
+          {
+            "ip" : "fd89:bf71:89b3:4309:264e:2c7:2cd2:801a",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "fd89:bf71:89b3:4309:264f:26d7:d42f:d8ee",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 1400,
+        "name" : "ipsec6",
+        "receivedBytes" : 19759104,
+        "receivedPackets" : 56228,
+        "sentBytes" : 25222144,
+        "sentPackets" : 47167
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::78df:a7d1:ef3b:15ca",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "3865:1fde:73f8:4035:25dd:c717:e1e1:f580",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 2000,
+        "name" : "ipsec9",
+        "receivedBytes" : 25600,
+        "receivedPackets" : 69,
+        "sentBytes" : 13312,
+        "sentPackets" : 48
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::78df:a7d1:ef3b:15ca",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "3865:1fde:73f8:4035:25dd:c717:e1e1:f580",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "ipsec",
+        "mtu" : 2000,
+        "name" : "ipsec10",
+        "receivedBytes" : 0,
+        "receivedPackets" : 0,
+        "sentBytes" : 0,
+        "sentPackets" : 4
+      },
+      {
+        "addresses" : [
+          {
+            "ip" : "fe80::78df:a7d1:ef3b:15ca",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          },
+          {
+            "ip" : "fdbb:7928:3a3d:cbba:ebca:8703:4430:599",
+            "isIPv6" : true,
+            "prefixLength" : 64
+          }
+        ],
+        "flags" : 32849,
+        "isUp" : true,
+        "kind" : "tunnel",
+        "mtu" : 16000,
+        "name" : "utun3",
+        "receivedBytes" : 6486016,
+        "receivedPackets" : 1156,
+        "sentBytes" : 95232,
+        "sentPackets" : 362
+      }
+    ],
+    "path" : {
+      "gateways" : [
+        "10.223.102.236"
+      ],
+      "isConstrained" : false,
+      "isExpensive" : false,
+      "isOnline" : true,
+      "supportsDNS" : true,
+      "supportsIPv4" : true,
+      "supportsIPv6" : false
+    },
+    "proxy" : {
+      "isEnabled" : false
+    },
+    "publicIPv4" : {
+      "kind" : "none"
+    },
+    "publicIPv6" : {
+      "kind" : "none"
+    },
+    "takenAt" : "2026-09-21T15:08:59Z",
+    "vpnServiceInterfaces" : [
+
+    ],
+    "wifi" : {
+      "kind" : "needsPermission",
+      "permission" : "location"
+    }
+  },
+  "takenAt" : "2026-09-21T15:08:59Z"
+}

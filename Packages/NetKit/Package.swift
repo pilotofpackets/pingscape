@@ -9,6 +9,6 @@ let package = Package(
     ],
     targets: [
         .target(name: "NetKit"),
-        .testTarget(name: "NetKitTests", dependencies: ["NetKit"]),
+        .testTarget(name: "NetKitTests", dependencies: ["NetKit"], resources: [.copy("Fixtures")]),
     ]
 )

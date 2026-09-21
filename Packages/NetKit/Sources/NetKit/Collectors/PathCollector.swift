@@ -22,6 +22,47 @@ public enum PathCollector {
 
     /// The current path, or `nil` if the system did not answer in time.
     public static func current(timeoutSeconds: Double = 1.5) async -> PathSummary? {
+        async let cellular = cellularInterfaceName(timeoutSeconds: timeoutSeconds)
+        guard let summary = await currentPath(timeoutSeconds: timeoutSeconds) else { return nil }
+        return summary.with(cellularInterface: await cellular)
+    }
+
+    /// The interface a path monitor for cellular only names, or `nil` without cellular.
+    static func cellularInterfaceName(timeoutSeconds: Double) async -> String? {
+        await withCheckedContinuation { continuation in
+            let once = OnceName(continuation)
+            let monitor = NWPathMonitor(requiredInterfaceType: .cellular)
+            monitor.pathUpdateHandler = { path in
+                once.resume(path.status == .satisfied ? path.availableInterfaces.first?.name : nil)
+                monitor.cancel()
+            }
+            let queue = DispatchQueue(label: "app.pingscape.path.cellular")
+            monitor.start(queue: queue)
+            queue.asyncAfter(deadline: .now() + timeoutSeconds) {
+                once.resume(nil)
+                monitor.cancel()
+            }
+        }
+    }
+
+    private final class OnceName: @unchecked Sendable {
+        private let lock = NSLock()
+        private var continuation: CheckedContinuation<String?, Never>?
+
+        init(_ continuation: CheckedContinuation<String?, Never>) {
+            self.continuation = continuation
+        }
+
+        func resume(_ value: String?) {
+            lock.lock()
+            let pending = continuation
+            continuation = nil
+            lock.unlock()
+            pending?.resume(returning: value)
+        }
+    }
+
+    private static func currentPath(timeoutSeconds: Double) async -> PathSummary? {
         await withCheckedContinuation { continuation in
             let once = Once(continuation)
             let monitor = NWPathMonitor()

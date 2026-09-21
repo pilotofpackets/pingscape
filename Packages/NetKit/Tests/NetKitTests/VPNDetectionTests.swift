@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import NetKit
@@ -46,9 +47,15 @@ struct VPNDetectionTests {
         let tunnel = NetworkInterface(name: "utun4", addresses: [address("10.250.10.1", prefix: 32)])
         let snapshot = NetworkSnapshot(
             interfaces: [wifi, tunnel],
-            defaultRoutes: [DefaultRoute(interfaceName: "en0", gateway: "192.168.178.1", isActive: true)])
+            defaultRoutes: [DefaultRoute(interfaceName: "en0", gateway: "192.168.178.1", isActive: true)],
+            vpnServiceInterfaces: ["utun4"])
         #expect(snapshot.isVPNActive)
         #expect(snapshot.tunnelScope == .partial)
+    }
+
+    @Test func aTunnelWithAnAddressButNeitherServiceNorRouteIsNoVPN() {
+        let tunnel = NetworkInterface(name: "utun4", addresses: [address("10.250.10.1", prefix: 32)])
+        #expect(!NetworkSnapshot(interfaces: [wifi, tunnel]).isVPNActive)
     }
 
     @Test func doesNotCountTheCarrierIPsecTunnelAsVPN() {
@@ -67,7 +74,8 @@ struct VPNDetectionTests {
     @Test func countsSeveralTunnelsAtOnce() {
         let wireguard = NetworkInterface(name: "utun4", addresses: [address("10.250.10.1", prefix: 32)])
         let ikev2 = NetworkInterface(name: "ipsec0", addresses: [address("10.9.0.7", prefix: 32)])
-        let snapshot = NetworkSnapshot(interfaces: [wifi, wireguard, ikev2], vpnServiceInterfaces: ["ipsec0"])
+        let snapshot = NetworkSnapshot(
+            interfaces: [wifi, wireguard, ikev2], vpnServiceInterfaces: ["utun4", "ipsec0"])
         #expect(snapshot.vpnInterfaces.count == 2)
     }
 
@@ -81,10 +89,28 @@ struct VPNDetectionTests {
         #expect(NetworkSnapshot(interfaces: [cellular]).primaryInterface?.name == "pdp_ip0")
     }
 
+    @Test func picksTheCellularInterfaceTheSystemNames() {
+        let ims = NetworkInterface(name: "pdp_ip1", addresses: [address("2001:db8::5", prefix: 64, v6: true)])
+        let data = NetworkInterface(name: "pdp_ip0", addresses: [address("100.72.31.14", prefix: 30)])
+        let path = PathSummary(isOnline: true, cellularInterface: "pdp_ip0")
+        #expect(NetworkSnapshot(path: path, interfaces: [ims, data]).primaryInterface?.name == "pdp_ip0")
+        #expect(NetworkSnapshot(path: path, interfaces: [ims, data]).interface(of: .cellular)?.name == "pdp_ip0")
+        // Without the name from the system the first interface with an address stays the answer.
+        #expect(NetworkSnapshot(interfaces: [ims, data]).primaryInterface?.name == "pdp_ip1")
+    }
+
     @Test func neverPicksATunnelOrHotspotAsPrimary() {
         let hotspot = NetworkInterface(name: "bridge100", addresses: [address("172.20.10.1", prefix: 28)])
         let tunnel = NetworkInterface(name: "utun4", addresses: [address("10.250.10.1", prefix: 32)])
         #expect(NetworkSnapshot(interfaces: [hotspot, tunnel]).primaryInterface == nil)
+    }
+
+    @Test func cellularHasNoLocalNetwork() {
+        let snapshot = NetworkSnapshot(
+            interfaces: [cellular], defaultRoutes: [DefaultRoute(interfaceName: "pdp_ip0", gateway: "100.72.31.14")])
+        #expect(snapshot.primaryInterface?.name == "pdp_ip0")
+        #expect(snapshot.lanRange == nil)
+        #expect(snapshot.localGateway4 == nil)
     }
 
     @Test func derivesTheLANRangeFromThePrimaryAddress() {
@@ -104,6 +130,37 @@ struct VPNDetectionTests {
         #expect(snapshot.primaryInterface?.name == "en0")
         #expect(snapshot.tunnelScope == .full)
         #expect(snapshot.localGateway4 == "192.168.178.1")
+    }
+}
+
+/// Diagnostic dumps taken on a real iPhone (anonymized), see `docs/09-test-plan.md`.
+@Suite("VPN detection on recorded iPhone dumps")
+struct RecordedVPNTests {
+    private func snapshot(_ name: String) throws -> NetworkSnapshot {
+        let url = try #require(Bundle.module.url(forResource: name, withExtension: "json", subdirectory: "Fixtures"))
+        return try DiagnosticDump.decode(Data(contentsOf: url)).snapshot
+    }
+
+    /// iOS 27 has a system `utun` (MTU 16000, unique-local IPv6 address) that is
+    /// not a VPN. The first version of the rule counted it as one.
+    @Test func theSystemTunnelIsNoVPN() throws {
+        let snapshot = try snapshot("dump-ios27-no-vpn-wifi")
+        #expect(snapshot.interfaces.contains { $0.name == "utun3" && $0.hasUsableAddress })
+        #expect(!snapshot.isVPNActive)
+        #expect(snapshot.tunnelScope == nil)
+        #expect(snapshot.primaryInterface?.name == "en0")
+    }
+
+    @Test func wireGuardOverCellularIsTheOnlyVPN() throws {
+        let snapshot = try snapshot("dump-ios27-wireguard-full-cellular")
+        #expect(snapshot.vpnInterfaces.map(\.name) == ["utun3"])
+        #expect(snapshot.tunnelScope == .full)
+        #expect(snapshot.interfaces.contains { $0.name == "utun6" && $0.hasUsableAddress })
+        // The system names pdp_ip0 as the cellular interface. pdp_ip1 (IPv6 only) comes first in the list.
+        #expect(snapshot.primaryInterface?.name == "pdp_ip0")
+        // Cellular has no local network and no local gateway.
+        #expect(snapshot.lanRange == nil)
+        #expect(snapshot.localGateway4 == nil)
     }
 }
 
