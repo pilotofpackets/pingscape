@@ -24,7 +24,6 @@ struct RootView: View {
             Tab("About", systemImage: "info.circle", value: AppTab.about) { AboutView() }
         }
         .tabViewStyle(.sidebarAdaptable)
-        .modifier(MinimizeTabBarOnScroll())
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
             Task { await store.refresh() }
@@ -43,17 +42,6 @@ struct RootView: View {
         }
         .sheet(isPresented: $showsExternalPrompt) {
             ExternalPromptSheet()
-        }
-    }
-}
-
-/// The tab bar shrinks while scrolling (iOS 26 and later).
-private struct MinimizeTabBarOnScroll: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
-            content.tabBarMinimizeBehavior(.onScrollDown)
-        } else {
-            content
         }
     }
 }
