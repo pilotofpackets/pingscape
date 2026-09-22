@@ -20,9 +20,17 @@ struct StatusView: View {
                             tone: snapshot.isOnline ? .good : .critical,
                             systemImage: heroSymbol(snapshot),
                             chips: heroChips(snapshot))
-                        connection(snapshot)
+                        // While a full tunnel carries the traffic, the VPN
+                        // card is what actually governs the connection, so it
+                        // leads and is marked.
+                        if snapshot.tunnelScope == .full {
+                            vpn(snapshot)
+                            connection(snapshot)
+                        } else {
+                            connection(snapshot)
+                            vpn(snapshot)
+                        }
                         wifi(snapshot)
-                        vpn(snapshot)
                         cellular(snapshot)
                         technicalDetails(snapshot)
                         Text("As of \(snapshot.takenAt.formatted(date: .omitted, time: .standard))")
@@ -66,11 +74,8 @@ struct StatusView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    ShareLink(item: reportText) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                    .accessibilityLabel("Share report")
-                    .disabled(sections.isEmpty)
+                    ExportMenu(fileBaseName: "overview", header: reportHeader, sections: sections)
+                        .disabled(sections.isEmpty)
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -85,12 +90,10 @@ struct StatusView: View {
         }
     }
 
-    /// The overview as text: exactly the rows on screen, and the hidden values
-    /// stay hidden. External values are in it only if they are loaded.
-    private var reportText: String {
-        ReportFormatter.text(
-            header: DeviceInfo.reportHeader(at: store.snapshot?.takenAt ?? Date()),
-            sections: sections.reportSections, masked: mask.isMasked)
+    /// Header lines of the report: exactly the rows on screen, and the hidden
+    /// values stay hidden. External values are in it only if they are loaded.
+    private var reportHeader: [String] {
+        DeviceInfo.reportHeader(at: store.snapshot?.takenAt ?? Date())
     }
 
     // MARK: Hero
@@ -140,6 +143,11 @@ struct StatusView: View {
 
     @ViewBuilder
     private func connection(_ snapshot: NetworkSnapshot) -> some View {
+        // A full tunnel decides the system's DNS servers and what an outside
+        // server sees, so those two rows move to the VPN card below (or
+        // above), which is what determines them. The address, gateway and
+        // proxy stay here: they belong to this connection regardless of a VPN.
+        let fullTunnel = snapshot.tunnelScope == .full
         InfoSection(title: "Connection") {
             if let ipv4 = snapshot.primaryIPv4 {
                 Rows.address(ipv4)
@@ -150,14 +158,26 @@ struct StatusView: View {
             if let ipv6 = snapshot.primaryIPv6 {
                 Rows.address(ipv6)
             }
-            if !snapshot.dnsServers.isEmpty {
-                DataRow(
-                    label: "DNS servers", value: snapshot.dnsServers.joined(separator: "\n"),
-                    monospaced: true, sensitive: true)
-            }
-            LoadableRow(label: "External IPv4", state: external.ipv4) { external.load(userRequested: true) }
-            LoadableRow(label: "External IPv6", state: external.ipv6, stacked: true) {
-                external.load(userRequested: true)
+            if !fullTunnel {
+                if !snapshot.dnsServers.isEmpty {
+                    DataRow(
+                        label: "DNS servers", value: snapshot.dnsServers.joined(separator: "\n"),
+                        monospaced: true, sensitive: true)
+                }
+                LoadableRow(label: "External IPv4", state: external.ipv4) { external.load(userRequested: true) }
+                LoadableRow(label: "External IPv6", state: external.ipv6, stacked: true) {
+                    external.load(userRequested: true)
+                }
+            } else if let name = snapshot.primaryInterface?.name {
+                // The VPN carries the default route, so a plain request would
+                // only repeat the VPN card's external IP. This one is bound to
+                // the interface underneath, around the tunnel.
+                LoadableRow(label: "External IPv4", state: external.boundIPv4) {
+                    external.loadBound(interfaceName: name, userRequested: true)
+                }
+                LoadableRow(label: "External IPv6", state: external.boundIPv6, stacked: true) {
+                    external.loadBound(interfaceName: name, userRequested: true)
+                }
             }
             DataRow(
                 label: "Proxy", value: proxyDescription(snapshot.proxy),
@@ -200,7 +220,7 @@ struct StatusView: View {
     @ViewBuilder
     private func vpn(_ snapshot: NetworkSnapshot) -> some View {
         if let scope = snapshot.tunnelScope {
-            InfoSection(title: "VPN and Tunnel", details: OverviewDestination.vpn) {
+            InfoSection(title: "VPN and Tunnel", details: OverviewDestination.vpn, prominent: scope == .full) {
                 StatusRow(
                     label: "Status",
                     text: scope == .full
@@ -215,6 +235,20 @@ struct StatusView: View {
                     }
                     if let mtu = tunnel.mtu {
                         DataRow(label: "MTU", value: String(mtu))
+                    }
+                }
+                // Only while this carries the default route: everything the
+                // internet resolves and sees is really the tunnel's, not the
+                // Wi-Fi or cellular connection underneath (see the Connection card).
+                if scope == .full {
+                    if !snapshot.dnsServers.isEmpty {
+                        DataRow(
+                            label: "DNS servers", value: snapshot.dnsServers.joined(separator: "\n"),
+                            monospaced: true, sensitive: true)
+                    }
+                    LoadableRow(label: "External IPv4", state: external.ipv4) { external.load(userRequested: true) }
+                    LoadableRow(label: "External IPv6", state: external.ipv6, stacked: true) {
+                        external.load(userRequested: true)
                     }
                 }
             }

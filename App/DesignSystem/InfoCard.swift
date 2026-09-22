@@ -11,6 +11,9 @@ struct InfoSection<Trailing: View, Content: View>: View {
     @State private var sectionID = UUID()
 
     let title: LocalizedStringResource
+    /// Marks the card as the one that actually governs the connection right
+    /// now (a VPN with a full tunnel): a colored border, nothing else changes.
+    var prominent = false
     @ViewBuilder let trailing: Trailing
     @ViewBuilder let content: Content
 
@@ -26,7 +29,7 @@ struct InfoSection<Trailing: View, Content: View>: View {
                 trailing
             }
             .padding(.horizontal, 16)
-            InfoCard { content }
+            InfoCard(prominent: prominent) { content }
                 .environment(\.copySection, CopySectionAction(id: sectionID, perform: copy))
                 .onPreferenceChange(RowRecordsKey.self) { rows = $0 }
                 // The rows belong to this section and go no further up.
@@ -55,16 +58,17 @@ extension SectionRecord {
 }
 
 extension InfoSection where Trailing == EmptyView {
-    init(title: LocalizedStringResource, @ViewBuilder content: () -> Content) {
-        self.init(title: title, trailing: { EmptyView() }, content: content)
+    init(title: LocalizedStringResource, prominent: Bool = false, @ViewBuilder content: () -> Content) {
+        self.init(title: title, prominent: prominent, trailing: { EmptyView() }, content: content)
     }
 }
 
 extension InfoSection {
     init<Value: Hashable>(
-        title: LocalizedStringResource, details value: Value, @ViewBuilder content: () -> Content
+        title: LocalizedStringResource, details value: Value, prominent: Bool = false,
+        @ViewBuilder content: () -> Content
     ) where Trailing == DetailsLink<Value> {
-        self.init(title: title, trailing: { DetailsLink(value: value) }, content: content)
+        self.init(title: title, prominent: prominent, trailing: { DetailsLink(value: value) }, content: content)
     }
 }
 
@@ -91,6 +95,7 @@ struct DetailsLink<Value: Hashable>: View {
 
 /// Rows with separators between them, on a rounded surface.
 struct InfoCard<Content: View>: View {
+    var prominent = false
     @ViewBuilder let content: Content
 
     var body: some View {
@@ -107,5 +112,11 @@ struct InfoCard<Content: View>: View {
         .background(
             Color(.secondarySystemGroupedBackground),
             in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay {
+            if prominent {
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .strokeBorder(.tint, lineWidth: 2)
+            }
+        }
     }
 }
