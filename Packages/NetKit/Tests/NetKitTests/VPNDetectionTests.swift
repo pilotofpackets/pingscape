@@ -151,6 +151,35 @@ struct RecordedVPNTests {
         #expect(snapshot.primaryInterface?.name == "en0")
     }
 
+    @Test func wireGuardOverWiFiKeepsTheLocalNetworkVisible() throws {
+        let snapshot = try snapshot("dump-ios27-wireguard-full-wifi")
+        #expect(snapshot.vpnInterfaces.map(\.name) == ["utun3"])
+        #expect(snapshot.tunnelScope == .full)
+        #expect(snapshot.primaryInterface?.name == "en0")
+        // The Wi-Fi gateway and network stay known while the tunnel carries the traffic.
+        #expect(snapshot.localGateway4 != nil)
+        #expect(snapshot.lanRange?.description.hasSuffix("/24") == true)
+    }
+
+    /// IKEv2 runs on an `ipsec` interface, like the carrier tunnels for Wi-Fi
+    /// Calling. Only the one the system lists as a service is the VPN.
+    @Test func ikev2OverWiFiIsTheOnlyVPNAmongManyIPsecInterfaces() throws {
+        let snapshot = try snapshot("dump-ios27-ikev2-full-wifi")
+        #expect(snapshot.interfaces.filter { $0.kind == .ipsec && $0.hasUsableAddress }.count > 3)
+        #expect(snapshot.vpnInterfaces.map(\.name) == ["ipsec11"])
+        #expect(snapshot.tunnelScope == .full)
+        #expect(snapshot.primaryInterface?.name == "en0")
+        #expect(snapshot.localGateway4 != nil)
+    }
+
+    @Test func ikev2OverCellularIsTheOnlyVPN() throws {
+        let snapshot = try snapshot("dump-ios27-ikev2-full-cellular")
+        #expect(snapshot.vpnInterfaces.map(\.name) == ["ipsec9"])
+        #expect(snapshot.tunnelScope == .full)
+        #expect(snapshot.primaryInterface?.name == "pdp_ip0")
+        #expect(snapshot.lanRange == nil)
+    }
+
     @Test func wireGuardOverCellularIsTheOnlyVPN() throws {
         let snapshot = try snapshot("dump-ios27-wireguard-full-cellular")
         #expect(snapshot.vpnInterfaces.map(\.name) == ["utun3"])

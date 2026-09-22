@@ -131,6 +131,11 @@ enum SelfTest {
         case .none: log("wifi none")
         }
         log("cellular services=\(snapshot.cellularServices.map { "\($0.isDataService ? "data" : "other"):\($0.technology.rawValue)" }.joined(separator: ",")) access=\(CellularDataAccess.current)")
+        // The routes that point into a tunnel, by prefix length and class only.
+        let tunnelNames = Set(snapshot.interfaces.filter { [.tunnel, .ipsec].contains($0.kind) && snapshot.isVPN($0) }.map(\.name))
+        for route in RouteCollector.allRoutes() where tunnelNames.contains(route.interfaceName) {
+            log("vpn-route \(route.interfaceName) \(route.isIPv6 ? "v6" : "v4") \(route.isDefault ? "default" : "\(addressClass(route.destination))/\(route.prefixLength.map(String.init) ?? "-")") gateway=\(route.gateway != nil) flags=\(route.flags)")
+        }
         log("routes all=\(RouteCollector.allRoutes().count) nat64=\(NAT64Collector.prefix() ?? "-")")
     }
 
