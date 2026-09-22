@@ -221,21 +221,20 @@ struct StatusView: View {
     private func vpn(_ snapshot: NetworkSnapshot) -> some View {
         if let scope = snapshot.tunnelScope {
             InfoSection(title: "VPN and Tunnel", details: OverviewDestination.vpn, prominent: scope == .full) {
-                StatusRow(
-                    label: "Status",
-                    text: scope == .full
-                        ? String(localized: "Active · Full tunnel")
-                        : String(localized: "Active · Split tunnel"))
+                // "Status" is inside the loop, not a row of its own before it:
+                // a plain row directly followed by a ForEach, both direct
+                // children of one card, made the card's divider mechanism
+                // (`Group(subviews:)`) drop the divider around some of the
+                // ForEach's own rows (found 2026-09-22; harmless to repeat
+                // per tunnel, there is normally exactly one).
                 ForEach(snapshot.vpnInterfaces) { tunnel in
+                    StatusRow(
+                        label: "Status",
+                        text: scope == .full
+                            ? String(localized: "Active · Full tunnel")
+                            : String(localized: "Active · Split tunnel"))
                     DataRow(label: "Interface", value: tunnel.name, monospaced: true)
-                    if let address = tunnel.usableAddresses.first(where: { !$0.isIPv6 })
-                        ?? tunnel.usableAddresses.first
-                    {
-                        Rows.address(address)
-                    }
-                    if let mtu = tunnel.mtu {
-                        DataRow(label: "MTU", value: String(mtu))
-                    }
+                    Rows.addresses(of: tunnel)
                 }
                 // Only while this carries the default route: everything the
                 // internet resolves and sees is really the tunnel's, not the

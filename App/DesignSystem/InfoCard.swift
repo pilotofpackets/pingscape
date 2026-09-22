@@ -101,9 +101,13 @@ struct InfoCard<Content: View>: View {
     var body: some View {
         VStack(spacing: 0) {
             Group(subviews: content) { subviews in
-                ForEach(subviews) { subview in
+                // By index, not by `subview.id`: several rows written behind
+                // one `if let` (an optional address, an optional MTU) can end
+                // up sharing one id, which silently dropped the divider
+                // before and after that whole block (found 2026-09-22).
+                ForEach(Array(subviews.enumerated()), id: \.offset) { index, subview in
                     subview
-                    if subview.id != subviews.last?.id {
+                    if index != subviews.count - 1 {
                         Divider().padding(.leading, 16)
                     }
                 }
