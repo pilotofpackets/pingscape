@@ -62,6 +62,7 @@ struct ToolsView: View {
                 .padding(.bottom, control == nil ? 24 : 88)
             }
             .scrollDismissesKeyboard(.interactively)
+            .keyboardDoneButton()
             .background(Color(.systemGroupedBackground))
             .safeAreaInset(edge: .bottom) {
                 if let control {
@@ -72,7 +73,7 @@ struct ToolsView: View {
             .toolbar {
                 if !sections.isEmpty {
                     ToolbarItem(placement: .primaryAction) {
-                        ResultActions(text: resultText)
+                        ResultActions(text: resultText, baseName: selected.rawValue, sections: sections)
                     }
                 }
             }

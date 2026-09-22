@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import NetKit
@@ -44,6 +45,33 @@ struct ReportTests {
     @Test func copiesASingleSectionWithItsHeading() {
         #expect(ReportFormatter.text(of: sections[2], masked: false) == "WI-FI\nName (SSID): HomeNet")
         #expect(ReportFormatter.text(of: sections[2], masked: true) == "WI-FI\nName (SSID): \(ReportFormatter.placeholder)")
+    }
+
+    @Test func jsonDropsEmptyRowsAndSections() throws {
+        let data = try ReportFormatter.json(header: ["Pingscape 1.0 (12)"], sections: sections, masked: false)
+        let text = String(decoding: data, as: UTF8.self)
+        #expect(!text.contains("\"Nothing\""))
+        #expect(!text.contains("\"Empty\""))
+        let decoded = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        #expect(decoded["header"] as? [String] == ["Pingscape 1.0 (12)"])
+        let jsonSections = try #require(decoded["sections"] as? [[String: Any]])
+        #expect(jsonSections.count == 2)
+        #expect(jsonSections[0]["title"] as? String == "Connection")
+    }
+
+    @Test func jsonKeepsLineBreaksInAMultiLineValue() throws {
+        let data = try ReportFormatter.json(header: [], sections: sections, masked: false)
+        let decoded = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let rows = try #require((decoded["sections"] as? [[String: Any]])?.first?["rows"] as? [[String: String]])
+        #expect(rows[1]["value"] == "192.0.2.1\n192.0.2.2")
+    }
+
+    @Test func jsonReplacesSensitiveValuesWhileHidden() throws {
+        let data = try ReportFormatter.json(header: [], sections: sections, masked: true)
+        let text = String(decoding: data, as: UTF8.self)
+        #expect(!text.contains("192.0.2") && !text.contains("HomeNet"))
+        #expect(text.contains(ReportFormatter.placeholder))
+        #expect(text.contains("\"Off\""))
     }
 
     private let devices = [

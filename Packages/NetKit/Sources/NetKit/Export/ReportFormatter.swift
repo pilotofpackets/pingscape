@@ -73,6 +73,51 @@ public enum ReportFormatter {
         guard text.contains(where: { $0 == "," || $0 == "\"" || $0.isNewline }) else { return text }
         return "\"" + text.replacingOccurrences(of: "\"", with: "\"\"") + "\""
     }
+
+    /// The sections as they would appear on screen: rows without a value
+    /// dropped, hidden values replaced. Unlike `text`, a multi-line value (DNS
+    /// servers) keeps its line breaks, since JSON and an image have no reason
+    /// to squeeze it onto one line. Shared by `json` and the image export.
+    public static func masked(_ sections: [ReportSection], masked: Bool) -> [ReportSection] {
+        sections.compactMap { section in
+            let rows = section.rows.filter { !$0.value.isEmpty }.map { row in
+                ReportRow(
+                    label: row.label, value: masked && row.isSensitive ? placeholder : row.value,
+                    isSensitive: false, isPreformatted: row.isPreformatted)
+            }
+            return rows.isEmpty ? nil : ReportSection(title: section.title, rows: rows)
+        }
+    }
+
+    /// The same report as `text`, as JSON: `{"header": [...], "sections":
+    /// [{"title": ..., "rows": [{"label": ..., "value": ...}]}]}`.
+    public static func json(header: [String], sections: [ReportSection], masked isMasked: Bool) throws -> Data {
+        let document = JSONReport(
+            header: header,
+            sections: masked(sections, masked: isMasked).map { section in
+                JSONReport.Section(title: section.title, rows: section.rows.map { JSONReport.Row(label: $0.label, value: $0.value) })
+            })
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        return try encoder.encode(document)
+    }
+}
+
+/// The shape of `ReportFormatter.json`. Not `Codable` back, a report is
+/// written once and not read by the app.
+private struct JSONReport: Encodable {
+    let header: [String]
+    let sections: [Section]
+
+    struct Section: Encodable {
+        let title: String
+        let rows: [Row]
+    }
+
+    struct Row: Encodable {
+        let label: String
+        let value: String
+    }
 }
 
 /// The list of devices on the local network as text and as CSV.

@@ -187,9 +187,11 @@ struct RecentChips: View {
     }
 }
 
-/// Copy and share of a result.
+/// Copy and share (as text, image or JSON) of a result.
 struct ResultActions: View {
     let text: String
+    let baseName: String
+    let sections: [SectionRecord]
 
     var body: some View {
         HStack(spacing: 14) {
@@ -199,10 +201,7 @@ struct ResultActions: View {
                 Image(systemName: "doc.on.doc")
             }
             .accessibilityLabel("Copy")
-            ShareLink(item: text) {
-                Image(systemName: "square.and.arrow.up")
-            }
-            .accessibilityLabel("Share")
+            ExportMenu(fileBaseName: baseName, header: [], sections: sections)
         }
         .font(.subheadline)
     }

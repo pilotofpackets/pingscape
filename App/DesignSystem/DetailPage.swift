@@ -38,6 +38,7 @@ struct DetailPage<Content: View>: View {
                         } label: {
                             Label("Copy page", systemImage: "doc.on.doc")
                         }
+                        ShareButtons(fileBaseName: pageFileName, header: [], sections: sections)
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
@@ -48,6 +49,15 @@ struct DetailPage<Content: View>: View {
         .onChange(of: isAvailable) { _, available in
             if !available { dismiss() }
         }
+    }
+
+    /// A file-name-safe version of the page title, for the exported file.
+    private var pageFileName: String {
+        String(localized: title).lowercased().map { $0.isLetter || $0.isNumber ? $0 : "-" }
+            .reduce(into: "") { result, char in
+                if char != "-" || result.last != "-" { result.append(char) }
+            }
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
     }
 }
 

@@ -27,6 +27,8 @@ struct LiveView: View {
                 .padding(.top, 8)
                 .padding(.bottom, 24)
             }
+            .scrollDismissesKeyboard(.interactively)
+            .keyboardDoneButton()
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Live")
             .toolbar {

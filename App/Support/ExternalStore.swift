@@ -1,5 +1,6 @@
 import Foundation
 import NetKit
+import Network
 import Observation
 
 /// The state of one value that is loaded on request.
@@ -35,6 +36,11 @@ final class ExternalStore {
     private(set) var reverseName: LoadState<String> = .notLoaded
     private(set) var provider: LoadState<ProviderInfo> = .notLoaded
     private(set) var internetCheck: LoadState<InternetCheck> = .notLoaded
+    /// The address as it looks from one specific interface (Wi-Fi or
+    /// cellular), bypassing a full-tunnel VPN. Only asked for on a tap, and
+    /// only meaningful while such a tunnel is active (see the Connection card).
+    private(set) var boundIPv4: LoadState<String> = .notLoaded
+    private(set) var boundIPv6: LoadState<String> = .notLoaded
 
     private let settings: AppSettings
     private let isDemo: Bool
@@ -78,6 +84,48 @@ final class ExternalStore {
         ipv6 = .notLoaded
         reverseName = .notLoaded
         provider = .notLoaded
+        boundIPv4 = .notLoaded
+        boundIPv6 = .notLoaded
+    }
+
+    /// Asks for the address as seen from one named interface, around a VPN
+    /// that carries the default route. A tap on "Load" is its own consent,
+    /// like the plain address (`userRequested`); otherwise it needs the
+    /// setting to be on. There is no automatic reload: this is the secondary,
+    /// less-used value, and a full-tunnel VPN rarely changes the underlying
+    /// Wi-Fi or cellular connection while it runs.
+    func loadBound(interfaceName: String, userRequested: Bool = false) {
+        guard settings.externalLookups || userRequested else { return }
+        if isDemo {
+            boundIPv4 = .loaded("198.51.100.23")
+            boundIPv6 = .unavailable
+            return
+        }
+        boundIPv4 = .loading
+        boundIPv6 = .loading
+        Task { [weak self] in
+            guard let self else { return }
+            let interfaces = await PathCollector.availableInterfaces()
+            guard let interface = interfaces.first(where: { $0.name == interfaceName }) else {
+                boundIPv4 = .failed
+                boundIPv6 = .unavailable
+                return
+            }
+            async let fetched4 = boundFetch(.v4, over: interface)
+            async let fetched6 = boundFetch(.v6, over: interface, quiet: true)
+            (boundIPv4, boundIPv6) = await (fetched4, fetched6)
+        }
+    }
+
+    private func boundFetch(_ version: PublicIPLookup.Version, over interface: NWInterface, quiet: Bool = false) async
+        -> LoadState<String>
+    {
+        do {
+            if let address = try await PublicIPLookup.fetch(version, over: interface) { return .loaded(address) }
+            return quiet ? .unavailable : .failed
+        } catch {
+            return quiet ? .unavailable : .failed
+        }
     }
 
     private func run() async {

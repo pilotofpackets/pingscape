@@ -104,6 +104,43 @@ public enum PathCollector {
         }
     }
 
+    /// The interfaces `NWPath` currently knows about, to bind a request to one
+    /// of them by name (Wi-Fi's `en0`, cellular's `pdp_ip0`), bypassing a VPN
+    /// that otherwise carries the traffic of a request made the normal way.
+    public static func availableInterfaces(timeoutSeconds: Double = 1.5) async -> [NWInterface] {
+        await withCheckedContinuation { continuation in
+            let once = OnceInterfaces(continuation)
+            let monitor = NWPathMonitor()
+            monitor.pathUpdateHandler = { path in
+                once.resume(path.status == .satisfied ? path.availableInterfaces : [])
+                monitor.cancel()
+            }
+            let queue = DispatchQueue(label: "app.pingscape.path.interfaces")
+            monitor.start(queue: queue)
+            queue.asyncAfter(deadline: .now() + timeoutSeconds) {
+                once.resume([])
+                monitor.cancel()
+            }
+        }
+    }
+
+    private final class OnceInterfaces: @unchecked Sendable {
+        private let lock = NSLock()
+        private var continuation: CheckedContinuation<[NWInterface], Never>?
+
+        init(_ continuation: CheckedContinuation<[NWInterface], Never>) {
+            self.continuation = continuation
+        }
+
+        func resume(_ value: [NWInterface]) {
+            lock.lock()
+            let pending = continuation
+            continuation = nil
+            lock.unlock()
+            pending?.resume(returning: value)
+        }
+    }
+
     /// A stream that yields whenever the network path changes.
     public static func changes() -> AsyncStream<Void> {
         AsyncStream { continuation in
