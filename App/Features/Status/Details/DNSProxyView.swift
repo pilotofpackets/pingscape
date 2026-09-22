@@ -6,6 +6,7 @@ struct DNSProxyView: View {
     @State private var timings: [String: DNSTiming] = [:]
     @State private var isMeasuring = false
     @State private var nat64Prefix: String?
+    @State private var measureTask: Task<Void, Never>?
 
     var body: some View {
         DetailPage(title: "DNS and Proxy") {
@@ -40,12 +41,21 @@ struct DNSProxyView: View {
         .task {
             nat64Prefix = DemoLaunch.isDemo ? nil : await Task.detached { NAT64Collector.prefix() }.value
         }
+        .onDisappear {
+            // Without this a measurement still running when the page closes
+            // keeps writing into this page's own state after it is gone.
+            // Seen as a crash on a device (2026-09-22): every other task on a
+            // page is owned by a model and cancelled with it; this one was a
+            // bare, unstored Task, the one place that was not.
+            measureTask?.cancel()
+        }
     }
 
     private func measure(_ servers: [String]) {
+        measureTask?.cancel()
         isMeasuring = true
         timings = [:]
-        Task {
+        measureTask = Task {
             await withTaskGroup(of: (String, DNSTiming).self) { group in
                 for server in servers {
                     group.addTask {
@@ -54,8 +64,12 @@ struct DNSProxyView: View {
                         do { return (server, .milliseconds(try await DNSClient.measure(server: address))) } catch { return (server, .noAnswer) }
                     }
                 }
-                for await (server, timing) in group { timings[server] = timing }
+                for await (server, timing) in group {
+                    guard !Task.isCancelled else { return }
+                    timings[server] = timing
+                }
             }
+            guard !Task.isCancelled else { return }
             isMeasuring = false
         }
     }
