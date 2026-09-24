@@ -113,6 +113,9 @@ struct StatusRow: View {
 struct PermissionRow: View {
     let label: LocalizedStringResource
     let buttonTitle: LocalizedStringResource
+    /// Why a previous attempt failed, shown under the label so a retry that
+    /// fails again reads differently from a tap that did nothing.
+    var detail: String?
     let action: () -> Void
 
     private var button: some View {
@@ -121,15 +124,24 @@ struct PermissionRow: View {
             .buttonBorderShape(.capsule)
     }
 
+    private var labelStack: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+            if let detail {
+                Text(detail).font(.footnote).foregroundStyle(.secondary)
+            }
+        }
+    }
+
     var body: some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 16) {
-                Text(label)
+                labelStack
                 Spacer(minLength: 8)
                 button
             }
             VStack(alignment: .leading, spacing: 8) {
-                Text(label)
+                labelStack
                 button
             }
             .frame(maxWidth: .infinity, alignment: .leading)

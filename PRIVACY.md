@@ -16,6 +16,7 @@ Nothing below happens on its own, except the first group after you agree to it.
 **Public IP address and provider.** Off until you agree (a question at first launch, and a switch under About). A tap on "Load" also works once without switching it on. These servers are asked:
 
 - `api.ipify.org` (IPv4) and `api6.ipify.org` (IPv6): return your public IP address. The request carries nothing but the request itself.
+- `ipv4.icanhazip.com` and `ipv6.icanhazip.com`: asked only if the matching ipify host does not answer. Same request, same address returned.
 - `stat.ripe.net` (RIPEstat, RIPE NCC): gets your public IP address and returns the AS number and its holder. The app names itself with `sourceapp=pingscape`.
 - Your system DNS server: is asked for the name that belongs to your public IP address.
 

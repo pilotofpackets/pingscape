@@ -78,8 +78,8 @@ struct LoadableRow: View {
             LoadingRow(label: label)
         case .notLoaded:
             PermissionRow(label: label, buttonTitle: "Load", action: load)
-        case .failed:
-            PermissionRow(label: label, buttonTitle: "Try again", action: load)
+        case .failed(let reason):
+            PermissionRow(label: label, buttonTitle: "Try again", detail: reason, action: load)
         case .unavailable:
             EmptyView()
         }

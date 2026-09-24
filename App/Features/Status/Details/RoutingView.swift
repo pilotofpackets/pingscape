@@ -74,6 +74,9 @@ private struct RouteRow: View {
             Text(verbatim: route.interfaceName)
                 .font(.system(.body, design: .monospaced))
                 .foregroundStyle(.secondary)
+            if let label = InterfaceKind(interfaceName: route.interfaceName).label {
+                Text(label).font(.footnote).foregroundStyle(.tertiary)
+            }
         }
     }
 

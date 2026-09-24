@@ -86,9 +86,14 @@ private struct RouteEntryRow: View {
     }
 
     private var interfaceText: some View {
-        Text(verbatim: route.interfaceName)
-            .font(.system(.body, design: .monospaced))
-            .foregroundStyle(.secondary)
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Text(verbatim: route.interfaceName)
+                .font(.system(.body, design: .monospaced))
+                .foregroundStyle(.secondary)
+            if let label = InterfaceKind(interfaceName: route.interfaceName).label {
+                Text(label).font(.footnote).foregroundStyle(.tertiary)
+            }
+        }
     }
 
     /// For copying: gateway, interface and flags, as `netstat -rn` orders them.

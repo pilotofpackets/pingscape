@@ -2,11 +2,13 @@ import Foundation
 import Network
 
 extension PublicIPLookup.Version {
-    /// `api.ipify.org` or `api6.ipify.org`, without the scheme.
-    var host: String {
+    /// Tried in order: `api.ipify.org`/`api6.ipify.org` first, then
+    /// `ipv4.icanhazip.com`/`ipv6.icanhazip.com` if the first does not
+    /// answer. Every host here splits IPv4 and IPv6 onto its own name.
+    public var hosts: [String] {
         switch self {
-        case .v4: "api.ipify.org"
-        case .v6: "api6.ipify.org"
+        case .v4: ["api.ipify.org", "ipv4.icanhazip.com"]
+        case .v6: ["api6.ipify.org", "ipv6.icanhazip.com"]
         }
     }
 }
@@ -24,7 +26,20 @@ extension PublicIPLookup {
     /// which does the handshake the same way; here the request is also sent
     /// and its small plain-text body is read.
     public static func fetch(_ version: Version, over interface: NWInterface) async throws -> String? {
-        let data = try await response(host: version.host, interface: interface)
+        var lastError: ToolError?
+        for host in version.hosts {
+            do {
+                if let address = try await fetch(version, host: host, over: interface) { return address }
+            } catch let error as ToolError {
+                lastError = error
+            }
+        }
+        if let lastError { throw lastError }
+        return nil
+    }
+
+    private static func fetch(_ version: Version, host: String, over interface: NWInterface) async throws -> String? {
+        let data = try await response(host: host, interface: interface)
         guard let text = String(data: data, encoding: .utf8) else { return nil }
         guard let headerEnd = text.range(of: "\r\n\r\n") else { return nil }
         let statusLine = text[text.startIndex..<(text.firstIndex(of: "\r") ?? text.endIndex)]

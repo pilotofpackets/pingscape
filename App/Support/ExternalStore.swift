@@ -8,8 +8,10 @@ enum LoadState<Value: Sendable>: Sendable {
     case notLoaded
     case loading
     case loaded(Value)
-    /// The request failed. The row offers "Try again".
-    case failed
+    /// The request failed. The row offers "Try again", with `reason` naming
+    /// what went wrong (timeout, refused, an HTTP status, ...), so a retry
+    /// that fails again looks different from a tap that did nothing.
+    case failed(reason: String)
     /// The request worked and there is no value (no IPv6, an unannounced
     /// address). The row is left out.
     case unavailable
@@ -52,6 +54,37 @@ final class ExternalStore {
     private static let minimumInterval: TimeInterval = 30
     /// How long a provider answer is reused for the same address.
     private static let providerLifetime: TimeInterval = 600
+    /// However fast a request fails, the row stays on its spinner at least
+    /// this long, so a retry that fails again is visibly different from a
+    /// tap that did nothing (an instant failure and an ignored tap looked
+    /// identical before this, found 2026-09-23).
+    private static let minimumVisibleLoad: Duration = .milliseconds(500)
+
+    private static func withMinimumVisibleDuration<T>(_ work: () async -> T) async -> T {
+        let start = ContinuousClock.now
+        let result = await work()
+        let elapsed = start.duration(to: .now)
+        if elapsed < minimumVisibleLoad {
+            try? await Task.sleep(for: minimumVisibleLoad - elapsed)
+        }
+        return result
+    }
+
+    /// Which addresses were asked (the primary host, then its fallback) and
+    /// why the last one did not answer, so a port blocked by a VPN's firewall
+    /// shows up as that instead of a silent failure. The app calls each host
+    /// on port 443 (HTTPS); at least one of them needs to be reachable
+    /// through whatever connection is active for the row to load.
+    private static func reason(hosts: [String], error: (any Error)?) -> String {
+        let detail: String
+        if let error {
+            detail = (error as? ToolError)?.text ?? (error as NSError).localizedDescription
+        } else {
+            detail = String(localized: "The server sent an unexpected answer")
+        }
+        let addresses = hosts.map { "\($0):443" }.joined(separator: ", ")
+        return String(localized: "\(addresses) – \(detail). At least one of these addresses and this port must be reachable.")
+    }
 
     init(settings: AppSettings, isDemo: Bool = DemoLaunch.isDemo) {
         self.settings = settings
@@ -107,7 +140,9 @@ final class ExternalStore {
             guard let self else { return }
             let interfaces = await PathCollector.availableInterfaces()
             guard let interface = interfaces.first(where: { $0.name == interfaceName }) else {
-                boundIPv4 = .failed
+                boundIPv4 = await Self.withMinimumVisibleDuration {
+                    .failed(reason: String(localized: "\(interfaceName) is no longer available"))
+                }
                 boundIPv6 = .unavailable
                 return
             }
@@ -120,11 +155,13 @@ final class ExternalStore {
     private func boundFetch(_ version: PublicIPLookup.Version, over interface: NWInterface, quiet: Bool = false) async
         -> LoadState<String>
     {
-        do {
-            if let address = try await PublicIPLookup.fetch(version, over: interface) { return .loaded(address) }
-            return quiet ? .unavailable : .failed
-        } catch {
-            return quiet ? .unavailable : .failed
+        await Self.withMinimumVisibleDuration {
+            do {
+                if let address = try await PublicIPLookup.fetch(version, over: interface) { return .loaded(address) }
+                return quiet ? .unavailable : .failed(reason: Self.reason(hosts: version.hosts, error: nil))
+            } catch {
+                return quiet ? .unavailable : .failed(reason: Self.reason(hosts: version.hosts, error: error))
+            }
         }
     }
 
@@ -151,7 +188,7 @@ final class ExternalStore {
         // The provider and the name belong to the address the internet sees.
         guard let address = first.value ?? second.value else {
             reverseName = .unavailable
-            provider = first.isFailed ? .failed : .unavailable
+            provider = first.isFailed ? .failed(reason: String(localized: "No public address to look up")) : .unavailable
             return
         }
         async let name = HostResolver.reverseName(of: address)
@@ -163,11 +200,13 @@ final class ExternalStore {
 
     /// `quiet`: a failure means there is no such connection (no IPv6), not an error.
     private func fetch(_ version: PublicIPLookup.Version, quiet: Bool = false) async -> LoadState<String> {
-        do {
-            if let address = try await PublicIPLookup.fetch(version) { return .loaded(address) }
-            return quiet ? .unavailable : .failed
-        } catch {
-            return quiet ? .unavailable : .failed
+        await Self.withMinimumVisibleDuration {
+            do {
+                if let address = try await PublicIPLookup.fetch(version) { return .loaded(address) }
+                return quiet ? .unavailable : .failed(reason: Self.reason(hosts: version.hosts, error: nil))
+            } catch {
+                return quiet ? .unavailable : .failed(reason: Self.reason(hosts: version.hosts, error: error))
+            }
         }
     }
 
@@ -180,7 +219,8 @@ final class ExternalStore {
             providerCache[address] = (info, Date())
             return info.map { .loaded($0) } ?? .unavailable
         } catch {
-            return .failed
+            let detail = (error as? ToolError)?.text ?? (error as NSError).localizedDescription
+            return .failed(reason: String(localized: "stat.ripe.net – \(detail)"))
         }
     }
 

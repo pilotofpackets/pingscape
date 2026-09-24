@@ -187,6 +187,9 @@ struct LicensesView: View {
                 source("IEEE OUI list", detail: "Vendor names for MAC address prefixes. IEEE Registration Authority.", url: "https://standards-oui.ieee.org")
                 source("RIPEstat", detail: "Provider and organization of the public IP address. Network data: RIPEstat, RIPE NCC.", url: "https://stat.ripe.net")
                 source("ipify", detail: "Your public IP address (api.ipify.org, api6.ipify.org).", url: "https://www.ipify.org")
+                source(
+                    "icanhazip", detail: "Your public IP address, only if ipify does not answer (ipv4.icanhazip.com, ipv6.icanhazip.com).",
+                    url: "https://major.io/icanhazip-com-faq")
                 source("IANA RDAP bootstrap", detail: "Which registry answers for a domain, address or AS number (data.iana.org).", url: "https://data.iana.org/rdap/")
             }
             Section {

@@ -112,7 +112,7 @@ extension LoadState {
         case .notLoaded: .notLoaded
         case .loading: .loading
         case .loaded(let value): .loaded(transform(value))
-        case .failed: .failed
+        case .failed(let reason): .failed(reason: reason)
         case .unavailable: .unavailable
         }
     }
@@ -128,6 +128,8 @@ private struct ExternalSourceSheet: View {
                 Section {
                     source("api.ipify.org", detail: "Your public IPv4 address")
                     source("api6.ipify.org", detail: "Your public IPv6 address")
+                    source("ipv4.icanhazip.com", detail: "Your public IPv4 address, only if ipify does not answer")
+                    source("ipv6.icanhazip.com", detail: "Your public IPv6 address, only if ipify does not answer")
                     source("stat.ripe.net", detail: "Provider and organization of the public address (RIPEstat, RIPE NCC)")
                     source("System DNS server", detail: "The name that belongs to the public address")
                 } header: {
