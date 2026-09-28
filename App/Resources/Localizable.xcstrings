@@ -4822,6 +4822,40 @@
         }
       }
     },
+    "Loads captive.apple.com and checks the answer – the page iOS itself uses to detect a Wi-Fi sign-in page. That host sees your public IP address." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lädt captive.apple.com und prüft die Antwort – die Seite, die iOS selbst nutzt, um eine Anmeldeseite im WLAN zu erkennen. Dieser Host sieht deine öffentliche IP-Adresse."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loads captive.apple.com and checks the answer – the page iOS itself uses to detect a Wi-Fi sign-in page. That host sees your public IP address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carga captive.apple.com y comprueba la respuesta: la página que el propio iOS usa para detectar una página de inicio de sesión en el Wi-Fi. Ese host ve tu dirección IP pública."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Charge captive.apple.com et vérifie la réponse : la page qu’iOS lui-même utilise pour détecter une page de connexion Wi-Fi. Cet hôte voit votre adresse IP publique."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carica captive.apple.com e controlla la risposta: la pagina che iOS stesso usa per rilevare una pagina di accesso Wi-Fi. Quell’host vede il tuo indirizzo IP pubblico."
+          }
+        }
+      }
+    },
     "Loads the page once, with no cache, and reads only the headers." : {
       "localizations" : {
         "de" : {

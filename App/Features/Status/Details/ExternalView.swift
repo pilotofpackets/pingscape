@@ -79,16 +79,23 @@ struct ExternalView: View {
     }
 
     private var reachability: some View {
-        InfoSection(title: "Reachability") {
-            switch external.internetCheck {
-            case .loaded(let result):
-                StatusRow(label: "Internet", text: result.text, tone: result.tone)
-                PermissionRow(label: "Internet", buttonTitle: "Check again") { external.checkInternet() }
-            case .loading:
-                LoadingRow(label: "Internet")
-            default:
-                PermissionRow(label: "Internet", buttonTitle: "Check internet") { external.checkInternet() }
+        VStack(spacing: 12) {
+            InfoSection(title: "Reachability") {
+                switch external.internetCheck {
+                case .loaded(let result):
+                    StatusRow(label: "Internet", text: result.text, tone: result.tone)
+                    PermissionRow(label: "Internet", buttonTitle: "Check again") { external.checkInternet() }
+                case .loading:
+                    LoadingRow(label: "Internet")
+                default:
+                    PermissionRow(label: "Internet", buttonTitle: "Check internet") { external.checkInternet() }
+                }
             }
+            Text("Loads captive.apple.com and checks the answer – the page iOS itself uses to detect a Wi-Fi sign-in page. That host sees your public IP address.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 4)
         }
     }
 }
