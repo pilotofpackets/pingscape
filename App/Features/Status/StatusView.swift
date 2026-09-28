@@ -150,15 +150,20 @@ struct StatusView: View {
         let fullTunnel = snapshot.tunnelScope == .full
         InfoSection(title: "Connection") {
             if let ipv4 = snapshot.primaryIPv4 {
-                Rows.address(ipv4)
-            }
-            if let gateway = snapshot.localGateway4 {
-                DataRow(label: "Default gateway", value: gateway, monospaced: true, sensitive: true)
+                DataRow(label: "IP address", value: ipv4.ip, monospaced: true, sensitive: true)
             }
             if let ipv6 = snapshot.primaryIPv6 {
                 Rows.address(ipv6)
             } else if snapshot.primaryInterface != nil {
                 DataRow(label: "IPv6 address", value: String(localized: "Not available"))
+            }
+            if let ipv4 = snapshot.primaryIPv4,
+                let mask = ipv4.netmask ?? ipv4.prefixLength.map(IPv4.netmask(fromPrefix:))
+            {
+                DataRow(label: "Subnet mask", value: mask, monospaced: true, sensitive: true)
+            }
+            if let gateway = snapshot.localGateway4 {
+                DataRow(label: "Default gateway", value: gateway, monospaced: true, sensitive: true)
             }
             if !fullTunnel {
                 if !snapshot.dnsServers.isEmpty {
@@ -169,7 +174,8 @@ struct StatusView: View {
                 LoadableRow(label: "External IPv4", state: external.ipv4) { external.load(userRequested: true) }
                 LoadableRow(
                     label: "External IPv6", state: external.ipv6, stacked: true,
-                    note: snapshot.externalIPv6MayBeCellular ? Self.externalIPv6CellularNote : nil
+                    note: snapshot.externalIPv6MayBeCellular ? Self.externalIPv6CellularNote : nil,
+                    unavailableText: "Not available"
                 ) {
                     external.load(userRequested: true)
                 }
@@ -180,7 +186,9 @@ struct StatusView: View {
                 LoadableRow(label: "External IPv4", state: external.boundIPv4) {
                     external.loadBound(interfaceName: name, userRequested: true)
                 }
-                LoadableRow(label: "External IPv6", state: external.boundIPv6, stacked: true) {
+                LoadableRow(
+                    label: "External IPv6", state: external.boundIPv6, stacked: true, unavailableText: "Not available"
+                ) {
                     external.loadBound(interfaceName: name, userRequested: true)
                 }
             }
@@ -301,7 +309,11 @@ struct StatusView: View {
                         }))
                 rows.append(
                     AnyView(
-                        LoadableRow(label: "External IPv6", state: external.ipv6, stacked: true) {
+                        LoadableRow(
+                            label: "External IPv6", state: external.ipv6, stacked: true,
+                            note: snapshot.externalIPv6MayBeCellular ? Self.externalIPv6CellularNote : nil,
+                            unavailableText: "Not available"
+                        ) {
                             external.load(userRequested: true)
                         }))
             }

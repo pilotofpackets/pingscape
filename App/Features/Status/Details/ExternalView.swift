@@ -43,7 +43,8 @@ struct ExternalView: View {
             LoadableRow(label: "IPv4 address", state: external.ipv4) { external.load(userRequested: true) }
             LoadableRow(
                 label: "IPv6 address", state: external.ipv6, stacked: true,
-                note: (store.snapshot?.externalIPv6MayBeCellular ?? false) ? StatusView.externalIPv6CellularNote : nil
+                note: (store.snapshot?.externalIPv6MayBeCellular ?? false) ? StatusView.externalIPv6CellularNote : nil,
+                unavailableText: "Not available"
             ) {
                 external.load(userRequested: true)
             }

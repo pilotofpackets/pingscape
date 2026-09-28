@@ -61,7 +61,9 @@ struct TrafficSection: View {
 
 /// A value that is loaded on request: "Load" before, a spinner while loading,
 /// the value after, "Try again" after a failure. A value that does not exist
-/// (no IPv6) leaves the row out.
+/// (no IPv6) leaves the row out, unless `unavailableText` names what to show
+/// instead (for a row with a sibling that does show, like "External IPv4"
+/// next to "External IPv6", where a missing row reads as unbalanced).
 struct LoadableRow: View {
     let label: LocalizedStringResource
     let state: LoadState<String>
@@ -70,6 +72,7 @@ struct LoadableRow: View {
     var stacked = false
     /// A short explanation shown under the value once it is loaded.
     var note: LocalizedStringResource?
+    var unavailableText: LocalizedStringResource?
     let load: () -> Void
 
     var body: some View {
@@ -84,7 +87,11 @@ struct LoadableRow: View {
         case .failed(let reason):
             PermissionRow(label: label, buttonTitle: "Try again", detail: reason, action: load)
         case .unavailable:
-            EmptyView()
+            if let unavailableText {
+                DataRow(label: label, value: String(localized: unavailableText))
+            } else {
+                EmptyView()
+            }
         }
     }
 }
