@@ -30,6 +30,7 @@ enum RateUnit: String, CaseIterable, Identifiable {
 final class AppSettings {
     nonisolated static let externalLookupsKey = "externalLookups"
     nonisolated static let externalPromptShownKey = "externalPromptShown"
+    nonisolated static let onboardingShownKey = "onboardingShown"
     nonisolated static let rateUnitKey = "rateUnit"
 
     private let defaults = UserDefaults.standard
@@ -44,6 +45,12 @@ final class AppSettings {
         didSet { defaults.set(externalPromptShown, forKey: Self.externalPromptShownKey) }
     }
 
+    /// The guided tour of the five tabs has been shown (or skipped) once.
+    /// Replayable any time from About.
+    var onboardingShown: Bool {
+        didSet { defaults.set(onboardingShown, forKey: Self.onboardingShownKey) }
+    }
+
     var rateUnit: RateUnit {
         didSet { defaults.set(rateUnit.rawValue, forKey: Self.rateUnitKey) }
     }
@@ -51,6 +58,7 @@ final class AppSettings {
     init() {
         externalLookups = defaults.bool(forKey: Self.externalLookupsKey)
         externalPromptShown = defaults.bool(forKey: Self.externalPromptShownKey)
+        onboardingShown = defaults.bool(forKey: Self.onboardingShownKey)
         rateUnit = RateUnit(rawValue: defaults.string(forKey: Self.rateUnitKey) ?? "") ?? .megabitPerSecond
     }
 }

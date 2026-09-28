@@ -11,6 +11,7 @@ struct RootView: View {
     @Environment(ExternalStore.self) private var external
     @Environment(AppNavigation.self) private var navigation
     @State private var showsExternalPrompt = false
+    @State private var showsOnboarding = false
 
     var body: some View {
         @Bindable var navigation = navigation
@@ -35,10 +36,22 @@ struct RootView: View {
             if isOn { external.load(force: true) } else { external.reset() }
         }
         .task {
-            if !settings.externalPromptShown, !DemoLaunch.isDemo || DemoLaunch.value(after: "-demo-firstrun") != nil {
+            let firstRunAllowed = !DemoLaunch.isDemo || DemoLaunch.value(after: "-demo-firstrun") != nil
+            if !settings.onboardingShown, firstRunAllowed {
+                showsOnboarding = true
+            } else if !settings.externalPromptShown, firstRunAllowed {
                 showsExternalPrompt = true
             }
             external.load()
+        }
+        // The tour first, then the one question about external requests —
+        // never both sheets at once.
+        .fullScreenCover(isPresented: $showsOnboarding) {
+            OnboardingView {
+                settings.onboardingShown = true
+                showsOnboarding = false
+                if !settings.externalPromptShown { showsExternalPrompt = true }
+            }
         }
         .sheet(isPresented: $showsExternalPrompt) {
             ExternalPromptSheet()
