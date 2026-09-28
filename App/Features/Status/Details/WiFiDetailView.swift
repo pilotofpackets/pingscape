@@ -48,7 +48,12 @@ struct WiFiDetailView: View {
                 if let security = info.security.label {
                     DataRow(label: "Security", value: security)
                 }
-                if let autoJoined = info.didAutoJoin {
+                // iOS only reports didAutoJoin reliably right when the join
+                // happens; once the connection is no longer fresh (didJustJoin
+                // isn't true), it tends to report false regardless of how the
+                // network was actually joined. Showing that would be a guess,
+                // so the row only appears while the join is still fresh.
+                if let autoJoined = info.didAutoJoin, info.didJustJoin == true {
                     DataRow(label: "Joined automatically", value: yesNo(autoJoined))
                 }
             }
