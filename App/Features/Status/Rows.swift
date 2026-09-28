@@ -1,45 +1,67 @@
 import NetKit
 import SwiftUI
 
-/// Groups of rows that several pages share. They are functions, not views, so
-/// that the rows land in the card as separate rows with a divider between them.
+/// Groups of rows that several pages share, prebuilt as plain arrays with
+/// ordinary Swift `for`/`if` rather than `ForEach`/SwiftUI-`if`, and meant to
+/// be rendered through `RowList`. `InfoCard`'s divider mechanism
+/// (`Group(subviews:)`) has repeatedly dropped the divider at the seam where
+/// a plain row sits directly next to a `ForEach` or SwiftUI-`if` — even
+/// nested one level deep inside another `ForEach`'s own per-item content —
+/// including seams entirely inside what used to be `addresses(of:)` itself
+/// (found 2026-09-22 and 2026-09-28, real-device only). Returning `[AnyView]`
+/// and combining arrays with `append(contentsOf:)` removes every such seam
+/// before the content ever reaches `Group(subviews:)`.
 @MainActor
 enum Rows {
     /// An IPv4 address and its subnet mask as two rows, so each fits on one
     /// line. An IPv6 address keeps its prefix and may wrap.
-    @ViewBuilder
-    static func address(_ address: InterfaceAddress) -> some View {
+    static func address(_ address: InterfaceAddress) -> [AnyView] {
         if address.isIPv6 {
-            DataRow(
-                label: "IPv6 address", value: address.withPrefix, monospaced: true, sensitive: true,
-                stacked: true)
-        } else {
-            DataRow(label: "IP address", value: address.ip, monospaced: true, sensitive: true)
-            if let mask = address.netmask ?? address.prefixLength.map(IPv4.netmask(fromPrefix:)) {
-                DataRow(label: "Subnet mask", value: mask, monospaced: true, sensitive: true)
-            }
+            return [
+                AnyView(
+                    DataRow(
+                        label: "IPv6 address", value: address.withPrefix, monospaced: true, sensitive: true,
+                        stacked: true))
+            ]
         }
+        var rows: [AnyView] = [
+            AnyView(DataRow(label: "IP address", value: address.ip, monospaced: true, sensitive: true))
+        ]
+        if let mask = address.netmask ?? address.prefixLength.map(IPv4.netmask(fromPrefix:)) {
+            rows.append(AnyView(DataRow(label: "Subnet mask", value: mask, monospaced: true, sensitive: true)))
+        }
+        return rows
     }
 
     /// The usable IPv4 addresses of an interface, its default gateway, the
     /// usable IPv6 addresses, then the MTU.
-    @ViewBuilder
-    static func addresses(of interface: NetworkInterface, gateway: String? = nil) -> some View {
-        ForEach(interface.ipv4Addresses, id: \.self) { address($0) }
+    static func addresses(of interface: NetworkInterface, gateway: String? = nil) -> [AnyView] {
+        var rows = interface.ipv4Addresses.flatMap { address($0) }
         if let gateway {
-            DataRow(label: "Default gateway", value: gateway, monospaced: true, sensitive: true)
+            rows.append(AnyView(DataRow(label: "Default gateway", value: gateway, monospaced: true, sensitive: true)))
         }
-        ForEach(interface.ipv6Addresses, id: \.self) { address($0) }
+        rows.append(contentsOf: interface.ipv6Addresses.flatMap { address($0) })
         if let mtu = interface.mtu {
-            DataRow(label: "MTU", value: String(mtu))
+            rows.append(AnyView(DataRow(label: "MTU", value: String(mtu))))
         }
+        return rows
     }
 
     /// The system DNS servers, one row each.
-    @ViewBuilder
-    static func dnsServers(_ servers: [String]) -> some View {
-        ForEach(servers, id: \.self) { server in
-            DataRow(label: "DNS server", value: server, monospaced: true, sensitive: true)
+    static func dnsServers(_ servers: [String]) -> [AnyView] {
+        servers.map { AnyView(DataRow(label: "DNS server", value: $0, monospaced: true, sensitive: true)) }
+    }
+}
+
+/// Renders rows built as a plain array through one array-backed `ForEach`, so
+/// nothing here is a sibling `ForEach`/conditional for `InfoCard`'s divider
+/// mechanism to trip over. See `Rows`.
+struct RowList: View {
+    let rows: [AnyView]
+
+    var body: some View {
+        ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+            row
         }
     }
 }

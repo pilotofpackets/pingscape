@@ -20,17 +20,24 @@ struct VPNDetailView: View {
                     let title: LocalizedStringResource =
                         tunnels.count > 1 ? "Tunnel · \(tunnel.name)" : "Tunnel"
                     InfoSection(title: title) {
-                        DataRow(label: "Interface", value: tunnel.name, monospaced: true)
-                        Rows.addresses(of: tunnel)
-                        // The system DNS servers are the tunnel's only while
-                        // the tunnel carries the internet traffic.
-                        if snapshot.carriesTraffic(tunnel) {
-                            Rows.dnsServers(snapshot.dnsServers)
-                        }
+                        RowList(rows: tunnelRows(tunnel, snapshot: snapshot))
                     }
                     TrafficSection(interface: tunnel)
                 }
             }
         }
+    }
+
+    /// Every row of one tunnel's card, flattened ahead of time. See `Rows`
+    /// for why this avoids a plain row sitting next to a ForEach/conditional.
+    private func tunnelRows(_ tunnel: NetworkInterface, snapshot: NetworkSnapshot) -> [AnyView] {
+        var rows: [AnyView] = [AnyView(DataRow(label: "Interface", value: tunnel.name, monospaced: true))]
+        rows.append(contentsOf: Rows.addresses(of: tunnel))
+        // The system DNS servers are the tunnel's only while the tunnel
+        // carries the internet traffic.
+        if snapshot.carriesTraffic(tunnel) {
+            rows.append(contentsOf: Rows.dnsServers(snapshot.dnsServers))
+        }
+        return rows
     }
 }

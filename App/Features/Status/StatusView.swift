@@ -153,7 +153,7 @@ struct StatusView: View {
                 DataRow(label: "IP address", value: ipv4.ip, monospaced: true, sensitive: true)
             }
             if let ipv6 = snapshot.primaryIPv6 {
-                Rows.address(ipv6)
+                RowList(rows: Rows.address(ipv6))
             } else if snapshot.primaryInterface != nil {
                 DataRow(label: "IPv6 address", value: String(localized: "Not available"))
             }
@@ -240,23 +240,21 @@ struct StatusView: View {
     private func vpn(_ snapshot: NetworkSnapshot) -> some View {
         if let scope = snapshot.tunnelScope {
             InfoSection(title: "VPN and Tunnel", details: OverviewDestination.vpn, prominent: scope == .full) {
-                // One flat, array-backed ForEach for every row, Status to
-                // External IPv6, instead of the rows being written as nested
-                // ForEach/if-let content: the card's divider mechanism
-                // (`Group(subviews:)`) has repeatedly dropped the divider at
-                // the seam where a plain row sits directly next to a ForEach,
-                // even nested inside another ForEach's own per-tunnel content
-                // — Status before the tunnel loop (found 2026-09-22), then
-                // Interface before the address rows and MTU right after them
-                // (found 2026-09-28, from a live VPN on Niklas' device; not
-                // reproducible in Simulator, seemingly because there the
-                // snapshot loads once instead of updating incrementally
-                // while the tunnel connects). Pre-building one array removes
-                // every such seam: nothing here is a sibling ForEach or
-                // conditional for Group(subviews:) to trip over.
-                ForEach(Array(vpnRows(snapshot, scope: scope).enumerated()), id: \.offset) { _, row in
-                    row
-                }
+                // RowList renders one flat, array-backed ForEach for every
+                // row, Status to External IPv6, instead of the rows being
+                // written as nested ForEach/if-let content: the card's
+                // divider mechanism (`Group(subviews:)`) has repeatedly
+                // dropped the divider at the seam where a plain row sits
+                // directly next to a ForEach, even nested inside another
+                // ForEach's own per-tunnel content — Status before the
+                // tunnel loop (found 2026-09-22), then Interface before the
+                // address rows and MTU right after them (found 2026-09-28,
+                // from a live VPN on Niklas' device; not reproducible in
+                // Simulator, seemingly because there the snapshot loads once
+                // instead of updating incrementally while the tunnel
+                // connects). See `Rows` for the same fix applied to the
+                // detail pages.
+                RowList(rows: vpnRows(snapshot, scope: scope))
             }
         }
     }
@@ -274,23 +272,7 @@ struct StatusView: View {
                             ? String(localized: "Active · Full tunnel")
                             : String(localized: "Active · Split tunnel"))))
             rows.append(AnyView(DataRow(label: "Interface", value: tunnel.name, monospaced: true)))
-            for address in tunnel.ipv4Addresses {
-                rows.append(
-                    AnyView(DataRow(label: "IP address", value: address.ip, monospaced: true, sensitive: true)))
-                if let mask = address.netmask ?? address.prefixLength.map(IPv4.netmask(fromPrefix:)) {
-                    rows.append(AnyView(DataRow(label: "Subnet mask", value: mask, monospaced: true, sensitive: true)))
-                }
-            }
-            for address in tunnel.ipv6Addresses {
-                rows.append(
-                    AnyView(
-                        DataRow(
-                            label: "IPv6 address", value: address.withPrefix, monospaced: true, sensitive: true,
-                            stacked: true)))
-            }
-            if let mtu = tunnel.mtu {
-                rows.append(AnyView(DataRow(label: "MTU", value: String(mtu))))
-            }
+            rows.append(contentsOf: Rows.addresses(of: tunnel))
             // Only while this carries the default route: everything the
             // internet resolves and sees is really the tunnel's, not the
             // Wi-Fi or cellular connection underneath (see the Connection card).

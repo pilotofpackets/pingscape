@@ -103,7 +103,7 @@ struct InterfaceDetailView: View {
                 // Every address the interface holds, link-local ones too.
                 if !interface.addresses.isEmpty {
                     InfoSection(title: "Addresses") {
-                        ForEach(interface.addresses, id: \.self) { Rows.address($0) }
+                        RowList(rows: interface.addresses.flatMap { Rows.address($0) })
                     }
                 }
                 counters(interface)

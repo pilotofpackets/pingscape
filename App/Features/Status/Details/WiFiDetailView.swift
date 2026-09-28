@@ -70,15 +70,21 @@ struct WiFiDetailView: View {
     private func addresses(_ snapshot: NetworkSnapshot) -> some View {
         if let wifi = snapshot.interface(of: .wifi) {
             InfoSection(title: "Addresses") {
-                Rows.addresses(of: wifi, gateway: snapshot.gateway(of: wifi))
-                // The DNS servers belong to the system, not to Wi-Fi. While a
-                // VPN is active they are usually the tunnel's, so they stay
-                // off this page then.
-                if !snapshot.isVPNActive {
-                    Rows.dnsServers(snapshot.dnsServers)
-                }
+                RowList(rows: addressRows(wifi, snapshot: snapshot))
             }
         }
+    }
+
+    /// Every row of the Addresses card, flattened ahead of time. See `Rows`
+    /// for why this avoids a plain row sitting next to a ForEach/conditional.
+    private func addressRows(_ wifi: NetworkInterface, snapshot: NetworkSnapshot) -> [AnyView] {
+        var rows = Rows.addresses(of: wifi, gateway: snapshot.gateway(of: wifi))
+        // The DNS servers belong to the system, not to Wi-Fi. While a VPN is
+        // active they are usually the tunnel's, so they stay off this page then.
+        if !snapshot.isVPNActive {
+            rows.append(contentsOf: Rows.dnsServers(snapshot.dnsServers))
+        }
+        return rows
     }
 
     /// A short measurement to the router, on a tap.

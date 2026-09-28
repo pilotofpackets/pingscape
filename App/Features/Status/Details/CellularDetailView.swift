@@ -18,7 +18,7 @@ struct CellularDetailView: View {
                 }
                 if let data = snapshot.interface(of: .cellular) {
                     InfoSection(title: "Data connection") {
-                        Rows.addresses(of: data)
+                        RowList(rows: Rows.addresses(of: data))
                     }
                     TrafficSection(interface: data)
                 }
