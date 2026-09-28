@@ -142,12 +142,24 @@ struct UPnPTests {
 
     @Test func readsTheRootDeviceAndItsServices() throws {
         let parsed = try #require(UPnPClient.parse(description: Data(description.utf8)))
+        #expect(parsed.friendlyName == "Example Router")
         #expect(parsed.manufacturer == "Example Networks")
         #expect(parsed.modelName == "ER-7000")
         #expect(parsed.modelNumber == "7000")
         #expect(parsed.firmware == "1.2.3")
         #expect(parsed.services.map(\.controlPath) == ["/upnp/control/L3F", "/upnp/control/WANIPConn1"])
         #expect(parsed.services.last?.type == "urn:schemas-upnp-org:service:WANIPConnection:1")
+    }
+
+    @Test func appendsTheModelNumberUnlessTheNameAlreadyHasIt() {
+        var description = UPnPClient.Description()
+        description.modelName = "FRITZ!Box"
+        description.modelNumber = "7590"
+        #expect(description.model == "FRITZ!Box 7590")
+        description.modelName = "FRITZ!Box 7590"
+        #expect(description.model == "FRITZ!Box 7590")
+        description.modelNumber = nil
+        #expect(description.model == "FRITZ!Box 7590")
     }
 
     @Test func readsSOAPValuesWithAndWithoutPrefix() {
@@ -167,5 +179,25 @@ struct UPnPTests {
         let reply = "HTTP/1.1 200 OK\r\nCACHE-CONTROL: max-age=120\r\nLocation: http://192.0.2.1:49000/igddesc.xml\r\nST: upnp:rootdevice\r\n\r\n"
         #expect(UPnPClient.location(inSearchReply: reply) == "http://192.0.2.1:49000/igddesc.xml")
         #expect(UPnPClient.location(inSearchReply: "HTTP/1.1 200 OK\r\n\r\n") == nil)
+    }
+}
+
+@Suite("SSDP")
+struct SSDPTests {
+    @Test func turnsADescriptionIntoAServiceWithTheDeviceSFields() {
+        var description = UPnPClient.Description()
+        description.friendlyName = "Living Room Speaker"
+        description.manufacturer = "Sonos"
+        description.modelName = "One"
+        let service = SSDPBrowser.service(from: description, fallbackName: "192.168.178.30")
+        #expect(service.type == "upnp:rootdevice")
+        #expect(service.name == "Living Room Speaker")
+        #expect(service.txt == ["manufacturer": "Sonos", "model": "One"])
+    }
+
+    @Test func fallsBackToTheAddressWhenADeviceGivesNoFriendlyName() {
+        let service = SSDPBrowser.service(from: UPnPClient.Description(), fallbackName: "192.168.178.30")
+        #expect(service.name == "192.168.178.30")
+        #expect(service.txt.isEmpty)
     }
 }

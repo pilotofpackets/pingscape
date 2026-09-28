@@ -89,7 +89,7 @@ public struct LANDevice: Sendable, Equatable, Identifiable {
     private static let namePriority = [
         "_airplay._tcp", "_googlecast._tcp", "_hap._tcp", "_companion-link._tcp", "_raop._tcp", "_sonos._tcp",
         "_ipp._tcp", "_ipps._tcp", "_printer._tcp", "_smb._tcp", "_afpovertcp._tcp", "_ssh._tcp", "_sftp-ssh._tcp",
-        "_workstation._tcp", "_http._tcp", "_https._tcp",
+        "_workstation._tcp", "upnp:rootdevice", "_http._tcp", "_https._tcp",
     ]
 
     /// The name the device gave itself over Bonjour. Google Cast delivers the

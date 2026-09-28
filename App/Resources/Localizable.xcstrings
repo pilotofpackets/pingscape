@@ -7641,70 +7641,70 @@
         }
       }
     },
-    "Ping and Bonjour" : {
+    "Ping, Bonjour and UPnP" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping und Bonjour"
+            "value" : "Ping, Bonjour und UPnP"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping and Bonjour"
+            "value" : "Ping, Bonjour and UPnP"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping y Bonjour"
+            "value" : "Ping, Bonjour y UPnP"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping et Bonjour"
+            "value" : "Ping, Bonjour et UPnP"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping e Bonjour"
+            "value" : "Ping, Bonjour e UPnP"
           }
         }
       }
     },
-    "Ping, Bonjour and ports" : {
+    "Ping, Bonjour, UPnP and ports" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping, Bonjour und Ports"
+            "value" : "Ping, Bonjour, UPnP und Ports"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping, Bonjour and ports"
+            "value" : "Ping, Bonjour, UPnP and ports"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping, Bonjour y puertos"
+            "value" : "Ping, Bonjour, UPnP y puertos"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping, Bonjour et ports"
+            "value" : "Ping, Bonjour, UPnP et ports"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ping, Bonjour e porte"
+            "value" : "Ping, Bonjour, UPnP e porte"
           }
         }
       }
@@ -7743,36 +7743,36 @@
         }
       }
     },
-    "Pings every address and listens for Bonjour." : {
+    "Pings every address and listens for Bonjour and UPnP." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pingt jede Adresse an und hört auf Bonjour."
+            "value" : "Pingt jede Adresse an und hört auf Bonjour und UPnP."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pings every address and listens for Bonjour."
+            "value" : "Pings every address and listens for Bonjour and UPnP."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hace ping a cada dirección y escucha Bonjour."
+            "value" : "Hace ping a cada dirección y escucha Bonjour y UPnP."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envoie un ping à chaque adresse et écoute Bonjour."
+            "value" : "Envoie un ping à chaque adresse et écoute Bonjour et UPnP."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fa il ping a ogni indirizzo e ascolta Bonjour."
+            "value" : "Fa il ping a ogni indirizzo e ascolta Bonjour e UPnP."
           }
         }
       }

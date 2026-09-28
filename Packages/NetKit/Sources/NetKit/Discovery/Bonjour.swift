@@ -7,14 +7,12 @@ public struct BonjourFinding: Sendable, Equatable {
     public let service: LANService
 }
 
-/// Looks for Bonjour (mDNS) services of a curated list of types.
-///
-/// Browsing all service types (`_services._dns-sd._udp`) needs Apple's
-/// multicast entitlement, so the list stays short and mirrors
-/// `NSBonjourServices` in the app's Info.plist. A type missing there is
-/// silently not delivered by the system.
+/// Looks for Bonjour (mDNS) services: first a curated list of types that need
+/// no special permission, then, with Apple's multicast entitlement, every
+/// other type the network actually announces.
 public enum BonjourBrowser {
-    /// Keep in sync with `NSBonjourServices` in `project.yml`.
+    /// Keep in sync with `NSBonjourServices` in `project.yml`. Browsed even
+    /// without the multicast entitlement, since they are declared there.
     public static let serviceTypes = [
         "_http._tcp", "_https._tcp", "_airplay._tcp", "_raop._tcp", "_hap._tcp", "_googlecast._tcp",
         "_ipp._tcp", "_ipps._tcp", "_printer._tcp", "_smb._tcp", "_afpovertcp._tcp", "_ssh._tcp",
@@ -22,30 +20,86 @@ public enum BonjourBrowser {
         "_meshcop._udp", "_spotify-connect._tcp", "_sonos._tcp",
     ]
 
-    /// Findings until the stream is cancelled or `duration` has passed.
+    /// Browsing this special type returns, as its results' names, every
+    /// service type the network announces (the DNS-SD meta-query). Needs the
+    /// multicast entitlement; without it the browse silently finds nothing,
+    /// and discovery stays with `serviceTypes` above.
+    private static let metaQueryType = "_services._dns-sd._udp"
+
+    /// Findings until the stream is cancelled or `duration` has passed. Types
+    /// beyond `types` that the meta-query turns up are browsed too, as they
+    /// are found, and so may keep delivering results until near the end.
     public static func browse(
         types: [String] = serviceTypes, duration: Duration = .seconds(6)
     ) -> AsyncStream<BonjourFinding> {
         AsyncStream { continuation in
             let queue = DispatchQueue(label: "app.pingscape.bonjour")
             let resolver = Resolver(continuation: continuation)
-            let browsers = types.map { type -> NWBrowser in
+            let tracker = BrowserTracker(startedTypes: Set(types))
+
+            @Sendable func startBrowser(for type: String) {
                 let browser = NWBrowser(for: .bonjourWithTXTRecord(type: type, domain: "local."), using: .tcp)
                 browser.browseResultsChangedHandler = { results, _ in
                     for result in results { resolver.resolve(result, type: type) }
                 }
                 browser.start(queue: queue)
-                return browser
+                tracker.add(browser)
             }
+
+            types.forEach(startBrowser)
+            let metaBrowser = NWBrowser(for: .bonjour(type: metaQueryType, domain: "local."), using: .tcp)
+            metaBrowser.browseResultsChangedHandler = { results, _ in
+                for result in results {
+                    // For the meta-query, the system puts the discovered type
+                    // itself (e.g. "_http._tcp") where an ordinary browse
+                    // puts the instance name, in the first position.
+                    guard case .service(let type, _, _, _) = result.endpoint, tracker.markStarted(type) else { continue }
+                    startBrowser(for: type)
+                }
+            }
+            metaBrowser.start(queue: queue)
+            tracker.add(metaBrowser)
+
             let timer = Task {
                 try? await Task.sleep(for: duration)
                 continuation.finish()
             }
             continuation.onTermination = { _ in
                 timer.cancel()
-                browsers.forEach { $0.cancel() }
+                tracker.cancelAll()
                 resolver.cancelAll()
             }
+        }
+    }
+
+    /// The browsers started so far and the types already covered, safe to
+    /// touch from a browser's own result handler and from cancellation.
+    private final class BrowserTracker: @unchecked Sendable {
+        private let lock = NSLock()
+        private var browsers: [NWBrowser] = []
+        private var startedTypes: Set<String>
+
+        init(startedTypes: Set<String>) { self.startedTypes = startedTypes }
+
+        func add(_ browser: NWBrowser) {
+            lock.lock()
+            browsers.append(browser)
+            lock.unlock()
+        }
+
+        /// Whether `type` had not been started yet, marking it as started either way.
+        func markStarted(_ type: String) -> Bool {
+            lock.lock()
+            defer { lock.unlock() }
+            return startedTypes.insert(type).inserted
+        }
+
+        func cancelAll() {
+            lock.lock()
+            let all = browsers
+            browsers = []
+            lock.unlock()
+            all.forEach { $0.cancel() }
         }
     }
 

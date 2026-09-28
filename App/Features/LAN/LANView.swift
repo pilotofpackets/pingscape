@@ -131,7 +131,7 @@ struct LANView: View {
             .disabled(lan.isBusy)
             footnote(
                 lan.mode == .quick
-                    ? "Pings every address and listens for Bonjour."
+                    ? "Pings every address and listens for Bonjour and UPnP."
                     : "Also tries a few ports on addresses that do not answer a ping, and lists open ports.")
             if lan.access == nil, !lan.isBusy, lan.list.devices.isEmpty {
                 footnote(
@@ -167,7 +167,7 @@ struct LANView: View {
                     if lan.phase == .askingPermission {
                         Text("Waiting for permission")
                     } else {
-                        Text(lan.mode == .quick ? "Ping and Bonjour" : "Ping, Bonjour and ports")
+                        Text(lan.mode == .quick ? "Ping, Bonjour and UPnP" : "Ping, Bonjour, UPnP and ports")
                     }
                     Spacer()
                     if let progress = lan.progress, lan.phase == .searching {

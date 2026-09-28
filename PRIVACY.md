@@ -30,7 +30,7 @@ Each of these servers sees your public IP address, as with any internet request.
 - "Check internet" in the External page asks `captive.apple.com`.
 - The optional internet ping in the Live tab (off by default) pings the host you enter, once a second.
 
-**On your local network.** The device search pings addresses of your own network and listens for Bonjour. The router's own address is asked for its UPnP description. This never leaves your network.
+**On your local network.** The device search pings addresses of your own network and listens for Bonjour, including for service types beyond the ones built into the app, using Apple's multicast networking entitlement. It also sends an SSDP search to the multicast address `239.255.255.250` to find UPnP devices (routers, media servers, printers) and asks each one that answers, and the router's own address directly, for its UPnP description. This never leaves your network.
 
 **Shortcuts and widget.** The Shortcuts actions (network status, VPN check, ping) run when you start them and return their result to you. The status widget reads whether the device is online, over what and whether a VPN is active, and shows the time it was read. Neither sends anything anywhere except the ping you ask for.
 

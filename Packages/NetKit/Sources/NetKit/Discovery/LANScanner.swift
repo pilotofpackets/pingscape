@@ -54,9 +54,16 @@ public enum LANScanner {
                         for await finding in BonjourBrowser.browse() {
                             // Only devices of this network: a service can also resolve to
                             // the loopback address or to another interface.
-                            guard let value = IPv4.toInt(finding.ip), value > range.network,
-                                IPv4Range(ip: finding.ip, prefix: range.prefix)?.network == range.network
-                            else { continue }
+                            guard isOnNetwork(finding.ip, range: range) else { continue }
+                            continuation.yield(.service(ip: finding.ip, finding.service))
+                        }
+                    }
+
+                    // SSDP runs beside the sweep too. It needs Apple's multicast
+                    // entitlement to send; without it, it silently finds nothing.
+                    group.addTask {
+                        for await finding in SSDPBrowser.browse() {
+                            guard isOnNetwork(finding.ip, range: range) else { continue }
                             continuation.yield(.service(ip: finding.ip, finding.service))
                         }
                     }
@@ -78,6 +85,13 @@ public enum LANScanner {
             }
             continuation.onTermination = { _ in task.cancel() }
         }
+    }
+
+    /// Whether an address belongs to the network being searched: a Bonjour or
+    /// SSDP finding can also resolve to the loopback address or to another interface.
+    private static func isOnNetwork(_ ip: String, range: IPv4Range) -> Bool {
+        guard let value = IPv4.toInt(ip), value > range.network else { return false }
+        return IPv4Range(ip: ip, prefix: range.prefix)?.network == range.network
     }
 
     /// Pings all addresses. Returns the ones that answered.

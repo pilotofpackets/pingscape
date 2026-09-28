@@ -31,12 +31,15 @@ public struct RouterInfo: Sendable, Equatable {
 /// Reads the UPnP device description of the router and, if it offers the
 /// read-only calls, its external address and uptime.
 ///
-/// Everything goes to the gateway's own address by unicast. No multicast, so
-/// Apple's multicast entitlement is not needed. Nothing is changed on the router.
+/// `describe(gateway:)` goes to the gateway's own address by unicast only, so
+/// it does not need Apple's multicast entitlement. `SSDPBrowser` uses this
+/// type's XML parsing to read the description of every device it finds by
+/// multicast. Nothing is ever changed on a device.
 public enum UPnPClient {
     public static let timeoutSeconds = 2.0
 
     struct Description: Equatable {
+        var friendlyName: String?
         var manufacturer: String?
         var modelName: String?
         var modelNumber: String?
@@ -47,13 +50,19 @@ public enum UPnPClient {
             let type: String
             let controlPath: String
         }
+
+        /// The model name with its number appended, unless the name already
+        /// contains it.
+        var model: String? {
+            guard let number = modelNumber, !number.isEmpty, modelName?.contains(number) != true else { return modelName }
+            return [modelName, number].compactMap { $0 }.joined(separator: " ")
+        }
     }
 
     /// The router's information, or `nil` if it does not answer over UPnP.
     public static func describe(gateway: String) async -> RouterInfo? {
         guard let base = await locate(gateway: gateway),
-            let data = try? await fetch(base, method: "GET"),
-            let description = parse(description: data)
+            let description = await fetchDescription(at: base)
         else { return nil }
 
         var externalIP: String?
@@ -69,12 +78,8 @@ public enum UPnPClient {
             }
         }
 
-        var model = description.modelName
-        if let number = description.modelNumber, !number.isEmpty, model?.contains(number) != true {
-            model = [model, number].compactMap { $0 }.joined(separator: " ")
-        }
         let info = RouterInfo(
-            manufacturer: description.manufacturer, model: model, firmware: description.firmware,
+            manufacturer: description.manufacturer, model: description.model, firmware: description.firmware,
             externalIP: externalIP, uptimeSeconds: uptime)
         return info.isEmpty ? nil : info
     }
@@ -87,6 +92,13 @@ public enum UPnPClient {
         (49000, "/igddesc.xml"), (1900, "/rootDesc.xml"), (5000, "/rootDesc.xml"), (52869, "/picsdesc.xml"),
         (49152, "/wps_device.xml"), (80, "/rootDesc.xml"),
     ]
+
+    /// Fetches and reads the device description at a `LOCATION` URL, used both
+    /// for the gateway above and for every device `SSDPBrowser` finds.
+    static func fetchDescription(at url: URL) async -> Description? {
+        guard let data = try? await fetch(url, method: "GET") else { return nil }
+        return parse(description: data)
+    }
 
     private static func locate(gateway: String) async -> URL? {
         if let location = try? await search(gateway: gateway),
@@ -209,6 +221,7 @@ public enum UPnPClient {
             let isRootDeviceField = deviceDepth.map { path.count == $0 + 1 } ?? false
             if isRootDeviceField, !value.isEmpty {
                 switch name {
+                case "friendlyName": result.friendlyName = result.friendlyName ?? value
                 case "manufacturer": result.manufacturer = result.manufacturer ?? value
                 case "modelName": result.modelName = result.modelName ?? value
                 case "modelNumber": result.modelNumber = result.modelNumber ?? value
