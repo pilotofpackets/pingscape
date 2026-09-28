@@ -3261,6 +3261,40 @@
         }
       }
     },
+    "Find other devices on this network" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere Geräte im Netzwerk finden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find other devices on this network"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuentra otros dispositivos en esta red"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Découvrir les autres appareils du réseau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trova altri dispositivi in questa rete"
+          }
+        }
+      }
+    },
     "Firmware" : {
       "localizations" : {
         "de" : {
@@ -3560,6 +3594,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gateway secondo il sistema"
+          }
+        }
+      }
+    },
+    "Get started" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los geht's"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get started"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empezar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inizia"
           }
         }
       }
@@ -3968,6 +4036,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Host"
+          }
+        }
+      }
+    },
+    "How many replies didn't come back." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie viele Antworten nicht zurückkamen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How many replies didn't come back."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuántas respuestas no han vuelto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nombre de réponses qui ne sont pas revenues."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quante risposte non sono tornate indietro."
           }
         }
       }
@@ -4444,6 +4546,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "LAN"
+          }
+        }
+      }
+    },
+    "LAN searches your Wi-Fi for other devices — routers, computers, smart devices — by asking them directly. Nothing leaves your iPhone." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAN durchsucht dein WLAN nach anderen Geräten – Router, Computer, smarte Geräte –, indem es sie direkt fragt. Nichts verlässt dabei dein iPhone."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAN searches your Wi-Fi for other devices — routers, computers, smart devices — by asking them directly. Nothing leaves your iPhone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAN busca otros dispositivos en tu Wi-Fi (routers, ordenadores, dispositivos inteligentes) preguntándoles directamente. Nada sale de tu iPhone."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAN recherche d'autres appareils sur votre Wi-Fi (routeurs, ordinateurs, appareils connectés) en les interrogeant directement. Rien ne quitte votre iPhone."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAN cerca altri dispositivi sul tuo Wi-Fi (router, computer, dispositivi smart) interrogandoli direttamente. Niente lascia il tuo iPhone."
           }
         }
       }
@@ -5118,6 +5254,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un appui long sur une valeur permet de masquer uniquement celle-ci, par exemple avant une capture d’écran."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni premuto su un valore per nascondere solo quello, ad esempio prima di uno screenshot."
+          }
+        }
+      }
+    },
+    "Long-press one value to hide just that one, for example before a screenshot." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einen Wert lang drücken, um nur diesen zu verbergen – zum Beispiel vor einem Screenshot."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long-press one value to hide just that one, for example before a screenshot."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén pulsado un valor para ocultar solo ese, por ejemplo antes de una captura de pantalla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un appui long sur une valeur permet de masquer uniquement celle-ci, par exemple avant une capture d'écran."
           }
         },
         "it" : {
@@ -6216,6 +6386,108 @@
         }
       }
     },
+    "Next" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanti"
+          }
+        }
+      }
+    },
+    "Nine tools for a closer look. Pick one from the row at the top, enter a host or address, and start." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neun Werkzeuge für den genaueren Blick. Wähle eines aus der Zeile oben, gib einen Host oder eine Adresse ein und starte."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nine tools for a closer look. Pick one from the row at the top, enter a host or address, and start."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueve herramientas para investigar más a fondo. Elige una en la fila superior, escribe un host o una dirección y empieza."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuf outils pour aller plus loin. Choisissez-en un dans la ligne du haut, saisissez un hôte ou une adresse, puis lancez-le."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nove strumenti per un'analisi più approfondita. Scegline uno dalla riga in alto, inserisci un host o un indirizzo e avvia."
+          }
+        }
+      }
+    },
+    "Nine tools in a row at the top: Ping, Traceroute, DNS, Whois, Ports, TLS, HTTP, Subnet, OUI." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neun Werkzeuge in der Zeile oben: Ping, Traceroute, DNS, Whois, Ports, TLS, HTTP, Subnet, OUI."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nine tools in a row at the top: Ping, Traceroute, DNS, Whois, Ports, TLS, HTTP, Subnet, OUI."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueve herramientas en la fila superior: Ping, Traceroute, DNS, Whois, Puertos, TLS, HTTP, Subred, OUI."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuf outils dans la ligne du haut : Ping, Traceroute, DNS, Whois, Ports, TLS, HTTP, Sous-réseau, OUI."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nove strumenti nella riga in alto: Ping, Traceroute, DNS, Whois, Porte, TLS, HTTP, Sottorete, OUI."
+          }
+        }
+      }
+    },
     "No" : {
       "localizations" : {
         "de" : {
@@ -7028,6 +7300,40 @@
         }
       }
     },
+    "On when a VPN app is connected. Full tunnel routes everything through it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiv, wenn eine VPN-App verbunden ist. Voll-Tunnel leitet dabei den gesamten Datenverkehr durch."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On when a VPN app is connected. Full tunnel routes everything through it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activo cuando hay una app VPN conectada. El túnel completo enruta todo el tráfico a través de ella."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actif lorsqu'une app VPN est connectée. Le tunnel complet fait passer tout le trafic par elle."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attivo quando un'app VPN è connessa. Il tunnel completo instrada tutto il traffico attraverso di essa."
+          }
+        }
+      }
+    },
     "Online" : {
       "localizations" : {
         "de" : {
@@ -7505,6 +7811,40 @@
         }
       }
     },
+    "Overview shows whether you're online and how — Wi-Fi, cellular or a VPN. Tap Details on any card for everything behind it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überblick zeigt, ob du online bist und wie – WLAN, Mobilfunk oder VPN. Tippe bei einer Karte auf Details für alles dahinter."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overview shows whether you're online and how — Wi-Fi, cellular or a VPN. Tap Details on any card for everything behind it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumen muestra si estás en línea y cómo: Wi-Fi, red móvil o una VPN. Toca Detalles en cualquier tarjeta para ver todo lo que hay detrás."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aperçu indique si vous êtes en ligne et comment : Wi-Fi, réseau cellulaire ou VPN. Touchez Détails sur une carte pour tout voir à ce sujet."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panoramica mostra se sei online e come: Wi-Fi, rete cellulare o una VPN. Tocca Dettagli su una scheda per tutto quello che c'è dietro."
+          }
+        }
+      }
+    },
     "Packets received" : {
       "localizations" : {
         "de" : {
@@ -7879,6 +8219,40 @@
         }
       }
     },
+    "Ping, Traceroute, DNS and more" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ping, Traceroute, DNS und mehr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ping, Traceroute, DNS and more"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ping, Traceroute, DNS y más"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ping, Traceroute, DNS et plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ping, Traceroute, DNS e altro"
+          }
+        }
+      }
+    },
     "Pings %@ once a second. That host sees your public IP address." : {
       "localizations" : {
         "de" : {
@@ -7981,6 +8355,40 @@
         }
       }
     },
+    "Pingscape has no account and shows no ads. It contacts the internet only for what you explicitly ask for, and never sends anything else." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape hat kein Konto und zeigt keine Werbung. Es kontaktiert das Internet nur für das, worum du ausdrücklich bittest, und schickt sonst nichts."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape has no account and shows no ads. It contacts the internet only for what you explicitly ask for, and never sends anything else."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape no tiene cuenta ni muestra anuncios. Solo contacta con internet para lo que le pides explícitamente, y nunca envía nada más."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape n'a pas de compte et n'affiche aucune publicité. Il ne contacte Internet que pour ce que vous demandez explicitement, et n'envoie jamais rien d'autre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape non ha un account e non mostra pubblicità. Contatta Internet solo per ciò che chiedi esplicitamente, e non invia mai nient'altro."
+          }
+        }
+      }
+    },
     "Pingscape is open source under the MIT License." : {
       "localizations" : {
         "de" : {
@@ -8011,6 +8419,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pingscape è open source con licenza MIT."
+          }
+        }
+      }
+    },
+    "Pingscape shows what is going on with this connection — on this iPhone, in the local network, and on the internet. A short tour of what's here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape zeigt, was mit dieser Verbindung los ist – auf diesem iPhone, im lokalen Netzwerk und im Internet. Eine kurze Tour durch die App."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape shows what is going on with this connection — on this iPhone, in the local network, and on the internet. A short tour of what's here."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape muestra qué ocurre con esta conexión: en este iPhone, en la red local y en internet. Un breve recorrido por lo que hay aquí."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape montre ce qui se passe avec cette connexion : sur cet iPhone, sur le réseau local et sur Internet. Une courte visite de ce qui vous attend ici."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape mostra cosa succede con questa connessione: su questo iPhone, nella rete locale e su Internet. Un breve giro di quello che trovi qui."
           }
         }
       }
@@ -9885,6 +10327,40 @@
         }
       }
     },
+    "See the connection at a glance" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Verbindung auf einen Blick"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See the connection at a glance"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Observa la conexión de un vistazo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La connexion en un coup d'œil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osserva la connessione a colpo d'occhio"
+          }
+        }
+      }
+    },
     "Send" : {
       "localizations" : {
         "de" : {
@@ -10429,6 +10905,40 @@
         }
       }
     },
+    "Show introduction again" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einführung erneut zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show introduction again"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a mostrar la introducción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revoir l'introduction"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra di nuovo l'introduzione"
+          }
+        }
+      }
+    },
     "Show public IP and provider?" : {
       "localizations" : {
         "de" : {
@@ -10493,6 +11003,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra valore"
+          }
+        }
+      }
+    },
+    "Skip" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omitir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salta"
           }
         }
       }
@@ -11007,6 +11551,40 @@
         }
       }
     },
+    "Tap any device for its address and open ports." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe auf ein Gerät für seine Adresse und offene Ports."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap any device for its address and open ports."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca cualquier dispositivo para ver su dirección y los puertos abiertos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez un appareil pour voir son adresse et ses ports ouverts."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocca un dispositivo per vedere il suo indirizzo e le porte aperte."
+          }
+        }
+      }
+    },
     "Target" : {
       "localizations" : {
         "de" : {
@@ -11279,6 +11857,40 @@
         }
       }
     },
+    "The device that connects this network to the internet." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Gerät, das dieses Netzwerk mit dem Internet verbindet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The device that connects this network to the internet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El dispositivo que conecta esta red con internet."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'appareil qui relie ce réseau à Internet."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il dispositivo che collega questa rete a Internet."
+          }
+        }
+      }
+    },
     "The name goes to the registry that is responsible for it. Registry data of others is not hidden by “Hide values”." : {
       "localizations" : {
         "de" : {
@@ -11547,6 +12159,40 @@
         }
       }
     },
+    "These translations were written by the developer and have not been checked by a native speaker. If something looks off, please let us know using “Report an issue” above." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Übersetzungen wurden vom Entwickler verfasst und nicht von Muttersprachlern geprüft. Falls dir etwas komisch vorkommt, sag uns gerne über „Fehler melden“ oben Bescheid."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These translations were written by the developer and have not been checked by a native speaker. If something looks off, please let us know using “Report an issue” above."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estas traducciones fueron escritas por el desarrollador y no han sido revisadas por un hablante nativo. Si algo no te parece correcto, avísanos mediante «Informar de un problema» más arriba."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ces traductions ont été rédigées par le développeur et n’ont pas été relues par un locuteur natif. Si quelque chose vous semble incorrect, merci de nous le signaler via « Signaler un problème » ci-dessus."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queste traduzioni sono state scritte dallo sviluppatore e non sono state riviste da un madrelingua. Se qualcosa non ti sembra corretto, segnalacelo tramite «Segnala un problema» qui sopra."
+          }
+        }
+      }
+    },
     "This device has no local IPv4 address. Connect to Wi-Fi to look for devices." : {
       "localizations" : {
         "de" : {
@@ -11611,6 +12257,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo iPhone"
+          }
+        }
+      }
+    },
+    "This iPhone's address on this network — a new one on each network you join." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Adresse dieses iPhones in diesem Netzwerk – bei jedem neuen Netzwerk eine andere."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This iPhone's address on this network — a new one on each network you join."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dirección de este iPhone en esta red: una distinta en cada red a la que te unes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'adresse de cet iPhone sur ce réseau : une nouvelle à chaque réseau que vous rejoignez."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'indirizzo di questo iPhone in questa rete: uno diverso per ogni rete a cui ti unisci."
           }
         }
       }
@@ -11713,6 +12393,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Approfondito"
+          }
+        }
+      }
+    },
+    "Throughput, latency and jitter update once a second while this tab is open. Every change — a new network, a VPN, a different radio technology — is logged below." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durchsatz, Latenz und Jitter aktualisieren sich einmal pro Sekunde, solange dieser Tab geöffnet ist. Jede Änderung – ein neues Netzwerk, ein VPN, eine andere Funktechnik – wird darunter protokolliert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Throughput, latency and jitter update once a second while this tab is open. Every change — a new network, a VPN, a different radio technology — is logged below."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El rendimiento, la latencia y el jitter se actualizan cada segundo mientras esta pestaña está abierta. Cada cambio (una nueva red, una VPN, otra tecnología de radio) queda registrado más abajo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le débit, la latence et la gigue se mettent à jour chaque seconde tant que cet onglet est ouvert. Chaque changement (nouveau réseau, VPN, technologie radio différente) est enregistré ci-dessous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velocità, latenza e jitter si aggiornano ogni secondo mentre questa scheda è aperta. Ogni cambiamento (una nuova rete, una VPN, una tecnologia radio diversa) viene registrato qui sotto."
           }
         }
       }
@@ -12295,6 +13009,40 @@
         }
       }
     },
+    "Type a host or address, then start." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host oder Adresse eingeben und starten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type a host or address, then start."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe un host o una dirección y empieza."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un hôte ou une adresse, puis lancez."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inserisci un host o un indirizzo, poi avvia."
+          }
+        }
+      }
+    },
     "Units" : {
       "localizations" : {
         "de" : {
@@ -12325,6 +13073,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unità"
+          }
+        }
+      }
+    },
+    "Updates once a second while this tab is open." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisiert sich einmal pro Sekunde, solange der Tab offen ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates once a second while this tab is open."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se actualiza cada segundo mientras esta pestaña está abierta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se met à jour chaque seconde tant que cet onglet est ouvert."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si aggiorna ogni secondo mentre questa scheda è aperta."
           }
         }
       }
@@ -12393,6 +13175,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usa un indirizzo con prefisso, ad esempio 192.0.2.42/24"
+          }
+        }
+      }
+    },
+    "VPN" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN"
           }
         }
       }
@@ -12771,6 +13587,40 @@
         }
       }
     },
+    "Watch the connection in real time" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Verbindung in Echtzeit beobachten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watch the connection in real time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Observa la conexión en tiempo real"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivre la connexion en temps réel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osserva la connessione in tempo reale"
+          }
+        }
+      }
+    },
     "Web address" : {
       "localizations" : {
         "de" : {
@@ -12801,6 +13651,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Indirizzo web"
+          }
+        }
+      }
+    },
+    "Welcome to Pingscape" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei Pingscape"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Pingscape"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenido a Pingscape"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenue dans Pingscape"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benvenuto in Pingscape"
+          }
+        }
+      }
+    },
+    "Whether you're connected, right now." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ob du gerade verbunden bist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whether you're connected, right now."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si estás conectado ahora mismo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous êtes connecté, à l'instant."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se sei connesso, proprio adesso."
+          }
+        }
+      }
+    },
+    "Which network you're on — Wi-Fi, cellular or VPN." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welches Netzwerk gerade aktiv ist – WLAN, Mobilfunk oder VPN."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which network you're on — Wi-Fi, cellular or VPN."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A qué red estás conectado: Wi-Fi, red móvil o VPN."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le réseau utilisé en ce moment : Wi-Fi, cellulaire ou VPN."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A quale rete sei connesso: Wi-Fi, cellulare o VPN."
           }
         }
       }
@@ -13073,6 +14025,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sì, mostra"
+          }
+        }
+      }
+    },
+    "You can watch this introduction again any time, under About." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst diese Einführung jederzeit unter Über erneut ansehen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can watch this introduction again any time, under About."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes volver a ver esta introducción cuando quieras, en Acerca de."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez revoir cette introduction à tout moment, dans À propos."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puoi rivedere questa introduzione in qualsiasi momento, in Info."
+          }
+        }
+      }
+    },
+    "Your data stays on this iPhone" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Daten bleiben auf diesem iPhone"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data stays on this iPhone"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus datos se quedan en este iPhone"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos données restent sur cet iPhone"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi dati restano su questo iPhone"
           }
         }
       }

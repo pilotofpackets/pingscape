@@ -8,6 +8,7 @@ struct AboutView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(PrivacyMask.hideByDefaultKey) private var hideByDefault = false
+    @State private var showsOnboarding = false
 
     private static let repository = URL(string: "https://github.com/pilotofpackets/pingscape")!
     private static let issues = URL(string: "https://github.com/pilotofpackets/pingscape/issues")!
@@ -15,6 +16,11 @@ struct AboutView: View {
     private static let privacy = URL(string: "https://github.com/pilotofpackets/pingscape/blob/main/PRIVACY.md")!
 
     private var version: String { "\(DeviceInfo.appVersion) (\(DeviceInfo.appBuild))" }
+
+    /// French, Spanish and Italian were translated by the developer, not a native speaker.
+    private var showsTranslationNotice: Bool {
+        ["fr", "es", "it"].contains(Bundle.main.preferredLocalizations.first)
+    }
 
     var body: some View {
         @Bindable var settings = settings
@@ -57,15 +63,22 @@ struct AboutView: View {
                 }
                 permissions
                 Section("More") {
+                    Button("Show introduction again") { showsOnboarding = true }
                     NavigationLink("Diagnostic dump") { DiagnosticDumpView() }
                     NavigationLink("Licenses and sources") { LicensesView() }
                 }
-                Section("Project") {
+                Section {
                     Link("Source code on GitHub", destination: Self.repository)
                     Link("Report an issue", destination: Self.issues)
                     Link("Privacy", destination: Self.privacy)
                     Link(destination: Self.license) {
                         LabeledContent("License", value: "MIT")
+                    }
+                } header: {
+                    Text("Project")
+                } footer: {
+                    if showsTranslationNotice {
+                        Text("These translations were written by the developer and have not been checked by a native speaker. If something looks off, please let us know using “Report an issue” above.")
                     }
                 }
                 Section("Privacy") {
@@ -73,6 +86,9 @@ struct AboutView: View {
                 }
             }
             .navigationTitle("About")
+            .fullScreenCover(isPresented: $showsOnboarding) {
+                OnboardingView { showsOnboarding = false }
+            }
             .onChange(of: scenePhase) { _, phase in
                 // The user may have changed a permission in Settings.
                 if phase == .active {
