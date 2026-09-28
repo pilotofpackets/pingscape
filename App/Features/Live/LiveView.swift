@@ -132,6 +132,9 @@ struct LiveView: View {
             if target != nil || model.usesInternetTarget || DemoLaunch.isDemo {
                 ChartCard(title: "Latency", points: model.latencyPoints, style: .latency, tint: .accentColor)
                 InfoSection(title: "Quality") {
+                    if let target {
+                        DataRow(label: "Target", value: target, monospaced: true)
+                    }
                     DataRow(label: "Latency", value: model.latency.latest.map(milliseconds) ?? "–")
                     DataRow(label: "Jitter", value: model.latency.jitter.map(milliseconds) ?? "–")
                     DataRow(
