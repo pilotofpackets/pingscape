@@ -3666,6 +3666,40 @@
         }
       }
     },
+    "Hide value" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wert verbergen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide value"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar valor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer la valeur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi valore"
+          }
+        }
+      }
+    },
     "Hide values" : {
       "localizations" : {
         "de" : {
@@ -5022,6 +5056,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La posizione serve solo per leggere il nome della tua rete Wi-Fi. Pingscape non usa la tua posizione. L’accesso alla rete locale viene richiesto alla prima ricerca di dispositivi."
+          }
+        }
+      }
+    },
+    "Long press any value to hide just that one, for example before a screenshot." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein langer Druck auf einen Wert verbirgt nur diesen, zum Beispiel vor einem Screenshot."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long press any value to hide just that one, for example before a screenshot."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén pulsado un valor para ocultar solo ese, por ejemplo antes de una captura de pantalla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un appui long sur une valeur permet de masquer uniquement celle-ci, par exemple avant une capture d’écran."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni premuto su un valore per nascondere solo quello, ad esempio prima di uno screenshot."
           }
         }
       }
@@ -10357,6 +10425,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrare IP pubblico e provider?"
+          }
+        }
+      }
+    },
+    "Show value" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wert einblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show value"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar valor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la valeur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra valore"
           }
         }
       }

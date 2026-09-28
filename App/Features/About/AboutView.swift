@@ -38,7 +38,14 @@ struct AboutView: View {
                 }
                 Section {
                     Toggle("External requests", isOn: $settings.externalLookups)
-                    Toggle("Hide values by default", isOn: $hideByDefault)
+                    Toggle(isOn: $hideByDefault) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Hide values by default")
+                            Text("Long press any value to hide just that one, for example before a screenshot.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                     Picker("Units", selection: $settings.rateUnit) {
                         Text("Mbit/s").tag(RateUnit.megabitPerSecond)
                         Text("MB/s").tag(RateUnit.megabytePerSecond)

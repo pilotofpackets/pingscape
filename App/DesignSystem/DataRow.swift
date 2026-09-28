@@ -4,7 +4,8 @@ import SwiftUI
 ///
 /// The label sits left and the value right. If they do not fit on one line
 /// (large text, a long IPv6 address) the label moves above the value, which
-/// then wraps. Values are never truncated. Long press copies a value.
+/// then wraps. Values are never truncated. Long press copies a value, or
+/// hides just that one (independent of the "Hide values" toggle).
 struct DataRow: View {
     @Environment(PrivacyMask.self) private var mask
 
@@ -18,8 +19,29 @@ struct DataRow: View {
     /// A short explanation shown under the value, in the stacked layout only.
     var note: LocalizedStringResource?
 
+    /// "Not available", "Off", "On": the state of a field that would be
+    /// sensitive if it had a value (External IPv6, Proxy, …). Masked along
+    /// with the sensitive rows even where the row itself is not marked
+    /// `sensitive`, so a masked screenshot does not single out which optional
+    /// values are absent or which switches are on.
+    private static let maskedStates: Set<String> = [
+        String(localized: "Not available"),
+        String(localized: "Off"),
+        String(localized: "On"),
+    ]
+
+    private var labelKey: String { String(localized: label) }
+
+    private var isIndividuallyHidden: Bool {
+        mask.isIndividuallyHidden(label: labelKey, value: value)
+    }
+
+    private var effectiveSensitive: Bool {
+        sensitive || Self.maskedStates.contains(value)
+    }
+
     private var shown: String {
-        sensitive ? mask.shown(value) : value
+        isIndividuallyHidden ? PrivacyMask.placeholder : (effectiveSensitive ? mask.shown(value) : value)
     }
 
     var body: some View {
@@ -37,9 +59,20 @@ struct DataRow: View {
         .padding(.vertical, 11)
         .frame(minHeight: 44)
         .contentShape(Rectangle())
-        .contextMenu { RowCopyMenu(value: value) }
+        .contextMenu {
+            RowCopyMenu(value: value)
+            Button {
+                mask.toggleIndividuallyHidden(label: labelKey, value: value)
+            } label: {
+                if isIndividuallyHidden {
+                    Label("Show value", systemImage: "eye")
+                } else {
+                    Label("Hide value", systemImage: "eye.slash")
+                }
+            }
+        }
         .accessibilityElement(children: .combine)
-        .recordRow(label: label, value: value, sensitive: sensitive)
+        .recordRow(label: label, value: value, sensitive: effectiveSensitive)
     }
 
     private var valueText: some View {
