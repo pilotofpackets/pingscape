@@ -68,12 +68,15 @@ struct LoadableRow: View {
     var monospaced = true
     var sensitive = true
     var stacked = false
+    /// A short explanation shown under the value once it is loaded.
+    var note: LocalizedStringResource?
     let load: () -> Void
 
     var body: some View {
         switch state {
         case .loaded(let value):
-            DataRow(label: label, value: value, monospaced: monospaced, sensitive: sensitive, stacked: stacked)
+            DataRow(
+                label: label, value: value, monospaced: monospaced, sensitive: sensitive, stacked: stacked, note: note)
         case .loading:
             LoadingRow(label: label)
         case .notLoaded:

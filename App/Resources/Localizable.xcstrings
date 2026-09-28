@@ -6148,6 +6148,40 @@
         }
       }
     },
+    "No IPv6 on this connection — this address may be from cellular instead (e.g. Wi-Fi Assist)." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein IPv6 auf dieser Verbindung – diese Adresse kann stattdessen von Mobilfunk stammen (z. B. WLAN-Assistent)."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No IPv6 on this connection — this address may be from cellular instead (e.g. Wi-Fi Assist)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin IPv6 en esta conexión: esta dirección puede provenir de datos móviles (p. ej., con Asistencia Wi-Fi)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas d'IPv6 sur cette connexion : cette adresse peut provenir du réseau cellulaire (par ex. avec l'Assistant Wi-Fi)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun IPv6 su questa connessione: l'indirizzo potrebbe provenire dalla rete cellulare (ad es. Assistenza Wi-Fi)."
+          }
+        }
+      }
+    },
     "No VPN is active" : {
       "localizations" : {
         "de" : {
@@ -6582,6 +6616,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non ancora richiesto"
+          }
+        }
+      }
+    },
+    "Not available" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No disponible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non disponible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non disponibile"
           }
         }
       }

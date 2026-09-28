@@ -15,6 +15,8 @@ struct DataRow: View {
     var sensitive = false
     /// Always stack label and value (for long values).
     var stacked = false
+    /// A short explanation shown under the value, in the stacked layout only.
+    var note: LocalizedStringResource?
 
     private var shown: String {
         sensitive ? mask.shown(value) : value
@@ -63,8 +65,15 @@ struct DataRow: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             valueText
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
+            if let note {
+                Text(note)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 2)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

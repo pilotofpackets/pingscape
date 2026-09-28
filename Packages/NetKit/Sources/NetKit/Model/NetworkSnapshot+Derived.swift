@@ -29,6 +29,24 @@ extension NetworkSnapshot {
     public var primaryIPv4: InterfaceAddress? { primaryInterface?.ipv4Addresses.first }
     public var primaryIPv6: InterfaceAddress? { primaryInterface?.ipv6Addresses.first }
 
+    /// Whether a loaded "external IPv6" address may in truth describe the
+    /// cellular connection, not the primary one: the primary interface
+    /// (Wi-Fi or Ethernet) carries no IPv6 of its own, while cellular does.
+    /// `URLSession` picks whatever interface actually has an IPv6 route for
+    /// that one request, so on an IPv4-only Wi-Fi network with Wi-Fi Assist
+    /// (or plain cellular data) on, that route can be cellular even though
+    /// Wi-Fi carries everything else. This can only be guessed at from the
+    /// interface list, not proven for one specific past request.
+    public var externalIPv6MayBeCellular: Bool {
+        guard let primary = primaryInterface, primary.kind != .cellular, primary.ipv6Addresses.isEmpty else {
+            return false
+        }
+        guard let cellular = interface(of: .cellular), cellular.isUp, !cellular.ipv6Addresses.isEmpty else {
+            return false
+        }
+        return true
+    }
+
     public func interface(of kind: InterfaceKind) -> NetworkInterface? {
         usableInterface(of: kind, mustBeUp: false)
     }

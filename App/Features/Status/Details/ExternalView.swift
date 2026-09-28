@@ -4,6 +4,7 @@ import SwiftUI
 /// The public address and the provider behind it. Everything here is loaded on
 /// request from the services listed under "Source".
 struct ExternalView: View {
+    @Environment(SnapshotStore.self) private var store
     @Environment(ExternalStore.self) private var external
     @State private var showsSource = false
 
@@ -40,7 +41,10 @@ struct ExternalView: View {
     private var publicAddress: some View {
         InfoSection(title: "Public IP address") {
             LoadableRow(label: "IPv4 address", state: external.ipv4) { external.load(userRequested: true) }
-            LoadableRow(label: "IPv6 address", state: external.ipv6, stacked: true) {
+            LoadableRow(
+                label: "IPv6 address", state: external.ipv6, stacked: true,
+                note: (store.snapshot?.externalIPv6MayBeCellular ?? false) ? StatusView.externalIPv6CellularNote : nil
+            ) {
                 external.load(userRequested: true)
             }
             LoadableRow(label: "Reverse DNS", state: external.reverseName, monospaced: false, stacked: true) {

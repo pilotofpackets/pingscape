@@ -131,6 +131,32 @@ struct VPNDetectionTests {
         #expect(snapshot.tunnelScope == .full)
         #expect(snapshot.localGateway4 == "192.168.178.1")
     }
+
+    @Test func flagsExternalIPv6AsPossiblyCellularOnAnIPv4OnlyWiFiNetwork() {
+        let cellularWithIPv6 = NetworkInterface(
+            name: "pdp_ip0",
+            addresses: [address("100.72.31.14", prefix: 30), address("2001:db8:1::5", prefix: 64, v6: true)])
+        #expect(NetworkSnapshot(interfaces: [wifi, cellularWithIPv6]).externalIPv6MayBeCellular)
+    }
+
+    @Test func doesNotFlagExternalIPv6WhenWiFiHasItsOwn() {
+        let wifiWithIPv6 = NetworkInterface(
+            name: "en0",
+            addresses: [address("192.168.178.42", prefix: 24), address("2001:db8:2::42", prefix: 64, v6: true)])
+        #expect(!NetworkSnapshot(interfaces: [wifiWithIPv6, cellular]).externalIPv6MayBeCellular)
+    }
+
+    @Test func doesNotFlagExternalIPv6WithoutCellularIPv6() {
+        #expect(!NetworkSnapshot(interfaces: [wifi, cellular]).externalIPv6MayBeCellular)
+        #expect(!NetworkSnapshot(interfaces: [wifi]).externalIPv6MayBeCellular)
+    }
+
+    @Test func doesNotFlagExternalIPv6WhenCellularIsThePrimary() {
+        let cellularWithIPv6 = NetworkInterface(
+            name: "pdp_ip0",
+            addresses: [address("100.72.31.14", prefix: 30), address("2001:db8:1::5", prefix: 64, v6: true)])
+        #expect(!NetworkSnapshot(interfaces: [cellularWithIPv6]).externalIPv6MayBeCellular)
+    }
 }
 
 /// Diagnostic dumps taken on a real iPhone (anonymized), see `docs/09-test-plan.md`.
