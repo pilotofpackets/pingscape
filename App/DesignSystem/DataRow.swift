@@ -2,10 +2,14 @@ import SwiftUI
 
 /// One label and one value.
 ///
-/// The label sits left and the value right. If they do not fit on one line
-/// (large text, a long IPv6 address) the label moves above the value, which
-/// then wraps. Values are never truncated. Long press copies a value, or
-/// hides just that one (independent of the "Hide values" toggle).
+/// The label sits left and the value right, and stays there: if they do not
+/// fit on one line, the label shrinks and the value wraps onto more lines,
+/// but the value never moves under the label. `stacked` opts a row with a
+/// long value (a full IPv6 address) into a layout with the label on its own
+/// line above, for a value that needs the full row width to read
+/// comfortably — but the value still hugs the right edge, wrapping onto more
+/// lines as needed. Values are never truncated. Long press copies a value,
+/// or hides just that one (independent of the "Hide values" toggle).
 struct DataRow: View {
     @Environment(PrivacyMask.self) private var mask
 
@@ -44,15 +48,33 @@ struct DataRow: View {
         isIndividuallyHidden ? PrivacyMask.placeholder : (effectiveSensitive ? mask.shown(value) : value)
     }
 
+    /// `string` broken into two lines at a "." or ":" (never through the
+    /// middle of an octet or group), for a value that has to wrap. SwiftUI's
+    /// own wrapping has no such string to break at and cuts wherever the
+    /// width runs out, so this is done by hand instead.
+    private func wrapped(_ string: String) -> String {
+        let separators: Set<Character> = [".", ":"]
+        var segments: [String] = []
+        var current = ""
+        for character in string {
+            current.append(character)
+            if separators.contains(character) {
+                segments.append(current)
+                current = ""
+            }
+        }
+        if !current.isEmpty { segments.append(current) }
+        guard segments.count > 1 else { return string }
+        let firstLineCount = Int((Double(segments.count) / 2).rounded(.up))
+        return segments[..<firstLineCount].joined() + "\n" + segments[firstLineCount...].joined()
+    }
+
     var body: some View {
         Group {
             if stacked {
                 stackedLayout
             } else {
-                ViewThatFits(in: .horizontal) {
-                    inlineLayout
-                    stackedLayout
-                }
+                inlineLayout
             }
         }
         .padding(.horizontal, 16)
@@ -75,32 +97,44 @@ struct DataRow: View {
         .recordRow(label: label, value: value, sensitive: effectiveSensitive)
     }
 
-    private var valueText: some View {
-        Text(shown)
+    private func valueText(_ string: String) -> some View {
+        Text(string)
             .font(monospaced ? .system(.body, design: .monospaced) : .body)
+    }
+
+    /// The value at its normal size on one line if that fits, or — the
+    /// value never moves under the label — broken at a "." or ":" and
+    /// shrunk a little rather than either overflowing or getting cut with
+    /// "…".
+    private var adaptiveValue: some View {
+        ViewThatFits(in: .horizontal) {
+            valueText(shown)
+            valueText(wrapped(shown))
+                .multilineTextAlignment(.trailing)
+                .minimumScaleFactor(0.85)
+        }
+        .foregroundStyle(.secondary)
     }
 
     private var inlineLayout: some View {
         HStack(alignment: .firstTextBaseline, spacing: 16) {
             Text(label)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
             Spacer(minLength: 8)
-            valueText
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.trailing)
+            adaptiveValue
         }
-        // Wrap to a second line rather than cut a value with "…".
         .fixedSize(horizontal: false, vertical: true)
     }
 
     private var stackedLayout: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            valueText
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                adaptiveValue
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             if let note {
                 Text(note)
                     .font(.caption)
@@ -112,8 +146,8 @@ struct DataRow: View {
     }
 }
 
-/// A row whose value is a status: a dot and a short text. Like `DataRow`, it
-/// stacks label above status when they do not fit on one line.
+/// A row whose value is a status: a dot and a short text. Like `DataRow`, the
+/// label shrinks rather than moving the status under it.
 struct StatusRow: View {
     let label: LocalizedStringResource
     let text: String
@@ -127,19 +161,13 @@ struct StatusRow: View {
     }
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .firstTextBaseline, spacing: 16) {
-                Text(label)
-                Spacer(minLength: 8)
-                status
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(label)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                status
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        HStack(alignment: .firstTextBaseline, spacing: 16) {
+            Text(label)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .layoutPriority(1)
+            Spacer(minLength: 8)
+            status
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
@@ -176,17 +204,11 @@ struct PermissionRow: View {
     }
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 16) {
-                labelStack
-                Spacer(minLength: 8)
-                button
-            }
-            VStack(alignment: .leading, spacing: 8) {
-                labelStack
-                button
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        HStack(spacing: 16) {
+            labelStack
+                .layoutPriority(1)
+            Spacer(minLength: 8)
+            button
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
