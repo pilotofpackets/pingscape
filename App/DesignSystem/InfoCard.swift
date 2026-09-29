@@ -100,15 +100,30 @@ struct InfoCard<Content: View>: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Group(subviews: content) { subviews in
-                // By index, not by `subview.id`: several rows written behind
-                // one `if let` (an optional address, an optional MTU) can end
-                // up sharing one id, which silently dropped the divider
-                // before and after that whole block (found 2026-09-22).
-                ForEach(Array(subviews.enumerated()), id: \.offset) { index, subview in
-                    subview
-                    if index != subviews.count - 1 {
-                        Divider().padding(.leading, 16)
+            if let rowList = content as? RowList {
+                // A card built from `RowList` already hands over its rows as
+                // a concrete `[AnyView]`, so they're zipped together with
+                // dividers by plain Swift indexing here — `Group(subviews:)`
+                // is not involved at all. Rewriting a card's content as one
+                // flat, array-backed `ForEach` (instead of nested
+                // ForEach/if-let) was tried first and still dropped the same
+                // dividers on a real device (found again 2026-09-29):
+                // `Group(subviews:)` apparently doesn't reliably decompose
+                // even a single top-level `ForEach` back into one subview
+                // per row. Skipping it here removes that risk instead of
+                // continuing to depend on its undocumented behavior.
+                rowsWithDividers(rowList.rows)
+            } else {
+                Group(subviews: content) { subviews in
+                    // By index, not by `subview.id`: several rows written behind
+                    // one `if let` (an optional address, an optional MTU) can end
+                    // up sharing one id, which silently dropped the divider
+                    // before and after that whole block (found 2026-09-22).
+                    ForEach(Array(subviews.enumerated()), id: \.offset) { index, subview in
+                        subview
+                        if index != subviews.count - 1 {
+                            Divider().padding(.leading, 16)
+                        }
                     }
                 }
             }
@@ -120,6 +135,15 @@ struct InfoCard<Content: View>: View {
             if prominent {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .strokeBorder(.tint, lineWidth: 2)
+            }
+        }
+    }
+
+    private func rowsWithDividers(_ rows: [AnyView]) -> some View {
+        ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
+            row
+            if index != rows.count - 1 {
+                Divider().padding(.leading, 16)
             }
         }
     }
