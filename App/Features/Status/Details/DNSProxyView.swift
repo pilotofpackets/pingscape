@@ -3,10 +3,16 @@ import SwiftUI
 
 struct DNSProxyView: View {
     @Environment(SnapshotStore.self) private var store
+    @Environment(\.openURL) private var openURL
     @State private var timings: [String: DNSTiming] = [:]
     @State private var isMeasuring = false
     @State private var nat64Prefix: String?
     @State private var measureTask: Task<Void, Never>?
+    /// Set after a measurement leaves a server with no answer: a DNS server on
+    /// the local network (most home routers) needs the same "Local network"
+    /// permission as the LAN search, but nothing here asks for it, so a
+    /// missing permission otherwise looks like a plain timeout.
+    @State private var localNetworkAccess: LocalNetworkAccess?
 
     var body: some View {
         DetailPage(title: "DNS and Proxy") {
@@ -19,13 +25,7 @@ struct DNSProxyView: View {
                                 DataRow(label: "Response time", value: timing.text)
                             }
                         }
-                        if isMeasuring {
-                            LoadingRow(label: "Measuring")
-                        } else {
-                            PermissionRow(label: "Response time", buttonTitle: "Measure response time") {
-                                measure(snapshot.dnsServers)
-                            }
-                        }
+                        measurementFooter(snapshot.dnsServers)
                     }
                 }
                 if let nat64Prefix {
@@ -54,6 +54,7 @@ struct DNSProxyView: View {
     private func measure(_ servers: [String]) {
         measureTask?.cancel()
         isMeasuring = true
+        localNetworkAccess = nil
         timings = [:]
         measureTask = Task {
             await withTaskGroup(of: (String, DNSTiming).self) { group in
@@ -71,7 +72,40 @@ struct DNSProxyView: View {
             }
             guard !Task.isCancelled else { return }
             isMeasuring = false
+            if !DemoLaunch.isDemo, timings.values.contains(where: { if case .noAnswer = $0 { true } else { false } }) {
+                localNetworkAccess = await LocalNetworkPermission.check(timeoutSeconds: 3)
+            }
         }
+    }
+
+    /// The "measure" button, its loading state, and the permission hint, as
+    /// one view: `InfoCard`'s divider logic (`Group(subviews:)`) drops the
+    /// separator at the seam between adjacent `if`/`ForEach` blocks in a
+    /// section (see `Rows.swift`), so this stays a single dynamic child of
+    /// the section instead of two or three siblings.
+    @ViewBuilder
+    private func measurementFooter(_ servers: [String]) -> some View {
+        if isMeasuring {
+            LoadingRow(label: "Measuring")
+        } else {
+            PermissionRow(label: "Response time", buttonTitle: "Measure response time") {
+                measure(servers)
+            }
+            if localNetworkAccess == .denied { localNetworkDenied }
+        }
+    }
+
+    private var localNetworkDenied: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("A server with no answer may be on your local network (most home routers). That needs the \"Local network\" permission, which is off for Pingscape. Allow it in Settings.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 12)
     }
 
     @ViewBuilder
