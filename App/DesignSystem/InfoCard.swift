@@ -146,5 +146,16 @@ struct InfoCard<Content: View>: View {
                 Divider().padding(.leading, 16)
             }
         }
+        // Forces a full rebuild of every row and divider whenever the row
+        // count changes, instead of letting SwiftUI diff the `\.offset`
+        // identities against the previous render. A live VPN's snapshot
+        // fills in this card's rows incrementally as fields become known
+        // (found 2026-09-22/28/29), so between two renders the same offset
+        // can hold a different row than before; reusing that identity is the
+        // suspected reason a divider goes missing next to it even once the
+        // content is a single flat array. A plain count change is enough to
+        // catch every insertion without resetting on every value-only update
+        // (e.g. External IP arriving) that leaves the row count alone.
+        .id(rows.count)
     }
 }
