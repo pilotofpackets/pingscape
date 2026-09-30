@@ -95,10 +95,16 @@ struct LiveView: View {
         let name: String?
     }
 
+    /// The internet host, when the user asked for it and typed a valid one.
+    private var internetTarget: String? {
+        guard model.usesInternetTarget else { return nil }
+        return try? ToolInput.host(model.internetHost)
+    }
+
     /// The router when there is one, and the internet host if the user asked for it.
     private func pingTargets(gateway: String?) -> [String] {
         var targets: [String] = []
-        if model.usesInternetTarget, let host = try? ToolInput.host(model.internetHost) {
+        if let host = internetTarget {
             targets.append(host)
         } else if let gateway {
             targets.append(gateway)
@@ -131,15 +137,29 @@ struct LiveView: View {
         return VStack(spacing: 12) {
             if target != nil || model.usesInternetTarget || DemoLaunch.isDemo {
                 ChartCard(title: "Latency", points: model.latencyPoints, style: .latency, tint: .accentColor)
-                InfoSection(title: "Quality") {
-                    if let target {
-                        DataRow(label: "Target", value: target, monospaced: true)
+                VStack(spacing: 6) {
+                    InfoSection(title: "Quality") {
+                        if let target {
+                            DataRow(label: "Target", value: target, monospaced: true)
+                        }
+                        DataRow(label: "Latency", value: model.latency.latest.map(milliseconds) ?? "–")
+                        DataRow(label: "Jitter", value: model.latency.jitter.map(milliseconds) ?? "–")
+                        DataRow(
+                            label: "Loss",
+                            value: model.latency.lostPercent.map { "\(Int($0.rounded())) %" } ?? "–")
                     }
-                    DataRow(label: "Latency", value: model.latency.latest.map(milliseconds) ?? "–")
-                    DataRow(label: "Jitter", value: model.latency.jitter.map(milliseconds) ?? "–")
-                    DataRow(
-                        label: "Loss",
-                        value: model.latency.lostPercent.map { "\(Int($0.rounded())) %" } ?? "–")
+                    // The number means something else with the switch below on.
+                    if let host = internetTarget {
+                        footnote(
+                            Text(
+                                "Latency is the round-trip time to \(host) on the internet. It includes your router, your provider and the way to that host, so it is usually higher than to the router."
+                            ))
+                    } else if target != nil {
+                        footnote(
+                            Text(
+                                "Latency is the round-trip time to your router, so it only shows your local network. If you ping a host on the internet below, the value changes: it then includes your provider and the way to that host."
+                            ))
+                    }
                 }
             }
             InfoCard {
@@ -156,14 +176,18 @@ struct LiveView: View {
                         .frame(minHeight: 44)
                 }
             }
-            if model.usesInternetTarget, let host = try? ToolInput.host(model.internetHost) {
-                Text("Pings \(host) once a second. That host sees your public IP address.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 4)
+            if let host = internetTarget {
+                footnote(Text("Pings \(host) once a second. That host sees your public IP address."))
             }
         }
+    }
+
+    private func footnote(_ text: Text) -> some View {
+        text
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
     }
 
     @ViewBuilder

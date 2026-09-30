@@ -4758,6 +4758,74 @@
         }
       }
     },
+    "Latency is the round-trip time to your router, so it only shows your local network. If you ping a host on the internet below, the value changes: it then includes your provider and the way to that host." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Latenz ist die Antwortzeit deines Routers und zeigt damit nur dein lokales Netzwerk. Wenn du unten einen Host im Internet pingst, ändert sich der Wert: Er enthält dann auch deinen Anbieter und den Weg bis zu diesem Host."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latency is the round-trip time to your router, so it only shows your local network. If you ping a host on the internet below, the value changes: it then includes your provider and the way to that host."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La latencia es el tiempo de respuesta de tu router, así que solo refleja tu red local. Si abajo haces ping a un host de internet, el valor cambia: entonces incluye a tu proveedor y el camino hasta ese host."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La latence est le temps de réponse de votre routeur ; elle ne reflète donc que votre réseau local. Si vous envoyez un ping à un hôte sur Internet ci-dessous, la valeur change : elle inclut alors votre fournisseur d’accès et le trajet jusqu’à cet hôte."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La latenza è il tempo di risposta del tuo router, quindi mostra solo la tua rete locale. Se qui sotto fai il ping a un host su internet, il valore cambia: comprende allora anche il tuo provider e il percorso fino a quell’host."
+          }
+        }
+      }
+    },
+    "Latency is the round-trip time to %@ on the internet. It includes your router, your provider and the way to that host, so it is usually higher than to the router." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Latenz ist die Antwortzeit von %@ im Internet. Sie umfasst deinen Router, deinen Anbieter und den Weg bis zu diesem Host und ist deshalb meist höher als zum Router."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latency is the round-trip time to %@ on the internet. It includes your router, your provider and the way to that host, so it is usually higher than to the router."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La latencia es el tiempo de respuesta de %@ en internet. Incluye tu router, tu proveedor y el camino hasta ese host, por lo que suele ser mayor que la del router."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La latence est le temps de réponse de %@ sur Internet. Elle inclut votre routeur, votre fournisseur d’accès et le trajet jusqu’à cet hôte ; elle est donc généralement plus élevée que celle du routeur."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La latenza è il tempo di risposta di %@ su internet. Comprende il tuo router, il tuo provider e il percorso fino a quell’host, quindi di solito è più alta di quella verso il router."
+          }
+        }
+      }
+    },
     "Latency · Jitter · Loss" : {
       "localizations" : {
         "de" : {
