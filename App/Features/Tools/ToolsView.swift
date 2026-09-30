@@ -68,7 +68,7 @@ struct ToolsView: View {
             .safeAreaInset(edge: .bottom) {
                 if let control {
                     StartBar(control: control) { history.remember(control.inputText, for: selected) }
-                        .aboveKeyboardDoneBar(keyboardShown)
+                        .levelWithKeyboardDoneBar(keyboardShown)
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in

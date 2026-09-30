@@ -16,23 +16,24 @@ extension View {
         }
     }
 
-    /// Lifts a floating control above the "Done" bar while the keyboard is open.
-    /// Since iOS 26 that bar floats over the keyboard's top edge, and the safe
-    /// area ends at that edge, so anything pinned to the bottom of the page would
-    /// sit half behind it.
-    func aboveKeyboardDoneBar(_ keyboardShown: Bool) -> some View {
-        modifier(AboveKeyboardDoneBar(keyboardShown: keyboardShown))
+    /// Moves a floating control at the bottom of the page level with the "Done"
+    /// bar while the keyboard is open. Since iOS 26 that bar floats over the
+    /// keyboard's top edge, and the safe area ends at that edge, so the control
+    /// would sit half behind it. Beside it, in the free space, it stays in view.
+    func levelWithKeyboardDoneBar(_ keyboardShown: Bool) -> some View {
+        modifier(LevelWithKeyboardDoneBar(keyboardShown: keyboardShown))
     }
 }
 
-private struct AboveKeyboardDoneBar: ViewModifier {
+private struct LevelWithKeyboardDoneBar: ViewModifier {
     let keyboardShown: Bool
-    /// How far the bar reaches above the top edge of the keyboard.
-    @ScaledMetric private var clearance: CGFloat = 34
+    /// From the resting place of a 50 pt button, 8 pt above the safe area, down to
+    /// the middle of the Done bar.
+    @ScaledMetric private var drop: CGFloat = 22
 
     func body(content: Content) -> some View {
         content
-            .padding(.bottom, keyboardShown ? clearance : 0)
+            .offset(y: keyboardShown ? drop : 0)
             .animation(.default, value: keyboardShown)
     }
 }
