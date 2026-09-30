@@ -63,13 +63,13 @@ struct ToolsView: View {
                 .padding(.bottom, control == nil ? 24 : 88)
             }
             .scrollDismissesKeyboard(.interactively)
-            .keyboardDoneButton {
-                if let control, keyboardShown { KeyboardStartButton(control: control, onStart: remember) }
-            }
+            .keyboardDoneButton()
             .background(Color(.systemGroupedBackground))
             .safeAreaInset(edge: .bottom) {
-                // With the keyboard open, Start moves into the bar on the keyboard.
-                if let control, !keyboardShown { StartBar(control: control, onStart: remember) }
+                if let control {
+                    StartBar(control: control) { history.remember(control.inputText, for: selected) }
+                        .aboveKeyboardDoneBar(keyboardShown)
+                }
             }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
                 keyboardShown = true
@@ -91,10 +91,6 @@ struct ToolsView: View {
             }
             .onChange(of: store.snapshot?.takenAt, initial: true) { _, _ in prepare() }
         }
-    }
-
-    private func remember() {
-        if let control { history.remember(control.inputText, for: selected) }
     }
 
     /// What a copy or share of the result holds: the sections on screen.
