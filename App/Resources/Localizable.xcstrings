@@ -1485,6 +1485,40 @@
         }
       }
     },
+    "Cancel" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulla"
+          }
+        }
+      }
+    },
     "Carries traffic" : {
       "localizations" : {
         "de" : {
@@ -8155,6 +8189,40 @@
         }
       }
     },
+    "Photos access is off" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf Fotos ist aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos access is off"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El acceso a Fotos está desactivado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’accès aux Photos est désactivé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’accesso a Foto è disattivato"
+          }
+        }
+      }
+    },
     "Ping" : {
       "localizations" : {
         "de" : {
@@ -10225,6 +10293,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Viene eseguito sul tuo dispositivo. Non viene inviato nulla."
+          }
+        }
+      }
+    },
+    "Save image to Photos" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild in Fotos sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save image to Photos"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar imagen en Fotos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer l’image dans Photos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva immagine in Foto"
           }
         }
       }
@@ -12767,6 +12869,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Per trovare i dispositivi della tua rete, Pingscape li interroga direttamente. I risultati restano sul tuo iPhone. Consentilo in Impostazioni."
+          }
+        }
+      }
+    },
+    "To save the image, Pingscape needs to be allowed to add to your photos. Allow it in Settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um das Bild zu sichern, muss Pingscape Fotos hinzufügen dürfen. Erlaube es in den Einstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To save the image, Pingscape needs to be allowed to add to your photos. Allow it in Settings."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para guardar la imagen, Pingscape necesita permiso para añadir fotos. Permítelo en Ajustes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour enregistrer l’image, Pingscape doit être autorisé à ajouter des photos. Autorisez-le dans les Réglages."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per salvare l’immagine, Pingscape deve poter aggiungere foto. Consentilo in Impostazioni."
           }
         }
       }

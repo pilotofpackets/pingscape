@@ -141,6 +141,41 @@
           }
         }
       }
+    },
+    "NSPhotoLibraryAddUsageDescription" : {
+      "comment" : "Privacy - Photo Library Additions Usage Description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape legt das Bild eines Berichts nur in deiner Fotomediathek ab, wenn du „Bild sichern“ wählst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape adds the image of a report to your photo library only when you choose Save Image."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape solo añade la imagen de un informe a tu fototeca si eliges «Guardar imagen»."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape n’ajoute l’image d’un rapport à votre photothèque que si vous choisissez « Enregistrer l’image »."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pingscape aggiunge l’immagine di un rapporto alla tua libreria foto solo se scegli «Salva immagine»."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -72,6 +72,8 @@
 	<string>Pingscape looks for devices on your local network so it can list them. Results stay on your device.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Pingscape reads the name of your Wi-Fi network, which iOS only allows with location permission. Your location is not used or stored.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Pingscape adds the image of a report to your photo library only when you choose Save Image.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

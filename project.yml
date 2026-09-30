@@ -75,6 +75,7 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: public.app-category.utilities
         NSLocationWhenInUseUsageDescription: Pingscape reads the name of your Wi-Fi network, which iOS only allows with location permission. Your location is not used or stored.
+        NSPhotoLibraryAddUsageDescription: Pingscape adds the image of a report to your photo library only when you choose Save Image.
         # Plain HTTP only to local addresses (a router's web page, the UPnP
         # description) and to Apple's captive portal probe, which has no HTTPS.
         NSAppTransportSecurity:
