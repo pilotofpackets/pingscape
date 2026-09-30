@@ -33,6 +33,7 @@ struct ToolsView: View {
     @State private var http: HTTPModel
     @State private var subnetInput = ""
     @State private var ouiInput = ""
+    @State private var keyboardShown = false
 
     init() {
         let demo = DemoLaunch.tool != nil
@@ -62,12 +63,19 @@ struct ToolsView: View {
                 .padding(.bottom, control == nil ? 24 : 88)
             }
             .scrollDismissesKeyboard(.interactively)
-            .keyboardDoneButton()
+            .keyboardDoneButton {
+                if let control, keyboardShown { KeyboardStartButton(control: control, onStart: remember) }
+            }
             .background(Color(.systemGroupedBackground))
             .safeAreaInset(edge: .bottom) {
-                if let control {
-                    StartBar(control: control) { history.remember(control.inputText, for: selected) }
-                }
+                // With the keyboard open, Start moves into the bar on the keyboard.
+                if let control, !keyboardShown { StartBar(control: control, onStart: remember) }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+                keyboardShown = true
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                keyboardShown = false
             }
             .navigationTitle("Tools")
             .toolbar {
@@ -83,6 +91,10 @@ struct ToolsView: View {
             }
             .onChange(of: store.snapshot?.takenAt, initial: true) { _, _ in prepare() }
         }
+    }
+
+    private func remember() {
+        if let control { history.remember(control.inputText, for: selected) }
     }
 
     /// What a copy or share of the result holds: the sections on screen.

@@ -207,6 +207,19 @@ struct ResultActions: View {
     }
 }
 
+extension ToolControl {
+    /// Start or stop: the one action behind the floating button and the button
+    /// on the keyboard.
+    func toggle(onStart: () -> Void) {
+        if isRunning {
+            stop()
+        } else {
+            start()
+            onStart()
+        }
+    }
+}
+
 /// The floating Start or Stop button.
 struct StartBar: View {
     let control: any ToolControl
@@ -214,12 +227,7 @@ struct StartBar: View {
 
     var body: some View {
         Button {
-            if control.isRunning {
-                control.stop()
-            } else {
-                control.start()
-                onStart()
-            }
+            control.toggle(onStart: onStart)
         } label: {
             Label(control.isRunning ? "Stop" : "Start", systemImage: control.isRunning ? "stop.fill" : "play.fill")
                 .font(.headline)
@@ -233,6 +241,29 @@ struct StartBar: View {
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity)
         .sensoryFeedback(.impact(weight: .light), trigger: control.isRunning)
+    }
+}
+
+/// Start or Stop in the bar on the keyboard. While the keyboard is open the
+/// floating button would sit right on its edge, or behind it, so this takes its
+/// place. It closes the keyboard so the result is in view.
+struct KeyboardStartButton: View {
+    let control: any ToolControl
+    let onStart: () -> Void
+
+    var body: some View {
+        Button {
+            Keyboard.dismiss()
+            control.toggle(onStart: onStart)
+        } label: {
+            // Not a Label: the bar on the keyboard would show only its icon.
+            HStack(spacing: 6) {
+                Image(systemName: control.isRunning ? "stop.fill" : "play.fill")
+                if control.isRunning { Text("Stop") } else { Text("Start") }
+            }
+            .fontWeight(.semibold)
+        }
+        .disabled(!control.isRunning && !control.canStart)
     }
 }
 
