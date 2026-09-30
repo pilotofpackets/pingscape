@@ -1,6 +1,7 @@
+import CoreTransferable
 import NetKit
 import SwiftUI
-import UIKit
+import UniformTypeIdentifiers
 
 /// A standalone "Share" toolbar button with the three formats as a submenu.
 /// For a menu that already exists on the page (the detail pages' "More" menu
@@ -20,81 +21,100 @@ struct ExportMenu: View {
     }
 }
 
-/// Share as text, image or JSON. Text is cheap and reuses the app's own
-/// `ShareLink(item:)`. Image and JSON hold real work (rendering, writing a
-/// file), so they run only on a tap, not on every redraw of a page that keeps
-/// changing, such as a running tool.
+/// Share as text, image or JSON. All three are a `ShareLink`, which presents the
+/// share sheet itself. The buttons sit inside a `Menu`, and a `.sheet` on a view
+/// in a menu never shows, because that view is gone once the menu closes. Image
+/// and JSON hold real work (rendering, writing a file), which a `Transferable`
+/// does only when the share sheet asks for the file, not on every redraw of a
+/// page that keeps changing, such as a running tool.
 struct ShareButtons: View {
     @Environment(PrivacyMask.self) private var mask
     let fileBaseName: String
     let header: [String]
     let sections: [SectionRecord]
-    @State private var sharedFile: SharedFile?
 
     private var reportSections: [ReportSection] { sections.reportSections }
 
     var body: some View {
-        Group {
-            ShareLink(item: ReportFormatter.text(header: header, sections: reportSections, masked: mask.isMasked)) {
-                Label("Share as text", systemImage: "doc.plaintext")
-            }
-            Button {
-                shareImage()
-            } label: {
-                Label("Share as image", systemImage: "photo")
-            }
-            Button {
-                shareJSON()
-            } label: {
-                Label("Share as JSON", systemImage: "curlybraces")
-            }
+        let title = "Pingscape \(fileBaseName)"
+        ShareLink(item: ReportFormatter.text(header: header, sections: reportSections, masked: mask.isMasked)) {
+            Label("Share as text", systemImage: "doc.plaintext")
         }
-        .sheet(item: $sharedFile) { file in
-            ActivityView(items: [file.url])
+        ShareLink(item: report(as: ReportImageFile.self), preview: SharePreview(title)) {
+            Label("Share as image", systemImage: "photo")
+        }
+        ShareLink(item: report(as: ReportJSONFile.self), preview: SharePreview(title)) {
+            Label("Share as JSON", systemImage: "curlybraces")
         }
     }
 
-    private func shareImage() {
-        let masked = ReportFormatter.masked(reportSections, masked: mask.isMasked)
-        guard let data = ReportImage.pngData(title: fileBaseName, header: header, sections: masked) else { return }
-        sharedFile = write(data, extension: "png")
+    private func report<File: ReportFile>(as _: File.Type) -> File {
+        File(fileBaseName: fileBaseName, header: header, sections: reportSections, masked: mask.isMasked)
     }
+}
 
-    private func shareJSON() {
-        guard let data = try? ReportFormatter.json(header: header, sections: reportSections, masked: mask.isMasked) else {
-            return
-        }
-        sharedFile = write(data, extension: "json")
-    }
+/// A report that becomes a file when it is shared. Holds the plain data only
+/// (the same masking and filtering as the text) and does nothing until asked.
+private protocol ReportFile: Transferable, Sendable {
+    var fileBaseName: String { get }
+    var header: [String] { get }
+    var sections: [ReportSection] { get }
+    var masked: Bool { get }
+    static var fileExtension: String { get }
 
-    private func write(_ data: Data, extension fileExtension: String) -> SharedFile? {
+    init(fileBaseName: String, header: [String], sections: [ReportSection], masked: Bool)
+    @MainActor func data() throws -> Data
+}
+
+private extension ReportFile {
+    /// Writes the file under a name that says what it is and when it was made.
+    @MainActor func sentFile() throws -> SentTransferredFile {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd-HHmm"
-        let name = "pingscape-\(fileBaseName)-\(formatter.string(from: Date())).\(fileExtension)"
+        let name = "pingscape-\(fileBaseName)-\(formatter.string(from: Date())).\(Self.fileExtension)"
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(name)
-        do {
-            try data.write(to: url, options: .atomic)
-            return SharedFile(url: url)
-        } catch {
-            return nil
+        try data().write(to: url, options: .atomic)
+        return SentTransferredFile(url)
+    }
+}
+
+private struct ReportImageFile: ReportFile {
+    static let fileExtension = "png"
+    let fileBaseName: String
+    let header: [String]
+    let sections: [ReportSection]
+    let masked: Bool
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(exportedContentType: .png) { report in
+            try await report.sentFile()
         }
     }
+
+    @MainActor func data() throws -> Data {
+        let visible = ReportFormatter.masked(sections, masked: masked)
+        guard let data = ReportImage.pngData(title: fileBaseName, header: header, sections: visible) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+        return data
+    }
 }
 
-private struct SharedFile: Identifiable {
-    let id = UUID()
-    let url: URL
-}
+private struct ReportJSONFile: ReportFile {
+    static let fileExtension = "json"
+    let fileBaseName: String
+    let header: [String]
+    let sections: [ReportSection]
+    let masked: Bool
 
-/// The system share sheet, for a file that was just built (`ShareLink` cannot
-/// be triggered from code, only tapped, so image and JSON go through this).
-private struct ActivityView: UIViewControllerRepresentable {
-    let items: [Any]
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(exportedContentType: .json) { report in
+            try await report.sentFile()
+        }
     }
 
-    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+    @MainActor func data() throws -> Data {
+        try ReportFormatter.json(header: header, sections: sections, masked: masked)
+    }
 }
