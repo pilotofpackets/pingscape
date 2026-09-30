@@ -8,6 +8,7 @@ Pingscape has no account, no analytics, no advertising and no server of its own.
 
 - **Location (while in use):** iOS only lets an app read the name of the connected Wi-Fi network if it has this permission. Pingscape does not read or use your location.
 - **Local network:** needed to look for devices on your network and to reach your router. Asked for when you first search for devices. Results stay on your device.
+- **Photos (add only):** asked for when you first choose "Save Image" on a shared report image. Pingscape can only add that image to your photo library. It does not read your photos.
 
 ## Lookups that leave the device
 
