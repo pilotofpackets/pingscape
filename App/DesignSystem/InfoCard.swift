@@ -104,14 +104,18 @@ struct InfoCard<Content: View>: View {
                 // A card built from `RowList` already hands over its rows as
                 // a concrete `[AnyView]`, so they're zipped together with
                 // dividers by plain Swift indexing here — `Group(subviews:)`
-                // is not involved at all. Rewriting a card's content as one
-                // flat, array-backed `ForEach` (instead of nested
-                // ForEach/if-let) was tried first and still dropped the same
-                // dividers on a real device (found again 2026-09-29):
-                // `Group(subviews:)` apparently doesn't reliably decompose
-                // even a single top-level `ForEach` back into one subview
-                // per row. Skipping it here removes that risk instead of
-                // continuing to depend on its undocumented behavior.
+                // is not involved at all. This is belt-and-suspenders, not a
+                // proven fix on its own: after the 2026-09-22/28 divider
+                // losses (see `Rows`), a run of "still broken" reports on
+                // 2026-09-29/30 briefly looked like `Group(subviews:)` still
+                // failing even on a flat array — it turned out those test
+                // devices were running a stale build that Xcode's
+                // incremental deploy never actually replaced; a full
+                // delete-and-reinstall (still build 46, no code change)
+                // showed every divider correctly. Kept anyway since it's
+                // free and removes one more dependency on
+                // `Group(subviews:)`'s undocumented behavior for content
+                // that is already a known-safe array.
                 rowsWithDividers(rowList.rows)
             } else {
                 Group(subviews: content) { subviews in
@@ -148,14 +152,13 @@ struct InfoCard<Content: View>: View {
         }
         // Forces a full rebuild of every row and divider whenever the row
         // count changes, instead of letting SwiftUI diff the `\.offset`
-        // identities against the previous render. A live VPN's snapshot
-        // fills in this card's rows incrementally as fields become known
-        // (found 2026-09-22/28/29), so between two renders the same offset
-        // can hold a different row than before; reusing that identity is the
-        // suspected reason a divider goes missing next to it even once the
-        // content is a single flat array. A plain count change is enough to
-        // catch every insertion without resetting on every value-only update
-        // (e.g. External IP arriving) that leaves the row count alone.
+        // identities against the previous render. Added on 2026-09-29 while
+        // chasing a divider loss that later turned out to be a stale build
+        // on the test device, not a real diffing bug (see the comment
+        // above) — so this was never actually confirmed necessary. Left in
+        // as cheap insurance against `ForEach(id: \.offset)` reusing an
+        // index across a row-count change, which a live VPN's snapshot does
+        // trigger as fields become known one by one.
         .id(rows.count)
     }
 }
