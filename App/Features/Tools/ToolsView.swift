@@ -63,14 +63,8 @@ struct ToolsView: View {
                 .padding(.bottom, control == nil ? 24 : 88)
             }
             .scrollDismissesKeyboard(.interactively)
-            .keyboardDoneButton()
             .background(Color(.systemGroupedBackground))
-            .safeAreaInset(edge: .bottom) {
-                if let control {
-                    StartBar(control: control) { history.remember(control.inputText, for: selected) }
-                        .levelWithKeyboardDoneBar(keyboardShown)
-                }
-            }
+            .safeAreaInset(edge: .bottom) { bottomBar }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
                 keyboardShown = true
             }
@@ -90,6 +84,27 @@ struct ToolsView: View {
                 if let request { apply(request) }
             }
             .onChange(of: store.snapshot?.takenAt, initial: true) { _, _ in prepare() }
+        }
+    }
+
+    /// Start or Stop floats at the bottom. With the keyboard open, "Done" joins it,
+    /// level with it, so the keyboard can always be put away.
+    @ViewBuilder
+    private var bottomBar: some View {
+        if control != nil || keyboardShown {
+            ZStack(alignment: .bottomTrailing) {
+                if let control {
+                    StartBar(control: control) { history.remember(control.inputText, for: selected) }
+                }
+                if keyboardShown {
+                    KeyboardDoneBarButton()
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 8)
+                        .transition(.opacity)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .bottomTrailing)
+            .animation(.default, value: keyboardShown)
         }
     }
 
