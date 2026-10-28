@@ -4,15 +4,15 @@
 
 Display only. No account, no ads, no tracking, no backend.
 
-> **Status:** all planned screens are built and checked in the simulator and on a Mac. Not yet checked on a real iPhone: Wi-Fi name, cellular, VPN detection with WireGuard and IKEv2, and the Local Network behaviour. Expect rough edges there.
+> **Status:** all planned screens are built and checked in the simulator, on a Mac and on an iPhone 15 (iOS 27): Wi-Fi name, cellular with two SIMs, VPN detection with WireGuard and IKEv2 (full tunnel, over Wi-Fi and cellular) and the Local Network permission. Not yet proven on a device: split-tunnel VPNs, and the UPnP discovery of devices beyond your router. Expect rough edges there.
 
 ## Features
 
 - **Overview:** online status, gateway, DNS, proxy, public IP and provider (only with your consent). Every value can be copied, the overview can be shared as a text report, and "Hide values" keeps addresses out of screenshots.
 - **Wi-Fi:** SSID, BSSID, vendor, security, addresses, latency to the router, router details over UPnP
 - **Cellular and SIM:** radio technology per SIM, addresses, data counters
-- **VPN and tunnels:** whether a VPN is active, tunnel address, MTU, full or split tunnel
-- **LAN:** ping sweep and Bonjour discovery of devices on the local network, with a thorough mode that also probes a few TCP ports
+- **VPN and tunnels:** whether a VPN is active, tunnel address, MTU
+- **LAN:** ping sweep, Bonjour and UPnP discovery of devices on the local network, with a thorough mode that also probes a few TCP ports
 - **Live:** throughput per interface, latency, jitter and loss, and a timeline of network changes (foreground only, kept in memory)
 - **Tools:** ping, traceroute, DNS, whois and RDAP, ports, TLS certificate, HTTP timing, subnet calculator, OUI lookup
 - **Shortcuts and widget:** network status, VPN check and ping for Shortcuts and Siri, and a status widget that shows the time it was read
