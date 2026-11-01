@@ -83,7 +83,7 @@ struct ExternalPromptSheet: View {
                     settings.externalPromptShown = true
                     dismiss()
                 } label: {
-                    Text("Yes, show").frame(maxWidth: .infinity)
+                    Text("Yes, show").frame(maxWidth: .infinity).foregroundStyle(.onAccent)
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)

@@ -43,6 +43,7 @@ struct OnboardingView: View {
             } label: {
                 Text(page < Self.pageCount - 1 ? "Next" : "Get started")
                     .frame(maxWidth: .infinity)
+                    .foregroundStyle(.onAccent)
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
@@ -213,7 +214,7 @@ private struct ToolsPage: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
             .background(selected ? AnyShapeStyle(.tint) : AnyShapeStyle(.quaternary), in: Capsule())
-            .foregroundStyle(selected ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+            .foregroundStyle(selected ? AnyShapeStyle(.onAccent) : AnyShapeStyle(.primary))
     }
 }
 

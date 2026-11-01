@@ -129,7 +129,7 @@ struct ToolsView: View {
                             .background(
                                 selected == tool ? AnyShapeStyle(.tint) : AnyShapeStyle(.quaternary), in: Capsule()
                             )
-                            .foregroundStyle(selected == tool ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+                            .foregroundStyle(selected == tool ? AnyShapeStyle(.onAccent) : AnyShapeStyle(.primary))
                     }
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(selected == tool ? .isSelected : [])

@@ -80,8 +80,10 @@ struct LANView: View {
         } description: {
             Text("To find devices in your network, Pingscape asks them directly. The results stay on your iPhone. Allow it in Settings.")
         } actions: {
-            Button("Open Settings") {
+            Button {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            } label: {
+                Text("Open Settings").foregroundStyle(.onAccent)
             }
             .buttonStyle(.borderedProminent)
         }
@@ -146,6 +148,7 @@ struct LANView: View {
                 } label: {
                     Label(lan.phase == .idle ? "Search" : "Search again", systemImage: "magnifyingglass")
                         .frame(maxWidth: .infinity)
+                        .foregroundStyle(.onAccent)
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
