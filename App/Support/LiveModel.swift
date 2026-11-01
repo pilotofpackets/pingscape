@@ -125,9 +125,18 @@ final class LiveModel {
         }
     }
 
-    /// Clears the throughput charts, for another interface.
-    func resetThroughput() {
-        guard !isDemo else { return }
+    /// The interface and the ping target the charts belong to.
+    private var chartedInterface: String?
+    private var chartedTarget: String?
+
+    /// Clears the throughput charts when they are for another interface. A
+    /// return from the background keeps them: clearing on every restart of
+    /// the sampling emptied the charts each time the app came back
+    /// (found 2026-11-01). `sample` still resets the counters, so the pause
+    /// adds no false peak.
+    func resetThroughput(for name: String) {
+        guard !isDemo, name != chartedInterface else { return }
+        chartedInterface = name
         receive = []
         send = []
         sampler.reset()
@@ -153,8 +162,11 @@ final class LiveModel {
         }
     }
 
-    func resetLatency() {
-        guard !isDemo else { return }
+    /// Clears the latency chart when the target changes, not on a return
+    /// from the background (see `resetThroughput(for:)`).
+    func resetLatency(for target: String?) {
+        guard !isDemo, target != chartedTarget else { return }
+        chartedTarget = target
         latency = LatencyWindow()
         latencyPoints = []
     }

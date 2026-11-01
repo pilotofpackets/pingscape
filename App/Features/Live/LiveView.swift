@@ -71,13 +71,13 @@ struct LiveView: View {
         // Throughput of the shown interface, once a second.
         .task(id: TaskKey(visible: isVisible, name: selected?.name)) {
             guard isVisible, let name = selected?.name else { return }
-            model.resetThroughput()
+            model.resetThroughput(for: name)
             await model.sample(interface: name)
         }
         // Latency to the router or the internet target.
         .task(id: TaskKey(visible: isVisible, name: pingTargets.first)) {
             guard isVisible else { return }
-            model.resetLatency()
+            model.resetLatency(for: pingTargets.first)
             if let target = pingTargets.first { await model.ping(target) }
         }
         // The events (radio technology, access point) need fresh snapshots.
@@ -234,6 +234,20 @@ private struct ChartCard: View {
     let style: Style
     let tint: Color
 
+    /// The points in runs without a pause. Across a gap (the app was in the
+    /// background, or several pings went unanswered) the line breaks: drawn
+    /// through, it showed a slope over a time nothing was measured
+    /// (found 2026-11-01).
+    private var segmented: [(point: LivePoint, run: Int)] {
+        var run = 0
+        var previous: Date?
+        return points.map { point in
+            if let previous, point.time.timeIntervalSince(previous) > 3 { run += 1 }
+            previous = point.time
+            return (point, run)
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
@@ -247,12 +261,18 @@ private struct ChartCard: View {
                     .monospacedDigit()
                     .contentTransition(.numericText())
             }
-            Chart(points) { point in
-                AreaMark(x: .value("Time", point.time), y: .value("Value", point.value))
-                    .foregroundStyle(tint.opacity(0.15))
-                LineMark(x: .value("Time", point.time), y: .value("Value", point.value))
-                    .foregroundStyle(tint)
-                    .lineStyle(StrokeStyle(lineWidth: 1.5, lineJoin: .round))
+            Chart(segmented, id: \.point.id) { item in
+                AreaMark(
+                    x: .value("Time", item.point.time), y: .value("Value", item.point.value),
+                    series: .value("Run", item.run)
+                )
+                .foregroundStyle(tint.opacity(0.15))
+                LineMark(
+                    x: .value("Time", item.point.time), y: .value("Value", item.point.value),
+                    series: .value("Run", item.run)
+                )
+                .foregroundStyle(tint)
+                .lineStyle(StrokeStyle(lineWidth: 1.5, lineJoin: .round))
             }
             .chartXAxis(.hidden)
             .chartYAxis(.hidden)
