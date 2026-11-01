@@ -89,9 +89,27 @@ public enum HostResolver {
         return result
     }
 
-    /// All addresses of a host, or an empty list if the name does not resolve.
+    /// How long a name may take. `getaddrinfo` has no limit of its own: with a
+    /// DNS server that did not answer, a tool stayed on "Stop" for minutes
+    /// with nothing happening (found 2026-11-01).
+    public static let timeoutSeconds: Double = 10
+
+    /// All addresses of a host, or an empty list if the name does not resolve
+    /// in time. Cancelling the caller throws `CancellationError` at once.
     public static func resolve(_ host: String) async throws -> [ResolvedAddress] {
-        try await Blocking.run { _ in resolveNow(host) }
+        if let literal = ResolvedAddress(literal: host) { return [literal] }
+        return try await withThrowingTaskGroup(of: [ResolvedAddress]?.self) { group in
+            group.addTask { try await Blocking.run { _ in resolveNow(host) } }
+            group.addTask {
+                try await Task.sleep(for: .seconds(timeoutSeconds))
+                return nil
+            }
+            defer { group.cancelAll() }
+            // `nil` means the time ran out first. Empty reads as "does not
+            // resolve", which every tool already reports.
+            guard let first = try await group.next() else { return [] }
+            return first ?? []
+        }
     }
 
     /// The name a reverse lookup gives for an address, or `nil` if there is none.

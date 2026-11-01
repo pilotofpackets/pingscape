@@ -63,6 +63,7 @@ protocol ToolControl: AnyObject {
     /// The target field, for the list of recent targets.
     var inputText: String { get }
     var isRunning: Bool { get }
+    var failure: ToolFailure? { get }
     var canStart: Bool { get }
     func start()
     func stop()
@@ -84,6 +85,11 @@ final class ToolHistory {
         list.removeAll { $0 == trimmed }
         list.insert(trimmed, at: 0)
         entries[tool] = Array(list.prefix(5))
+    }
+
+    func forget(_ text: String, for tool: ToolKind) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        entries[tool]?.removeAll { $0 == trimmed }
     }
 }
 

@@ -91,7 +91,16 @@ struct ToolsView: View {
                 if tab != .tools { stopAll() }
             }
             .onChange(of: selected) { _, _ in stopAll() }
+            // A name that never resolved is no use as a recent target.
+            .onChange(of: unresolvedTarget) { _, target in
+                if let target { history.forget(target, for: selected) }
+            }
         }
+    }
+
+    private var unresolvedTarget: String? {
+        guard let control, control.failure == .tool(.cannotResolve) else { return nil }
+        return control.inputText
     }
 
     private func stopAll() {
