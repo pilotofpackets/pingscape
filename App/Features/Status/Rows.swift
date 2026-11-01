@@ -94,6 +94,8 @@ struct LoadableRow: View {
     var stacked = false
     /// A short explanation shown under the value once it is loaded.
     var note: LocalizedStringResource?
+    /// See `DataRow.reportNote`.
+    var reportNote: LocalizedStringResource?
     var unavailableText: LocalizedStringResource?
     let load: () -> Void
 
@@ -101,7 +103,8 @@ struct LoadableRow: View {
         switch state {
         case .loaded(let value):
             DataRow(
-                label: label, value: value, monospaced: monospaced, sensitive: sensitive, stacked: stacked, note: note)
+                label: label, value: value, monospaced: monospaced, sensitive: sensitive, stacked: stacked, note: note,
+                reportNote: reportNote)
         case .loading:
             LoadingRow(label: label)
         case .notLoaded:

@@ -2776,6 +2776,40 @@
         }
       }
     },
+    "likely via cellular" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vermutlich über Mobilfunk"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "likely via cellular"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "probablemente por la red móvil"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "probablement via le réseau cellulaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "probabilmente tramite rete cellulare"
+          }
+        }
+      }
+    },
     "DNS server %lld" : {
       "localizations" : {
         "de" : {

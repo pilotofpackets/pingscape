@@ -22,6 +22,10 @@ struct DataRow: View {
     var stacked = false
     /// A short explanation shown under the value, in the stacked layout only.
     var note: LocalizedStringResource?
+    /// A few words added in brackets to the value in a shared report, where
+    /// `note` does not go: without it the report read as if the cellular
+    /// IPv6 address belonged to the Wi-Fi connection.
+    var reportNote: LocalizedStringResource?
 
     /// "Not available", "Off", "On": the state of a field that would be
     /// sensitive if it had a value (External IPv6, Proxy, …). Masked along
@@ -48,7 +52,7 @@ struct DataRow: View {
         isIndividuallyHidden ? PrivacyMask.placeholder : (effectiveSensitive ? mask.shown(value) : value)
     }
 
-    /// Each line of `string` broken into two at a "." or ":" (never through
+    /// Each line of `string` broken into two at a ".", ":" or "_" (never through
     /// the middle of an octet or group), for a value that has to wrap.
     /// SwiftUI's own wrapping has no such string to break at and cuts
     /// wherever the width runs out, so this is done by hand instead. Line by
@@ -65,7 +69,9 @@ struct DataRow: View {
     }
 
     private func wrappedLine(_ string: String) -> String {
-        let separators: Set<Character> = [".", ":"]
+        // "_" too: a cipher suite (TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256)
+        // otherwise got a hyphen from the system that is not in the name.
+        let separators: Set<Character> = [".", ":", "_"]
         var segments: [String] = []
         var current = ""
         for character in string {
@@ -106,7 +112,9 @@ struct DataRow: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .recordRow(label: label, value: value, sensitive: effectiveSensitive)
+        .recordRow(
+            label: label, value: reportNote.map { "\(value) (\(String(localized: $0)))" } ?? value,
+            sensitive: effectiveSensitive)
     }
 
     private func valueText(_ string: String) -> some View {

@@ -178,6 +178,7 @@ struct StatusView: View {
                 LoadableRow(
                     label: "External IPv6", state: external.ipv6, stacked: true,
                     note: snapshot.externalIPv6MayBeCellular ? Self.externalIPv6CellularNote : nil,
+                    reportNote: snapshot.externalIPv6MayBeCellular ? Self.externalIPv6CellularReportNote : nil,
                     unavailableText: "Not available"
                 ) {
                     external.load(userRequested: true)
@@ -204,6 +205,7 @@ struct StatusView: View {
     /// Wi-Fi itself has no IPv6, so a loaded "External IPv6" can only have
     /// gone out over cellular (Wi-Fi Assist, or cellular data running
     /// alongside Wi-Fi) — shown next to the value, never on its own.
+    static let externalIPv6CellularReportNote: LocalizedStringResource = "likely via cellular"
     static let externalIPv6CellularNote: LocalizedStringResource =
         "No IPv6 on this connection — this address may be from cellular instead (e.g. Wi-Fi Assist)."
 
@@ -297,6 +299,7 @@ struct StatusView: View {
                         LoadableRow(
                             label: "External IPv6", state: external.ipv6, stacked: true,
                             note: snapshot.externalIPv6MayBeCellular ? Self.externalIPv6CellularNote : nil,
+                            reportNote: snapshot.externalIPv6MayBeCellular ? Self.externalIPv6CellularReportNote : nil,
                             unavailableText: "Not available"
                         ) {
                             external.load(userRequested: true)
