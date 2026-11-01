@@ -72,6 +72,7 @@ struct ToolsView: View {
                 keyboardShown = false
             }
             .navigationTitle("Tools")
+            .pingscapeCloseButton()
             .toolbar {
                 if !sections.isEmpty {
                     ToolbarItem(placement: .primaryAction) {

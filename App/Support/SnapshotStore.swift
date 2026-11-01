@@ -78,7 +78,7 @@ final class SnapshotStore {
 
     private nonisolated static func loadRegistry() async -> OUIRegistry {
         await Task.detached(priority: .utility) {
-            guard let url = Bundle.main.url(forResource: "oui", withExtension: "txt"),
+            guard let url = Bundle.pingscapeResources.url(forResource: "oui", withExtension: "txt"),
                 let text = try? String(contentsOf: url, encoding: .utf8)
             else { return OUIRegistry() }
             return OUIRegistry(text: text)

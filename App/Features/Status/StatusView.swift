@@ -59,6 +59,7 @@ struct StatusView: View {
                 navigation.overviewRequest = nil
             }
             .navigationTitle("Overview")
+            .pingscapeCloseButton()
             .navigationDestination(for: OverviewDestination.self) { destination in
                 switch destination {
                 case .wifi: WiFiDetailView()

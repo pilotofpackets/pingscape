@@ -31,6 +31,7 @@ struct LiveView: View {
             .keyboardDoneButton()
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Live")
+            .pingscapeCloseButton()
             .toolbar {
                 ToolbarItem(placement: .primaryAction) { runState }
             }
