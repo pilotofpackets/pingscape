@@ -110,10 +110,11 @@ struct StatusView: View {
         } else if snapshot.primaryInterface?.kind == .wifi {
             parts.append(String(localized: "via Wi-Fi"))
         } else if snapshot.primaryInterface?.kind == .cellular {
-            let technology = snapshot.cellularServices.first { $0.isDataService }?.technology.label
-            parts.append(
-                technology.map { String(localized: "via Cellular (\($0))") }
-                    ?? String(localized: "via Cellular"))
+            parts.append(String(localized: "via Cellular"))
+            // Its own part: the labels carry parentheses already ("4G (LTE)").
+            if let technology = snapshot.cellularServices.first(where: { $0.isDataService })?.technology.label {
+                parts.append(technology)
+            }
         } else if snapshot.primaryInterface?.kind == .ethernet {
             parts.append(String(localized: "via Ethernet"))
         }
@@ -166,9 +167,9 @@ struct StatusView: View {
                 DataRow(label: "Default gateway", value: gateway, monospaced: true, sensitive: true)
             }
             if !fullTunnel {
-                if !snapshot.dnsServers.isEmpty {
+                ForEach(Array(snapshot.dnsServers.enumerated()), id: \.offset) { index, server in
                     DataRow(
-                        label: "DNS servers", value: snapshot.dnsServers.joined(separator: "\n"),
+                        label: dnsServerLabel(index, of: snapshot.dnsServers.count), value: server,
                         monospaced: true, sensitive: true)
                 }
                 LoadableRow(label: "External IPv4", state: external.ipv4) { external.load(userRequested: true) }
@@ -277,11 +278,11 @@ struct StatusView: View {
             // internet resolves and sees is really the tunnel's, not the
             // Wi-Fi or cellular connection underneath (see the Connection card).
             if scope == .full {
-                if !snapshot.dnsServers.isEmpty {
+                for (index, server) in snapshot.dnsServers.enumerated() {
                     rows.append(
                         AnyView(
                             DataRow(
-                                label: "DNS servers", value: snapshot.dnsServers.joined(separator: "\n"),
+                                label: dnsServerLabel(index, of: snapshot.dnsServers.count), value: server,
                                 monospaced: true, sensitive: true)))
                 }
                 rows.append(
@@ -330,4 +331,11 @@ struct StatusView: View {
                 value: OverviewDestination.interfaces)
         }
     }
+}
+
+/// "DNS server 1", "DNS server 2" …, one row each, so two similar IPv6
+/// servers can be told apart (and copied or hidden one by one). Just
+/// "DNS server" when there is only one.
+private func dnsServerLabel(_ index: Int, of count: Int) -> LocalizedStringResource {
+    count == 1 ? "DNS server" : "DNS server \(index + 1)"
 }

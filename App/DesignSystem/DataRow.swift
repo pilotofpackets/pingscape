@@ -48,11 +48,23 @@ struct DataRow: View {
         isIndividuallyHidden ? PrivacyMask.placeholder : (effectiveSensitive ? mask.shown(value) : value)
     }
 
-    /// `string` broken into two lines at a "." or ":" (never through the
-    /// middle of an octet or group), for a value that has to wrap. SwiftUI's
-    /// own wrapping has no such string to break at and cuts wherever the
-    /// width runs out, so this is done by hand instead.
+    /// Each line of `string` broken into two at a "." or ":" (never through
+    /// the middle of an octet or group), for a value that has to wrap.
+    /// SwiftUI's own wrapping has no such string to break at and cuts
+    /// wherever the width runs out, so this is done by hand instead. Line by
+    /// line, because a list of addresses (DNS servers) split once as a whole
+    /// broke one address in the middle and left a lone digit on a line. A
+    /// line no wider than the halves of the others stays whole: the column
+    /// is that wide anyway (an IPv4 server next to IPv6 ones).
     private func wrapped(_ string: String) -> String {
+        let lines = string.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        let split = lines.map(wrappedLine)
+        let column = split.flatMap { $0.split(separator: "\n") }.map(\.count).max() ?? 0
+        return zip(lines, split).map { line, halves in line.count <= column ? line : halves }
+            .joined(separator: "\n")
+    }
+
+    private func wrappedLine(_ string: String) -> String {
         let separators: Set<Character> = [".", ":"]
         var segments: [String] = []
         var current = ""
@@ -152,6 +164,11 @@ struct StatusRow: View {
     let label: LocalizedStringResource
     let text: String
     var tone: StatusDot.Tone = .good
+    /// A refresh button at the end of the row, for a status that can be checked
+    /// again. Keeps it in this row instead of a second row with the same label.
+    /// Only a symbol, so it fits next to the status in every language; the
+    /// title is what VoiceOver reads.
+    var action: (title: LocalizedStringResource, perform: () -> Void)?
 
     private var status: some View {
         HStack(spacing: 8) {
@@ -168,13 +185,22 @@ struct StatusRow: View {
                 .layoutPriority(1)
             Spacer(minLength: 8)
             status
+            if let action {
+                Button(action: action.perform) {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.circle)
+                .accessibilityLabel(Text(action.title))
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
         .frame(minHeight: 44)
         .contentShape(Rectangle())
         .contextMenu { RowCopyMenu(value: text) }
-        .accessibilityElement(children: .combine)
+        // With a button, VoiceOver must still reach it on its own.
+        .accessibilityElement(children: action == nil ? .combine : .contain)
         .recordRow(label: label, value: text)
     }
 }

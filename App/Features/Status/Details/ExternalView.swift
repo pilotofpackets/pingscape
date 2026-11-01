@@ -83,8 +83,9 @@ struct ExternalView: View {
             InfoSection(title: "Reachability") {
                 switch external.internetCheck {
                 case .loaded(let result):
-                    StatusRow(label: "Internet", text: result.text, tone: result.tone)
-                    PermissionRow(label: "Internet", buttonTitle: "Check again") { external.checkInternet() }
+                    StatusRow(
+                        label: "Internet", text: result.text, tone: result.tone,
+                        action: ("Check again", { external.checkInternet() }))
                 case .loading:
                     LoadingRow(label: "Internet")
                 default:
