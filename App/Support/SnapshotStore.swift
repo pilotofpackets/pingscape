@@ -29,6 +29,7 @@ final class SnapshotStore {
 
     /// Loads the vendor table, then refreshes on every network change.
     func run() async {
+        CellularCollector.start()
         async let registry = Self.loadRegistry()
         await refresh()
         oui = await registry
