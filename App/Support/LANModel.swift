@@ -77,7 +77,10 @@ final class LANModel {
                 return
             }
             phase = .askingPermission
-            let answer = await LocalNetworkPermission.check()
+            // A neighbour, not the router: iOS lets the router through even
+            // before the user answered, so only a neighbour shows the answer.
+            let probe = LANScanner.addresses(in: range, around: me).addresses.first { $0 != gateway }
+            let answer = await LocalNetworkPermission.check(probe: probe)
             guard !Task.isCancelled else { return }
             if answer != .unknown { remember(answer) }
             if answer == .denied {
