@@ -59,6 +59,12 @@ extension NetworkSnapshot {
         if kind == .cellular, let name = path?.cellularInterface, let named = usable.first(where: { $0.name == name }) {
             return named
         }
+        // Offline with no cellular data path (Airplane Mode): a `pdp_ip`
+        // that still holds an address is the carrier's IMS or a leftover,
+        // not a connection (it showed as "via Cellular" while offline).
+        if kind == .cellular, let path, !path.isOnline, path.cellularInterface == nil {
+            return nil
+        }
         return usable.first
     }
 

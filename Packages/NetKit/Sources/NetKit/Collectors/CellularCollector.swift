@@ -6,8 +6,14 @@ import CoreTelephony
 /// No permission is needed. The carrier name is not readable on current iOS
 /// versions and is not part of the model.
 public enum CellularCollector {
+    /// One instance for the whole run. CoreTelephony keeps the radio state
+    /// current, and posts `CTServiceRadioAccessTechnologyDidChange`, only
+    /// while an instance is alive. A new one per read gave a stale answer
+    /// (4G after switching on Airplane Mode, found 2026-11-01) and never a
+    /// change notification.
+    nonisolated(unsafe) private static let info = CTTelephonyNetworkInfo()
+
     public static func services() -> [CellularService] {
-        let info = CTTelephonyNetworkInfo()
         let technologies = info.serviceCurrentRadioAccessTechnology ?? [:]
         let dataServiceID = info.dataServiceIdentifier
         return technologies

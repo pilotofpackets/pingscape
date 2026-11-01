@@ -172,7 +172,9 @@ struct StatusView: View {
                         label: dnsServerLabel(index, of: snapshot.dnsServers.count), value: server,
                         monospaced: true, sensitive: true)
                 }
-                LoadableRow(label: "External IPv4", state: external.ipv4) { external.load(userRequested: true) }
+                LoadableRow(label: "External IPv4", state: external.ipv4, unavailableText: "Not available") {
+                    external.load(userRequested: true)
+                }
                 LoadableRow(
                     label: "External IPv6", state: external.ipv6, stacked: true,
                     note: snapshot.externalIPv6MayBeCellular ? Self.externalIPv6CellularNote : nil,
@@ -287,7 +289,7 @@ struct StatusView: View {
                 }
                 rows.append(
                     AnyView(
-                        LoadableRow(label: "External IPv4", state: external.ipv4) {
+                        LoadableRow(label: "External IPv4", state: external.ipv4, unavailableText: "Not available") {
                             external.load(userRequested: true)
                         }))
                 rows.append(

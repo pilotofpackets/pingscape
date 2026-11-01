@@ -10,6 +10,7 @@ final class SnapshotStore {
     private(set) var snapshot: NetworkSnapshot?
     private(set) var oui = OUIRegistry()
     private(set) var isRefreshing = false
+    private var refreshAgain = false
     /// Changes seen while the app runs, newest first. Only in memory.
     private(set) var timeline = TimelineLog()
     /// Counts network path changes, so other parts can react to them.
@@ -41,19 +42,30 @@ final class SnapshotStore {
         }
         defer { radio.cancel() }
         for await _ in PathCollector.changes() {
-            pathChanges += 1
             await refresh()
+            // After the refresh, so whoever reacts to it sees the new state.
+            pathChanges += 1
         }
     }
 
     func refresh() async {
-        guard !isRefreshing else { return }
+        // A request that comes in while one runs is not dropped but runs
+        // right after it. Dropped, it left the overview stale: switching to
+        // Airplane Mode with the app open, the radio notification came during
+        // the path refresh, and 4G stayed on screen (found 2026-11-01).
+        guard !isRefreshing else {
+            refreshAgain = true
+            return
+        }
         isRefreshing = true
         defer { isRefreshing = false }
-        let next = await provider.snapshot()
-        timeline.record(from: snapshot, to: next)
-        snapshot = next
-        cellularAccess = CellularDataAccess.current
+        repeat {
+            refreshAgain = false
+            let next = await provider.snapshot()
+            timeline.record(from: snapshot, to: next)
+            snapshot = next
+            cellularAccess = CellularDataAccess.current
+        } while refreshAgain
     }
 
     private nonisolated static func loadRegistry() async -> OUIRegistry {

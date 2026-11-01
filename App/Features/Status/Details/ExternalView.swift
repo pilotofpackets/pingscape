@@ -12,7 +12,9 @@ struct ExternalView: View {
         DetailPage(title: "External") {
             if !external.isEnabled, external.ipv4.value == nil, !external.ipv4.isLoading {
                 InfoSection(title: "Public IP address") {
-                    LoadableRow(label: "IPv4 address", state: external.ipv4) { external.load(userRequested: true) }
+                    LoadableRow(label: "IPv4 address", state: external.ipv4, unavailableText: "Not available") {
+                        external.load(userRequested: true)
+                    }
                 }
             } else {
                 publicAddress
@@ -40,7 +42,9 @@ struct ExternalView: View {
 
     private var publicAddress: some View {
         InfoSection(title: "Public IP address") {
-            LoadableRow(label: "IPv4 address", state: external.ipv4) { external.load(userRequested: true) }
+            LoadableRow(label: "IPv4 address", state: external.ipv4, unavailableText: "Not available") {
+                        external.load(userRequested: true)
+                    }
             LoadableRow(
                 label: "IPv6 address", state: external.ipv6, stacked: true,
                 note: (store.snapshot?.externalIPv6MayBeCellular ?? false) ? StatusView.externalIPv6CellularNote : nil,

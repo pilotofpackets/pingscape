@@ -104,11 +104,27 @@ final class ExternalStore {
         lastLoad = Date()
         loadTask = Task { [weak self] in
             await self?.run()
-            self?.loadTask = nil
+            // A cancelled task was already replaced; it must not clear its successor.
+            if !Task.isCancelled { self?.loadTask = nil }
         }
     }
 
-    /// Clears everything when the user turns external requests off.
+    /// A new network: the old public address is no longer this device's,
+    /// so it goes, and is asked for again only while online. Offline both
+    /// addresses read "Not available" instead of a request that can only
+    /// fail. Before, a path change only asked (at most every 30 s) and
+    /// offline the old address stayed on screen (found 2026-11-01).
+    func networkChanged(isOnline: Bool) {
+        reset()
+        if isOnline {
+            load(force: true)
+        } else if isEnabled {
+            ipv4 = .unavailable
+            ipv6 = .unavailable
+        }
+    }
+
+    /// Clears everything: when the user turns external requests off, or on a new network.
     func reset() {
         loadTask?.cancel()
         loadTask = nil
@@ -181,9 +197,12 @@ final class ExternalStore {
         async let fetched4 = fetch(.v4)
         async let fetched6 = fetch(.v6, quiet: true)
         let (first, second) = await (fetched4, fetched6)
+        // Cancelled (a new network, the setting off): whatever is on screen
+        // now is newer than this answer. Written anyway, a load that failed
+        // while going offline overwrote "Not available" (found 2026-11-01).
+        guard !Task.isCancelled else { return }
         ipv4 = first
         ipv6 = second
-        guard !Task.isCancelled else { return }
 
         // The provider and the name belong to the address the internet sees.
         guard let address = first.value ?? second.value else {
@@ -194,6 +213,7 @@ final class ExternalStore {
         async let name = HostResolver.reverseName(of: address)
         async let info = providerInfo(for: address)
         let (resolved, providerResult) = await (name, info)
+        guard !Task.isCancelled else { return }
         reverseName = resolved.map { .loaded($0) } ?? .unavailable
         provider = providerResult
     }

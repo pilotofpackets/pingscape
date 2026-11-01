@@ -218,6 +218,8 @@ struct PermissionRow: View {
         Button(buttonTitle, action: action)
             .buttonStyle(.bordered)
             .buttonBorderShape(.capsule)
+            // Next to a long detail it was squeezed into a tall empty capsule.
+            .fixedSize()
     }
 
     private var labelStack: some View {

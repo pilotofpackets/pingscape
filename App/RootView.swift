@@ -27,11 +27,17 @@ struct RootView: View {
         .tabViewStyle(.sidebarAdaptable)
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
-            Task { await store.refresh() }
-            external.load()
+            Task {
+                await store.refresh()
+                // Not offline: closing Control Center after switching on
+                // Airplane Mode made this load, and fail, every time.
+                if store.snapshot?.isOnline != false { external.load() }
+            }
         }
         // A new network usually means a new public address.
-        .onChange(of: store.pathChanges) { _, _ in external.load() }
+        .onChange(of: store.pathChanges) { _, _ in
+            external.networkChanged(isOnline: store.snapshot?.isOnline ?? true)
+        }
         .onChange(of: settings.externalLookups) { _, isOn in
             if isOn { external.load(force: true) } else { external.reset() }
         }
