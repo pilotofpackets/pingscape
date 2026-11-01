@@ -59,11 +59,14 @@ struct DNSProxyView: View {
         measureTask = Task {
             await withTaskGroup(of: (String, DNSTiming).self) { group in
                 for server in servers {
-                    group.addTask {
-                        if DemoLaunch.isDemo { return (server, .milliseconds(8)) }
-                        guard let address = ResolvedAddress(literal: server) else { return (server, .noAnswer) }
-                        do { return (server, .milliseconds(try await DNSClient.measure(server: address))) } catch { return (server, .noAnswer) }
-                    }
+                    // The do/catch stays out of this closure on purpose. A child
+                    // that returns a (String, …) tuple straight from do/catch is
+                    // miscompiled by Swift 6.4 under -O (swiftlang/swift#93208):
+                    // the group reads a garbage string, ends early, and the next
+                    // child to finish aborts in AsyncTask::completeFuture with
+                    // __cxa_pure_virtual. That was the TestFlight crash on
+                    // "Measure response time" (builds 18, 27, 44). Release only.
+                    group.addTask { (server, await DNSTiming.measure(server)) }
                 }
                 for await (server, timing) in group {
                     guard !Task.isCancelled else { return }
@@ -127,6 +130,12 @@ struct DNSProxyView: View {
 enum DNSTiming {
     case milliseconds(Double)
     case noAnswer
+
+    static func measure(_ server: String) async -> DNSTiming {
+        if DemoLaunch.isDemo { return .milliseconds(8) }
+        guard let address = ResolvedAddress(literal: server) else { return .noAnswer }
+        do { return .milliseconds(try await DNSClient.measure(server: address)) } catch { return .noAnswer }
+    }
 
     var text: String {
         switch self {
