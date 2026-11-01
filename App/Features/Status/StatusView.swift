@@ -313,8 +313,9 @@ struct StatusView: View {
             InfoSection(title: "Cellular", details: OverviewDestination.cellular) {
                 ForEach(services) { service in
                     StatusRow(
-                        label: service.title(among: snapshot.cellularServices.count),
-                        text: service.technology.label)
+                        label: service.title(in: snapshot.cellularServices),
+                        text: service.statusText(among: snapshot.cellularServices),
+                        tone: service.isDataService ? .good : .neutral)
                 }
             }
         }

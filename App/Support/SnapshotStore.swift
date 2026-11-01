@@ -41,6 +41,13 @@ final class SnapshotStore {
             }
         }
         defer { radio.cancel() }
+        // Mobile data switched to the other SIM.
+        let dataSIM = Task { [weak self] in
+            for await _ in NotificationCenter.default.notifications(named: CellularCollector.dataServiceDidChange) {
+                await self?.refresh()
+            }
+        }
+        defer { dataSIM.cancel() }
         for await _ in PathCollector.changes() {
             await refresh()
             // After the refresh, so whoever reacts to it sees the new state.

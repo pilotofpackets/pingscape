@@ -66,7 +66,9 @@ enum StatusText {
                 ReportSection(
                     title: String(localized: "Cellular"),
                     rows: services.map {
-                        ReportRow(label: String($0.title(among: snapshot.cellularServices.count).localizedString), value: $0.technology.label, isSensitive: false)
+                        ReportRow(
+                            label: String(localized: $0.title(in: snapshot.cellularServices)),
+                            value: $0.statusText(among: snapshot.cellularServices), isSensitive: false)
                     }))
         }
         return ReportFormatter.text(header: DeviceInfo.reportHeader(at: date), sections: sections, masked: masked)
