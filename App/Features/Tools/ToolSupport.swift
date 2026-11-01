@@ -218,7 +218,9 @@ struct StartBar: View {
                 control.stop()
             } else {
                 control.start()
-                onStart()
+                // Only a run that started: a rejected input ("keinhost!!!")
+                // landed in the recent targets before (found 2026-11-01).
+                if control.isRunning { onStart() }
             }
         } label: {
             Label(control.isRunning ? "Stop" : "Start", systemImage: control.isRunning ? "stop.fill" : "play.fill")

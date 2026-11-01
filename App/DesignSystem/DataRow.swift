@@ -111,7 +111,10 @@ struct DataRow: View {
 
     private func valueText(_ string: String) -> some View {
         Text(string)
-            .font(monospaced ? .system(.body, design: .monospaced) : .body)
+            // The placeholder in the regular font everywhere: in the monospaced
+            // one its dots came out larger, so hidden addresses looked unlike
+            // a hidden network name next to them.
+            .font(monospaced && string != PrivacyMask.placeholder ? .system(.body, design: .monospaced) : .body)
     }
 
     /// The value at its normal size on one line if that fits, or — the

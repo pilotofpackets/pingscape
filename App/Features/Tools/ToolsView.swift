@@ -84,7 +84,19 @@ struct ToolsView: View {
                 if let request { apply(request) }
             }
             .onChange(of: store.snapshot?.takenAt, initial: true) { _, _ in prepare() }
+            // Leaving the page cancels (docs/07-tools.md), what came in stays.
+            // A ping kept going after a switch to another tab or tool, the
+            // latter with no Stop button in sight (found 2026-11-01).
+            .onChange(of: navigation.tab) { _, tab in
+                if tab != .tools { stopAll() }
+            }
+            .onChange(of: selected) { _, _ in stopAll() }
         }
+    }
+
+    private func stopAll() {
+        let controls: [any ToolControl] = [ping, traceroute, dns, whois, ports, tls, http]
+        for control in controls where control.isRunning { control.stop() }
     }
 
     /// Start or Stop floats at the bottom. With the keyboard open, "Done" joins it,
