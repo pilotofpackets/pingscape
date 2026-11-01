@@ -33,6 +33,7 @@ struct LANView: View {
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("LAN")
+            .pingscapeCloseButton()
             .toolbar { toolbar }
             .navigationDestination(for: String.self) { ip in
                 LANDeviceView(ip: ip)

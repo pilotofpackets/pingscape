@@ -7,5 +7,5 @@ extension ShapeStyle where Self == Color {
     ///
     /// Set it on the label itself: `.borderedProminent` paints its label white
     /// and wins over a style set outside the button.
-    static var onAccent: Color { Color("AccentForeground") }
+    static var onAccent: Color { Color("AccentForeground", bundle: .pingscapeResources) }
 }

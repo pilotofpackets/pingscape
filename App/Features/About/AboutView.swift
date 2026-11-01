@@ -86,6 +86,7 @@ struct AboutView: View {
                 }
             }
             .navigationTitle("About")
+            .pingscapeCloseButton()
             .fullScreenCover(isPresented: $showsOnboarding) {
                 OnboardingView { showsOnboarding = false }
             }
