@@ -18,7 +18,7 @@
 </div></header>
 <main><div class="wrap">
 <h1>Datenschutz</h1>
-<p class="small">Stand: 30.09.2026</p>
+<p class="small">Stand: 01.11.2026</p>
 <p class="lead">Pingscape hat kein Konto, keine Analyse, keine Werbung und keinen eigenen Server. Der Entwickler erhebt keine Daten über dich.</p>
 
 <h2>Verantwortlich</h2>
@@ -36,11 +36,15 @@
 </table>
 
 <h2>Anfragen, die dein Gerät verlassen</h2>
+<h3>Beim Start: eine DNS-Abfrage</h3>
+<p>Um herauszufinden, ob dein Netz IPv6 in IPv4 übersetzt (NAT64), fragt die App deinen System-DNS-Server nach <code>ipv4only.arpa</code>, einem festen Namen, der genau für diese Prüfung reserviert ist (RFC 7050). Dein DNS-Server, meist dein Router, gibt die Frage eventuell an deinen Provider weiter. Sie enthält nichts über dich oder dein Gerät.</p>
+
 <h3>Öffentliche IP-Adresse und Provider (nur mit deiner Zustimmung)</h3>
 <p>Das ist aus, bis du zustimmst, in der Frage beim ersten Start oder mit dem Schalter „Externe Abfragen“ unter Über. Ein Tipp auf „Laden“ funktioniert auch einmalig, ohne den Schalter einzuschalten. Diese Server werden gefragt:</p>
 <table>
 <tr><th>Server</th><th>Zweck</th></tr>
 <tr><td><code>api.ipify.org</code>, <code>api6.ipify.org</code> (<a href="https://www.ipify.org">ipify</a>)</td><td>Liefern deine öffentliche IPv4- und IPv6-Adresse.</td></tr>
+<tr><td><code>ipv4.icanhazip.com</code>, <code>ipv6.icanhazip.com</code></td><td>Werden nur gefragt, wenn der passende ipify-Server nicht antwortet. Gleiche Anfrage, gleiche Antwort.</td></tr>
 <tr><td><code>stat.ripe.net</code> (RIPEstat, <a href="https://www.ripe.net">RIPE NCC</a>)</td><td>Bekommt deine öffentliche IP-Adresse und liefert das autonome System und dessen Inhaber. Die App nennt sich mit <code>sourceapp=pingscape</code>.</td></tr>
 <tr><td>Dein System-DNS-Server</td><td>Wird nach dem Namen gefragt, der zu deiner öffentlichen IP-Adresse gehört.</td></tr>
 </table>

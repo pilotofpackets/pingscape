@@ -12,7 +12,9 @@ Pingscape has no account, no analytics, no advertising and no server of its own.
 
 ## Lookups that leave the device
 
-Nothing below happens on its own, except the first group after you agree to it.
+**At start: one DNS lookup.** To find out whether the network translates IPv6 to IPv4 (NAT64), the app asks your system DNS server for `ipv4only.arpa`, a fixed name reserved for exactly this check (RFC 7050). Your DNS server, usually your router, may pass the question on to your provider. It carries nothing about you or your device.
+
+Nothing else below happens on its own, except the first group after you agree to it.
 
 **Public IP address and provider.** Off until you agree (a question at first launch, and a switch under About). A tap on "Load" also works once without switching it on. These servers are asked:
 
@@ -37,4 +39,4 @@ Each of these servers sees your public IP address, as with any internet request.
 
 The full policy, in English and German, is on the website: `pingscape.app/privacy.html`.
 
-The app's [privacy manifest](App/Resources/PrivacyInfo.xcprivacy) declares that no data is collected and nothing is used for tracking.
+The app's [privacy manifest](App/Resources/PrivacyInfo.xcprivacy) declares nothing used for tracking. It lists "other data" for app functionality, not linked to you, because the public IP lookup above reaches services that may keep their own logs.
