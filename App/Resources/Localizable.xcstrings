@@ -1079,6 +1079,41 @@
         }
       }
     },
+    "Address translation" : {
+      "comment" : "Row: whether the servers see another address than the device's.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressübersetzung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address translation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducción de direcciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduction d’adresse"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduzione degli indirizzi"
+          }
+        }
+      }
+    },
     "Address type" : {
       "localizations" : {
         "de" : {
@@ -1930,6 +1965,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cellulare"
+          }
+        }
+      }
+    },
+    "Changed" : {
+      "comment" : "Port row of the NAT tool: the public port differs from the local one.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geändert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifié"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiata"
           }
         }
       }
@@ -2990,6 +3060,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diverse tra i server"
+          }
+        }
+      }
+    },
+    "Differs per server" : {
+      "comment" : "NAT tool: the STUN servers saw different public ports or addresses.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je Server anders"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Differs per server"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distinto según el servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Différent selon le serveur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diverso per ogni server"
           }
         }
       }
@@ -5528,6 +5633,41 @@
         }
       }
     },
+    "Kept" : {
+      "comment" : "Port row of the NAT tool: the public port is the local one.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beibehalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kept"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenuta"
+          }
+        }
+      }
+    },
     "LAN" : {
       "localizations" : {
         "de" : {
@@ -6789,6 +6929,41 @@
         }
       }
     },
+    "Mapping" : {
+      "comment" : "Section of the NAT tool: how the device's address and port appear outside.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuordnung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapping"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asignación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correspondance"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mappatura"
+          }
+        }
+      }
+    },
     "MB/s" : {
       "localizations" : {
         "de" : {
@@ -7500,6 +7675,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I nomi provengono dal tuo server DNS, che quindi vede gli indirizzi dei router lungo il percorso."
+          }
+        }
+      }
+    },
+    "NAT" : {
+      "comment" : "Name of the NAT tool (STUN). Usually not translated.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAT"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAT"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAT"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAT"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAT"
           }
         }
       }
@@ -9204,6 +9414,41 @@
         }
       }
     },
+    "Own STUN server (optional)" : {
+      "comment" : "Field of the NAT tool: an extra STUN server, host or host:port.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eigener STUN-Server (optional)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Own STUN server (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor STUN (opcional)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre serveur STUN (facultatif)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il tuo server STUN (facoltativo)"
+          }
+        }
+      }
+    },
     "Packet sizes" : {
       "comment" : "Accessibility label of the menu with common packet sizes.",
       "localizations" : {
@@ -9442,6 +9687,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Payload"
+          }
+        }
+      }
+    },
+    "Per destination" : {
+      "comment" : "Row: whether the mapping is the same for every server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je Ziel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per destination"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por destino"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par destination"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per destinazione"
           }
         }
       }
@@ -11727,6 +12007,41 @@
         }
       }
     },
+    "Same for all servers" : {
+      "comment" : "NAT tool: all STUN servers saw the same public address and port.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei allen Servern gleich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same for all servers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Igual para todos los servidores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identique pour tous les serveurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uguale per tutti i server"
+          }
+        }
+      }
+    },
     "Save image to Photos" : {
       "localizations" : {
         "de" : {
@@ -12033,6 +12348,41 @@
         }
       }
     },
+    "Seen from outside" : {
+      "comment" : "NAT tool row: the public address and port the STUN servers saw.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von außen gesehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seen from outside"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visto desde fuera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vu de l’extérieur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visto dall’esterno"
+          }
+        }
+      }
+    },
     "Send" : {
       "localizations" : {
         "de" : {
@@ -12063,6 +12413,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invio"
+          }
+        }
+      }
+    },
+    "Sends a STUN request from one UDP port to Cloudflare and Google, which answer with the address and port they saw." : {
+      "comment" : "Note of the NAT tool.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendet von einem UDP-Port eine STUN-Anfrage an Cloudflare und Google, die mit der Adresse und dem Port antworten, die bei ihnen ankamen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sends a STUN request from one UDP port to Cloudflare and Google, which answer with the address and port they saw."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envía desde un puerto UDP una solicitud STUN a Cloudflare y Google, que responden con la dirección y el puerto que vieron."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoie depuis un port UDP une requête STUN à Cloudflare et Google, qui répondent avec l’adresse et le port qu’ils ont vus."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia da una porta UDP una richiesta STUN a Cloudflare e Google, che rispondono con l’indirizzo e la porta che hanno visto."
           }
         }
       }
@@ -12337,6 +12722,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nome del server o URL DoH"
+          }
+        }
+      }
+    },
+    "Servers" : {
+      "comment" : "Section with the answer of each STUN server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servidores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
           }
         }
       }
@@ -14031,6 +14451,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Queste traduzioni sono state scritte dallo sviluppatore e non sono state riviste da un madrelingua. Se qualcosa non ti sembra corretto, segnalacelo tramite «Segnala un problema» qui sopra."
+          }
+        }
+      }
+    },
+    "This device" : {
+      "comment" : "Row: the local address and port of the device.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Gerät"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This device"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este dispositivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet appareil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo dispositivo"
           }
         }
       }

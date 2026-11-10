@@ -281,3 +281,76 @@ struct LoopbackToolTests {
         #expect(found == ["127.0.0.1"])
     }
 }
+
+@Suite("STUN")
+struct STUNTests {
+    private let transaction: [UInt8] = Array(1...12)
+
+    /// A binding success response with one attribute.
+    private func response(type: UInt16, value: [UInt8], transaction: [UInt8]? = nil) -> [UInt8] {
+        let attribute = [UInt8(type >> 8), UInt8(type & 0xFF), 0, UInt8(value.count)] + value
+        return [0x01, 0x01, 0, UInt8(attribute.count), 0x21, 0x12, 0xA4, 0x42] + (transaction ?? self.transaction)
+            + attribute
+    }
+
+    @Test func buildsABindingRequest() {
+        let request = STUNMessage.bindingRequest(transactionID: transaction)
+        #expect(request.count == 20)
+        #expect(Array(request[0..<8]) == [0, 1, 0, 0, 0x21, 0x12, 0xA4, 0x42])
+    }
+
+    @Test func readsAnXORMappedIPv4Address() {
+        // 203.0.113.5:40000, XORed with the cookie: port ^ 0x2112, address ^ 21 12 A4 42.
+        let value: [UInt8] = [0, 1, 0x9C ^ 0x21, 0x40 ^ 0x12, 203 ^ 0x21, 0 ^ 0x12, 113 ^ 0xA4, 5 ^ 0x42]
+        let found = STUNMessage.mappedAddress(in: response(type: 0x0020, value: value), transactionID: transaction)
+        #expect(found?.address == "203.0.113.5")
+        #expect(found?.port == 40000)
+        // Another transaction's answer is not ours.
+        #expect(STUNMessage.mappedAddress(in: response(type: 0x0020, value: value), transactionID: Array(repeating: 0, count: 12)) == nil)
+    }
+
+    @Test func readsAnXORMappedIPv6Address() {
+        let address: [UInt8] = [0x20, 0x01, 0x0D, 0xB8] + Array(repeating: 0, count: 11) + [1]
+        let key: [UInt8] = [0x21, 0x12, 0xA4, 0x42] + transaction
+        let xored = zip(address, key).map { $0 ^ $1 }
+        let value: [UInt8] = [0, 2, 0x13 ^ 0x21, 0x88 ^ 0x12] + xored
+        let found = STUNMessage.mappedAddress(in: response(type: 0x0020, value: value), transactionID: transaction)
+        #expect(found?.address == "2001:db8::1")
+        #expect(found?.port == 5000)
+    }
+
+    @Test func fallsBackToThePlainMappedAddress() {
+        let value: [UInt8] = [0, 1, 0x0D, 0x96, 198, 51, 100, 7]
+        let found = STUNMessage.mappedAddress(in: response(type: 0x0001, value: value), transactionID: transaction)
+        #expect(found?.address == "198.51.100.7")
+        #expect(found?.port == 3478)
+    }
+
+    private func mapping(_ server: String, at serverAddress: String, _ address: String, _ port: UInt16) -> STUNMapping {
+        STUNMapping(
+            server: STUNServer(host: server), serverAddress: serverAddress, publicAddress: address, publicPort: port,
+            milliseconds: 10, error: nil)
+    }
+
+    @Test func reportsTheFactsOfAMapping() {
+        let same = STUNReport(
+            localAddress: "192.168.1.20", localPort: 50000,
+            mappings: [mapping("a", at: "192.0.2.1", "203.0.113.5", 50000), mapping("b", at: "192.0.2.2", "203.0.113.5", 50000)])
+        #expect(same.isTranslated == true)
+        #expect(same.keepsPort == true)
+        #expect(same.sameMappingForAllServers == true)
+
+        let changing = STUNReport(
+            localAddress: "192.168.1.20", localPort: 50000,
+            mappings: [mapping("a", at: "192.0.2.1", "203.0.113.5", 61000), mapping("b", at: "192.0.2.2", "203.0.113.5", 61001)])
+        #expect(changing.keepsPort == false)
+        #expect(changing.sameMappingForAllServers == false)
+
+        let direct = STUNReport(
+            localAddress: "2001:db8::20", localPort: 50000,
+            mappings: [mapping("a", at: "2001:db8::1", "2001:db8::20", 50000)])
+        #expect(direct.isTranslated == false)
+        // One server cannot tell whether the mapping depends on the destination.
+        #expect(direct.sameMappingForAllServers == nil)
+    }
+}

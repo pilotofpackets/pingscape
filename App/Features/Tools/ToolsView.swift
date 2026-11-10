@@ -11,6 +11,7 @@ extension ToolKind {
         case .ports: "Ports"
         case .tls: "TLS"
         case .http: "HTTP"
+        case .nat: "NAT"
         case .subnet: "Subnet"
         case .oui: "OUI"
         }
@@ -31,6 +32,7 @@ struct ToolsView: View {
     @State private var ports: PortsModel
     @State private var tls: TLSModel
     @State private var http: HTTPModel
+    @State private var nat: NATModel
     @State private var subnetInput = ""
     @State private var ouiInput = ""
     @State private var keyboardShown = false
@@ -45,6 +47,7 @@ struct ToolsView: View {
         _ports = State(initialValue: demo ? .demo() : PortsModel())
         _tls = State(initialValue: demo ? .demo() : TLSModel())
         _http = State(initialValue: demo ? .demo() : HTTPModel())
+        _nat = State(initialValue: demo ? .demo() : NATModel())
         _subnetInput = State(initialValue: demo ? "192.168.178.42/24" : "")
         _ouiInput = State(initialValue: demo ? "3C:A6:2F:1B:D3:22" : "")
     }
@@ -105,7 +108,7 @@ struct ToolsView: View {
     }
 
     private func stopAll() {
-        let controls: [any ToolControl] = [ping, traceroute, dns, whois, ports, tls, http]
+        let controls: [any ToolControl] = [ping, traceroute, dns, whois, ports, tls, http, nat]
         for control in controls where control.isRunning { control.stop() }
     }
 
@@ -173,6 +176,7 @@ struct ToolsView: View {
         case .ports: PortsView(model: ports, history: history)
         case .tls: TLSView(model: tls, history: history)
         case .http: HTTPView(model: http, history: history)
+        case .nat: NATView(model: nat, history: history)
         case .subnet: SubnetView(input: $subnetInput)
         case .oui: OUIView(input: $ouiInput)
         }
@@ -187,6 +191,7 @@ struct ToolsView: View {
         case .ports: ports
         case .tls: tls
         case .http: http
+        case .nat: nat
         case .subnet, .oui: nil
         }
     }
@@ -206,7 +211,7 @@ struct ToolsView: View {
         case .whois: whois.input = request.target
         case .tls: tls.input = request.target
         case .http: http.input = request.target
-        case .subnet, .oui: break
+        case .nat, .subnet, .oui: break
         }
         navigation.toolRequest = nil
     }

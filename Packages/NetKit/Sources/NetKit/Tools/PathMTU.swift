@@ -178,6 +178,14 @@ enum OutgoingInterface {
     /// Connects a UDP socket, which sends nothing, and reads the local address
     /// the system picked. The interface holding that address is the one.
     static func find(for address: ResolvedAddress) -> NetworkInterface? {
+        guard let ip = localAddress(for: address) else { return nil }
+        return InterfaceCollector.collect().first { interface in
+            interface.addresses.contains { $0.ip == ip }
+        }
+    }
+
+    /// The local address the system would send from.
+    static func localAddress(for address: ResolvedAddress) -> String? {
         guard let socket = try? POSIXSocket(family: address.family, type: SOCK_DGRAM) else { return nil }
         let status = address.withSockaddr(port: 9) { sa, length in Darwin.connect(socket.fd, sa, length) }
         guard status == 0 else { return nil }
@@ -188,9 +196,6 @@ enum OutgoingInterface {
         }
         guard named == 0 else { return nil }
         let bytes = withUnsafeBytes(of: &local) { Array($0.prefix(Int(length))) }
-        guard let ip = ResolvedAddress.text(ofSockaddr: bytes) else { return nil }
-        return InterfaceCollector.collect().first { interface in
-            interface.addresses.contains { $0.ip == ip }
-        }
+        return ResolvedAddress.text(ofSockaddr: bytes)
     }
 }
