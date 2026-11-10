@@ -202,14 +202,26 @@ struct TracerouteView: View {
         VStack(spacing: 16) {
             ToolField(title: "Host or IP address", text: $model.input) { model.start() }
             RecentChips(items: history.recent(.traceroute)) { model.input = $0 }
+            Picker("Mode", selection: $model.mode) {
+                Text("Once").tag(TracerouteMode.once)
+                Text("Continuous (MTR)").tag(TracerouteMode.continuous)
+            }
+            .pickerStyle(.segmented)
+            .disabled(model.isRunning)
             InfoCard {
                 Toggle("Look up names", isOn: $model.resolveNames)
                     .padding(.horizontal, 16)
                     .frame(minHeight: 44)
             }
+            .disabled(model.isRunning)
+            if model.mode == .continuous {
+                ToolNote(Text("Sends one echo request to every hop each second until you stop it, and keeps loss and times per hop."))
+            }
             ToolNote(Text("Names come from your DNS server, which then sees the addresses of the routers on the way."))
             if let failure = model.failure { ErrorLine(failure: failure) }
-            if !model.hops.isEmpty {
+            if model.mode == .continuous {
+                if !model.mtrHops.isEmpty { continuous }
+            } else if !model.hops.isEmpty {
                 InfoSection(title: "Route") {
                     ForEach(model.hops) { hop in
                         HopRow(hop: hop, name: model.names[hop.number])
@@ -222,6 +234,92 @@ struct TracerouteView: View {
                 }
             }
         }
+    }
+}
+
+extension TracerouteView {
+    /// The hops up to the last one that ever answered. Beyond it there is
+    /// nothing measured to show.
+    private var shownHops: [MTRHop] {
+        guard let last = model.mtrHops.lastIndex(where: { $0.statistics.received > 0 }) else { return [] }
+        return Array(model.mtrHops[...last])
+    }
+
+    var continuous: some View {
+        InfoSection(title: "Route") {
+            ForEach(shownHops) { hop in
+                MTRHopRow(hop: hop, names: hop.addresses.compactMap { model.namesByAddress[$0] })
+            }
+            DataRow(label: "Rounds", value: String(model.mtrRounds))
+            DataRow(
+                label: "Result",
+                value: model.mtrReached ? String(localized: "Target reached") : String(localized: "Target not reached"))
+        }
+    }
+}
+
+/// A hop of the continuous traceroute: its addresses, then loss and times.
+private struct MTRHopRow: View {
+    @Environment(PrivacyMask.self) private var mask
+    let hop: MTRHop
+    let names: [String]
+
+    private var addressText: String {
+        hop.addresses.isEmpty ? String(localized: "No reply") : hop.addresses.map { mask.shown($0) }.joined(separator: "\n")
+    }
+
+    private var figures: String {
+        let stats = hop.statistics
+        var parts = ["\(String(localized: "Loss")) \(Int(stats.lostPercent.rounded())) %"]
+        if let last = hop.last { parts.append("\(String(localized: "Last")) \(milliseconds(last))") }
+        if let average = stats.average { parts.append("\(String(localized: "Avg")) \(milliseconds(average))") }
+        if let minimum = stats.minimum, let maximum = stats.maximum {
+            parts.append("\(String(localized: "Best")) \(milliseconds(minimum))")
+            parts.append("\(String(localized: "Worst")) \(milliseconds(maximum))")
+        }
+        if let jitter = stats.jitter { parts.append("\(String(localized: "Jitter")) \(milliseconds(jitter))") }
+        // A line breaks between the figures, never inside one ("1.9 / ms").
+        return parts.map { $0.replacingOccurrences(of: " ", with: "\u{00A0}") }.joined(separator: " · ")
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(verbatim: "\(hop.number)")
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .frame(minWidth: 24, alignment: .trailing)
+                Text(addressText)
+                    .font(hop.addresses.isEmpty ? .body : .system(.body, design: .monospaced))
+                    .foregroundStyle(hop.addresses.isEmpty ? .secondary : .primary)
+                Spacer(minLength: 8)
+                if hop.statistics.lostPercent > 0 {
+                    StatusDot(tone: hop.statistics.received == 0 ? .critical : .warning)
+                        .accessibilityHidden(true)
+                }
+            }
+            Text(figures)
+                .font(.footnote.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .padding(.leading, 36)
+            ForEach(names, id: \.self) { name in
+                Text(mask.shown(name))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 36)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .contextMenu { RowCopyMenu(value: (hop.addresses + names).joined(separator: " · ")) }
+        .accessibilityElement(children: .combine)
+        .recordRow(
+            label: LocalizedStringResource(stringLiteral: "\(hop.number)"),
+            value: ([addressText.replacingOccurrences(of: "\n", with: ", "), figures] + names.map { mask.shown($0) })
+                .joined(separator: " · "))
     }
 }
 

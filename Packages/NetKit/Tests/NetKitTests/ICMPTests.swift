@@ -354,3 +354,46 @@ struct STUNTests {
         #expect(direct.sameMappingForAllServers == nil)
     }
 }
+
+@Suite("MTR")
+struct MTRTests {
+    @Test func collectsStatisticsAndEveryAddressOfAHop() {
+        var hop = MTRHop(number: 3)
+        hop.record(("192.0.2.1", 10))
+        hop.record(nil)
+        hop.record(("192.0.2.2", 14))
+        hop.record(("192.0.2.1", 12))
+        #expect(hop.addresses == ["192.0.2.1", "192.0.2.2"])
+        #expect(hop.statistics.sent == 4)
+        #expect(hop.statistics.lostPercent == 25)
+        #expect(hop.statistics.minimum == 10)
+        #expect(hop.last == 12)
+        hop.record(nil)
+        #expect(hop.last == nil)
+    }
+
+    // Needs an ICMP datagram socket, which a locked-down CI machine may not give.
+    @Test(.enabled(if: ICMPEcho.isAvailable())) func tracesTheLoopbackInRounds() async {
+        let loopback = ResolvedAddress(literal: "127.0.0.1")!
+        var last: [MTRHop] = []
+        var reached = false
+        var rounds = 0
+        for await event in MTRTool.run(
+            address: loopback, settings: TracerouteSettings(maximumHops: 5, timeoutSeconds: 1, resolveNames: false),
+            intervalSeconds: 0.05)
+        {
+            if case .round(let number, let hops, let target) = event {
+                rounds = number
+                last = hops
+                reached = target
+                if number == 3 { break }
+            }
+            if case .failed = event { break }
+        }
+        #expect(rounds == 3)
+        #expect(reached)
+        #expect(last.count == 1)
+        #expect(last.first?.addresses == ["127.0.0.1"])
+        #expect(last.first?.statistics.received == 3)
+    }
+}

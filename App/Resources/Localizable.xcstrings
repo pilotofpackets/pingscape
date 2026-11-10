@@ -1729,6 +1729,41 @@
         }
       }
     },
+    "Avg" : {
+      "comment" : "Continuous traceroute: average round trip, short.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ø"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avg"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moy."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media"
+          }
+        }
+      }
+    },
     "Below interface MTU" : {
       "comment" : "Path MTU result: how many bytes the path MTU is below the MTU of the interface.",
       "localizations" : {
@@ -1760,6 +1795,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sotto la MTU dell’interfaccia"
+          }
+        }
+      }
+    },
+    "Best" : {
+      "comment" : "Continuous traceroute: shortest round trip.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meilleur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Migliore"
           }
         }
       }
@@ -2479,6 +2549,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contenuto"
+          }
+        }
+      }
+    },
+    "Continuous (MTR)" : {
+      "comment" : "Traceroute mode: round after round until stopped, like the tool mtr.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortlaufend (MTR)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuous (MTR)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuo (MTR)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continu (MTR)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuo (MTR)"
           }
         }
       }
@@ -5806,6 +5911,41 @@
         }
       }
     },
+    "Last" : {
+      "comment" : "Continuous traceroute: the round trip of the latest round.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultimo"
+          }
+        }
+      }
+    },
     "Last changed" : {
       "localizations" : {
         "de" : {
@@ -8833,6 +8973,41 @@
         }
       }
     },
+    "Once" : {
+      "comment" : "Traceroute mode: each hop once.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una vez"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une fois"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una volta"
+          }
+        }
+      }
+    },
     "Online" : {
       "localizations" : {
         "de" : {
@@ -11734,6 +11909,41 @@
         }
       }
     },
+    "Rounds" : {
+      "comment" : "Continuous traceroute: how many rounds were sent.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rounds"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rondas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giri"
+          }
+        }
+      }
+    },
     "Route" : {
       "localizations" : {
         "de" : {
@@ -12516,6 +12726,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invia richieste echo finché non lo interrompi."
+          }
+        }
+      }
+    },
+    "Sends one echo request to every hop each second until you stop it, and keeps loss and times per hop." : {
+      "comment" : "Note of the continuous traceroute.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendet jede Sekunde eine Echo-Anfrage an jeden Hop, bis du stoppst, und sammelt Verlust und Zeiten je Hop."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sends one echo request to every hop each second until you stop it, and keeps loss and times per hop."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envía cada segundo una solicitud de eco a cada salto hasta que lo detengas, y guarda pérdida y tiempos por salto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoie chaque seconde une requête d’écho à chaque saut jusqu’à ce que vous arrêtiez, et conserve pertes et temps par saut."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia ogni secondo una richiesta echo a ogni hop finché non lo interrompi, e tiene perdita e tempi per hop."
           }
         }
       }
@@ -16735,6 +16980,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wildcard"
+          }
+        }
+      }
+    },
+    "Worst" : {
+      "comment" : "Continuous traceroute: longest round trip.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlechteste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Worst"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peggiore"
           }
         }
       }
