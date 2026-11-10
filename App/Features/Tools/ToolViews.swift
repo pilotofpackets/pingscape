@@ -785,10 +785,19 @@ struct HTTPView: View {
             RecentChips(items: history.recent(.http)) { model.input = $0 }
             ToolNote(Text("Loads the page once, with no cache, and reads only the headers."))
             if let failure = model.failure { ErrorLine(failure: failure) }
+            if model.steps.count > 1, let last = model.steps.last {
+                InfoSection(title: "Redirects") {
+                    DataRow(label: "Redirects", value: String(model.steps.count - 1))
+                    DataRow(label: "Final address", value: last.url, monospaced: true, stacked: true)
+                }
+            }
             ForEach(model.steps) { step in
                 InfoSection(title: model.steps.count > 1 ? "Request \(step.id + 1)" : "Result") {
                     DataRow(label: "Address", value: step.url, monospaced: true, stacked: true)
                     if let status = step.statusCode { DataRow(label: "Status", value: String(status)) }
+                    if let location = step.location {
+                        DataRow(label: "Redirects to", value: location, monospaced: true, stacked: true)
+                    }
                     if let networkProtocol = step.networkProtocol { DataRow(label: "Protocol", value: networkProtocol) }
                     if let address = step.remoteAddress {
                         DataRow(
@@ -800,6 +809,15 @@ struct HTTPView: View {
                     if let value = step.tlsMilliseconds { DataRow(label: "TLS handshake", value: milliseconds(value)) }
                     if let value = step.waitMilliseconds { DataRow(label: "Time to first byte", value: milliseconds(value)) }
                     if let value = step.totalMilliseconds { DataRow(label: "Total until first byte", value: milliseconds(value)) }
+                }
+            }
+            if let last = model.steps.last, !last.headers.isEmpty {
+                InfoSection(title: "Response headers") {
+                    ForEach(last.headers) { header in
+                        DataRow(
+                            label: LocalizedStringResource(stringLiteral: header.name), value: header.value,
+                            monospaced: true, stacked: true)
+                    }
                 }
             }
         }

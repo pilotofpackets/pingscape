@@ -902,11 +902,18 @@ final class HTTPModel: ToolControl {
             HTTPTimingStep(
                 id: 0, url: "http://example.com/", statusCode: 301, networkProtocol: "http/1.1",
                 remoteAddress: "93.184.216.34", remotePort: 80, dnsMilliseconds: 14, tcpMilliseconds: 21,
-                tlsMilliseconds: nil, waitMilliseconds: 24, totalMilliseconds: 61),
+                tlsMilliseconds: nil, waitMilliseconds: 24, totalMilliseconds: 61,
+                headers: [HTTPHeader(name: "Location", value: "https://example.com/")]),
             HTTPTimingStep(
                 id: 1, url: "https://example.com/", statusCode: 200, networkProtocol: "h2",
                 remoteAddress: "93.184.216.34", remotePort: 443, dnsMilliseconds: 0.5, tcpMilliseconds: 20,
-                tlsMilliseconds: 31, waitMilliseconds: 30, totalMilliseconds: 82),
+                tlsMilliseconds: 31, waitMilliseconds: 30, totalMilliseconds: 82,
+                headers: [
+                    HTTPHeader(name: "Cache-Control", value: "max-age=3600"),
+                    HTTPHeader(name: "Content-Type", value: "text/html; charset=utf-8"),
+                    HTTPHeader(name: "Server", value: "ECS (nyd/D11E)"),
+                    HTTPHeader(name: "Strict-Transport-Security", value: "max-age=31536000"),
+                ]),
         ]
         return model
     }

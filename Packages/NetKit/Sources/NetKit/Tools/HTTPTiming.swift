@@ -1,6 +1,18 @@
 import Foundation
 import Synchronization
 
+/// A response header as the server sent it.
+public struct HTTPHeader: Sendable, Equatable, Identifiable {
+    public let name: String
+    public let value: String
+    public var id: String { name }
+
+    public init(name: String, value: String) {
+        self.name = name
+        self.value = value
+    }
+}
+
 /// One request in a chain of redirects, with the time each phase took.
 /// A phase that did not happen (no TLS on `http://`) is `nil` and its row is left out.
 public struct HTTPTimingStep: Sendable, Equatable, Identifiable {
@@ -18,12 +30,20 @@ public struct HTTPTimingStep: Sendable, Equatable, Identifiable {
     public let waitMilliseconds: Double?
     /// From the start of the request to the first byte of the answer.
     public let totalMilliseconds: Double?
+    /// The response headers, sorted by name.
+    public let headers: [HTTPHeader]
+
+    /// Where a redirect points to (the `Location` header).
+    public var location: String? {
+        headers.first { $0.name.caseInsensitiveCompare("Location") == .orderedSame }?.value
+    }
 
     public init(
         id: Int, url: String, statusCode: Int?, networkProtocol: String?, remoteAddress: String?, remotePort: Int?,
         dnsMilliseconds: Double?, tcpMilliseconds: Double?, tlsMilliseconds: Double?, waitMilliseconds: Double?,
-        totalMilliseconds: Double?
+        totalMilliseconds: Double?, headers: [HTTPHeader] = []
     ) {
+        self.headers = headers
         self.id = id
         self.url = url
         self.statusCode = statusCode
@@ -148,10 +168,17 @@ public enum HTTPTimer {
             }
             // The system counts the TLS handshake as part of "connect".
             let tcpEnd = transaction.secureConnectionStartDate ?? transaction.connectEndDate
+            let response = transaction.response as? HTTPURLResponse
+            let headers = (response?.allHeaderFields ?? [:])
+                .compactMap { key, value -> HTTPHeader? in
+                    guard let name = key as? String else { return nil }
+                    return HTTPHeader(name: name, value: "\(value)")
+                }
+                .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
             return HTTPTimingStep(
                 id: index,
                 url: transaction.request.url?.absoluteString ?? "",
-                statusCode: (transaction.response as? HTTPURLResponse)?.statusCode,
+                statusCode: response?.statusCode,
                 networkProtocol: transaction.networkProtocolName,
                 remoteAddress: transaction.remoteAddress,
                 remotePort: transaction.remotePort,
@@ -159,7 +186,8 @@ public enum HTTPTimer {
                 tcpMilliseconds: milliseconds(transaction.connectStartDate, tcpEnd),
                 tlsMilliseconds: milliseconds(transaction.secureConnectionStartDate, transaction.secureConnectionEndDate),
                 waitMilliseconds: milliseconds(transaction.requestStartDate, transaction.responseStartDate),
-                totalMilliseconds: milliseconds(transaction.fetchStartDate, transaction.responseStartDate))
+                totalMilliseconds: milliseconds(transaction.fetchStartDate, transaction.responseStartDate),
+                headers: headers)
         }
     }
 

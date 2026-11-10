@@ -4450,6 +4450,41 @@
         }
       }
     },
+    "Final address" : {
+      "comment" : "HTTP tool: the address after all redirects.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endadresse"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Final address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección final"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse finale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indirizzo finale"
+          }
+        }
+      }
+    },
     "Find other devices on this network" : {
       "localizations" : {
         "de" : {
@@ -11746,6 +11781,76 @@
         }
       }
     },
+    "Redirects" : {
+      "comment" : "HTTP tool: section and row with the number of redirects.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiterleitungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirects"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirecciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirections"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reindirizzamenti"
+          }
+        }
+      }
+    },
+    "Redirects to" : {
+      "comment" : "HTTP tool: the Location header of a redirect.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter zu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirects to"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirige a"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirige vers"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reindirizza a"
+          }
+        }
+      }
+    },
     "Reference" : {
       "comment" : "NTP reference: the clock or upstream server.",
       "localizations" : {
@@ -12118,6 +12223,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Codice di risposta"
+          }
+        }
+      }
+    },
+    "Response headers" : {
+      "comment" : "HTTP tool: section with the headers of the last response.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwort-Header"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Response headers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cabeceras de respuesta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En-têtes de réponse"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intestazioni della risposta"
           }
         }
       }
