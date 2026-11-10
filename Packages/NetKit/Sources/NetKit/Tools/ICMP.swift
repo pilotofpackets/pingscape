@@ -8,6 +8,10 @@ public struct ICMPReply: Sendable, Equatable {
         /// A router dropped the packet because its hop limit ran out.
         case timeExceeded
         case unreachable
+        /// A router could not forward the packet without fragmenting it, and
+        /// the packet said "don't fragment" (IPv6 never fragments on the way).
+        /// `mtu` is the largest packet the next link takes, if the router said.
+        case tooBig(mtu: Int?)
     }
 
     public let kind: Kind
@@ -17,7 +21,11 @@ public struct ICMPReply: Sendable, Equatable {
 
 /// Builds echo requests and reads replies. Pure functions, tested with recorded bytes.
 enum ICMPPacket {
-    static func echoRequest(ipv6: Bool, identifier: UInt16, sequence: UInt16, payloadSize: Int) -> [UInt8] {
+    /// `token` goes first into the payload (as far as it fits), so the answer
+    /// can be told apart from one to another socket with the same sequence.
+    static func echoRequest(
+        ipv6: Bool, identifier: UInt16, sequence: UInt16, payloadSize: Int, token: [UInt8] = []
+    ) -> [UInt8] {
         var packet = [UInt8](repeating: 0, count: 8 + payloadSize)
         packet[0] = ipv6 ? 128 : 8
         packet[4] = UInt8(identifier >> 8)
@@ -25,6 +33,7 @@ enum ICMPPacket {
         packet[6] = UInt8(sequence >> 8)
         packet[7] = UInt8(sequence & 0xFF)
         for index in 0..<payloadSize { packet[8 + index] = UInt8(index & 0xFF) }
+        for (index, byte) in token.prefix(payloadSize).enumerated() { packet[8 + index] = byte }
         // The kernel fills in the ICMPv6 checksum. ICMPv4 needs it from us.
         if !ipv6 {
             let sum = checksum(packet)
@@ -49,19 +58,30 @@ enum ICMPPacket {
     /// Reads a reply. With `sequence` it only accepts the answer to that
     /// request, also inside the quoted copy of a "time exceeded" message. The
     /// identifier is no use for matching: on datagram sockets the kernel
-    /// rewrites it. Without `sequence` any echo reply is accepted.
-    static func parse(_ data: [UInt8], ipv6: Bool, sequence: UInt16?) -> ICMPReply? {
+    /// rewrites it. Without `sequence` any echo reply is accepted. With
+    /// `token` an echo reply must also carry it at the start of its payload
+    /// (two pings at once, the Live tab and the Ping tool, share sequence numbers).
+    static func parse(_ data: [UInt8], ipv6: Bool, sequence: UInt16?, token: [UInt8] = []) -> ICMPReply? {
         func matches(at offset: Int) -> Bool {
             guard let sequence else { return true }
             guard offset + 8 <= data.count else { return false }
             return UInt16(data[offset + 6]) << 8 | UInt16(data[offset + 7]) == sequence
+        }
+        func carriesToken(at offset: Int) -> Bool {
+            guard offset + 8 + token.count <= data.count else { return token.isEmpty }
+            return Array(data[(offset + 8)..<(offset + 8 + token.count)]) == token
         }
 
         if ipv6 {
             // ICMPv6 arrives without the IP header.
             guard let type = data.first else { return nil }
             switch type {
-            case 129: return matches(at: 0) ? ICMPReply(kind: .echoReply, ttl: nil) : nil
+            case 129: return matches(at: 0) && carriesToken(at: 0) ? ICMPReply(kind: .echoReply, ttl: nil) : nil
+            // Packet too big carries the MTU of the next link in bytes 4 to 7.
+            case 2:
+                guard matches(at: 8 + 40) else { return nil }
+                let mtu = data[4...7].reduce(0) { $0 << 8 | Int($1) }
+                return ICMPReply(kind: .tooBig(mtu: mtu > 0 ? mtu : nil), ttl: nil)
             // Time exceeded and unreachable quote the IPv6 header (40 bytes) and our packet.
             case 3: return matches(at: 8 + 40) ? ICMPReply(kind: .timeExceeded, ttl: nil) : nil
             case 1: return matches(at: 8 + 40) ? ICMPReply(kind: .unreachable, ttl: nil) : nil
@@ -76,13 +96,21 @@ enum ICMPPacket {
         let ttl = data[8]
         switch data[headerLength] {
         case 0:
-            return matches(at: headerLength) ? ICMPReply(kind: .echoReply, ttl: ttl) : nil
+            return matches(at: headerLength) && carriesToken(at: headerLength)
+                ? ICMPReply(kind: .echoReply, ttl: ttl) : nil
         case 11, 3:
             let innerStart = headerLength + 8
             guard data.count > innerStart + 20 else { return nil }
             let innerHeader = Int(data[innerStart] & 0x0F) * 4
             guard matches(at: innerStart + innerHeader) else { return nil }
-            return ICMPReply(kind: data[headerLength] == 11 ? .timeExceeded : .unreachable, ttl: ttl)
+            if data[headerLength] == 11 { return ICMPReply(kind: .timeExceeded, ttl: ttl) }
+            // Code 4, fragmentation needed: bytes 6 and 7 hold the MTU of the
+            // next link (RFC 1191). Older routers leave them zero.
+            if data[headerLength + 1] == 4 {
+                let mtu = Int(data[headerLength + 6]) << 8 | Int(data[headerLength + 7])
+                return ICMPReply(kind: .tooBig(mtu: mtu > 0 ? mtu : nil), ttl: ttl)
+            }
+            return ICMPReply(kind: .unreachable, ttl: ttl)
         default:
             return nil
         }
@@ -94,6 +122,9 @@ enum ICMPEcho {
     enum Outcome: Sendable {
         case reply(ICMPReply, from: String, milliseconds: Double, bytes: Int)
         case timeout
+        /// The system did not send the packet: with "don't fragment" it is
+        /// larger than the MTU of the interface it would leave on.
+        case tooBigToSend
         /// The system gives this app no ICMP socket.
         case unsupported
         case failed(ToolError)
@@ -111,7 +142,7 @@ enum ICMPEcho {
     /// length turns it into a traceroute step. Blocks until the answer or the timeout.
     static func send(
         to address: ResolvedAddress, sequence: UInt16, ttl: Int32 = 64, timeoutMilliseconds: Int,
-        payloadSize: Int, cancel: CancelFlag
+        payloadSize: Int, dontFragment: Bool = false, cancel: CancelFlag
     ) throws -> Outcome {
         let socket: POSIXSocket
         do {
@@ -122,11 +153,19 @@ enum ICMPEcho {
             return .unsupported
         }
         socket.setTimeToLive(ttl, ipv6: address.isIPv6)
+        if dontFragment { socket.setDontFragment(ipv6: address.isIPv6) }
 
         let identifier = UInt16.random(in: 1...UInt16.max)
+        let size = max(0, min(payloadSize, PingSettings.maximumPayloadSize))
+        let token = (0..<min(size, 8)).map { _ in UInt8.random(in: 0...255) }
         let packet = ICMPPacket.echoRequest(
-            ipv6: address.isIPv6, identifier: identifier, sequence: sequence,
-            payloadSize: max(0, min(payloadSize, 1400)))
+            ipv6: address.isIPv6, identifier: identifier, sequence: sequence, payloadSize: size, token: token)
+        // The default buffers of an ICMP socket hold 8 KiB (net.inet.raw.maxdgram):
+        // a larger request fails with EMSGSIZE even when it may be fragmented.
+        // Every ICMP socket also gets a copy of every ICMP answer, so with
+        // other pings running the buffer needs room for theirs next to ours.
+        let receiveLimit = packet.count + 128
+        socket.setBufferSizes(max(receiveLimit * 4, 65536))
         let deadline = Deadline(afterMilliseconds: max(timeoutMilliseconds, 100))
         let started = monotonicMilliseconds()
         let sent = packet.withUnsafeBytes { raw in
@@ -134,6 +173,7 @@ enum ICMPEcho {
                 Darwin.sendto(socket.fd, raw.baseAddress, packet.count, 0, sa, length)
             }
         }
+        if sent < 0, errno == EMSGSIZE, dontFragment { return .tooBigToSend }
         guard sent >= 0 else { return .failed(ToolError(errno: errno)) }
 
         while true {
@@ -142,9 +182,9 @@ enum ICMPEcho {
             } catch ToolError.timeout {
                 return .timeout
             }
-            guard let (bytes, from) = socket.receiveFrom(limit: 2048) else { continue }
+            guard let (bytes, from) = socket.receiveFrom(limit: max(receiveLimit, 2048)) else { continue }
             let elapsed = monotonicMilliseconds() - started
-            guard let reply = ICMPPacket.parse(bytes, ipv6: address.isIPv6, sequence: sequence)
+            guard let reply = ICMPPacket.parse(bytes, ipv6: address.isIPv6, sequence: sequence, token: token)
             else { continue }
             let sender = ResolvedAddress.text(ofSockaddr: from) ?? address.text
             return .reply(reply, from: sender, milliseconds: elapsed, bytes: bytes.count)

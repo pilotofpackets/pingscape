@@ -113,6 +113,28 @@ final class POSIXSocket {
         return (Array(buffer.prefix(count)), fromBytes)
     }
 
+    /// Sets "don't fragment": a packet larger than the next link fails
+    /// instead of being split, locally with EMSGSIZE, on the way with an ICMP message.
+    func setDontFragment(ipv6: Bool) {
+        var on: Int32 = 1
+        if ipv6 {
+            setsockopt(fd, IPPROTO_IPV6, Self.ipv6DontFragment, &on, socklen_t(MemoryLayout<Int32>.size))
+        } else {
+            setsockopt(fd, IPPROTO_IP, IP_DONTFRAG, &on, socklen_t(MemoryLayout<Int32>.size))
+        }
+    }
+
+    /// `IPV6_DONTFRAG` from <netinet6/in6.h>. The header defines it only with
+    /// `__APPLE_USE_RFC_3542`, so Swift does not see it.
+    private static let ipv6DontFragment: Int32 = 62
+
+    /// Room for datagrams of `bytes` in both directions.
+    func setBufferSizes(_ bytes: Int) {
+        var value = Int32(clamping: bytes)
+        setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &value, socklen_t(MemoryLayout<Int32>.size))
+        setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &value, socklen_t(MemoryLayout<Int32>.size))
+    }
+
     func setTimeToLive(_ hops: Int32, ipv6: Bool) {
         var value = hops
         if ipv6 {

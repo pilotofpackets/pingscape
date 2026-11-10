@@ -149,3 +149,18 @@ struct LocalAddressTests {
         #expect(try #require(ResolvedAddress(literal: text)).isLocal == false)
     }
 }
+
+@Suite("Ping payload")
+struct PayloadSizeTests {
+    @Test func readsSizesAndDefaultsWhenEmpty() throws {
+        #expect(try ToolInput.payloadSize("") == 56)
+        #expect(try ToolInput.payloadSize(" 1472 ") == 1472)
+        #expect(try ToolInput.payloadSize("0") == 0)
+        #expect(try ToolInput.payloadSize("65507") == 65507)
+    }
+
+    @Test(arguments: ["-1", "65508", "14.5", "abc", "1 472"])
+    func rejectsOtherInput(_ input: String) {
+        #expect(throws: InputError.invalidPayloadSize) { try ToolInput.payloadSize(input) }
+    }
+}

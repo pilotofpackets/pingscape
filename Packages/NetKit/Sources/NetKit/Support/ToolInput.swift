@@ -12,6 +12,8 @@ public enum InputError: Error, Sendable, Equatable {
     case invalidURL
     case invalidSubnet
     case invalidMAC
+    /// The ping payload is no whole number from 0 to `PingSettings.maximumPayloadSize`.
+    case invalidPayloadSize
 }
 
 /// Reads what people type into the tool fields.
@@ -61,6 +63,16 @@ public enum ToolInput {
         guard !host.isEmpty else { throw InputError.empty }
         if isIPv4(host) || isIPv6(host) { return (host, port) }
         return (try hostName(host, allowUnderscore: allowUnderscore), port)
+    }
+
+    /// A ping payload in bytes. An empty field is the default of 56.
+    public static func payloadSize(_ text: String) throws -> Int {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return PingSettings().payloadSize }
+        guard let value = Int(trimmed), (0...PingSettings.maximumPayloadSize).contains(value) else {
+            throw InputError.invalidPayloadSize
+        }
+        return value
     }
 
     /// True for a dotted-quad IPv4 address.

@@ -16,16 +16,29 @@ struct PingLine: Identifiable, Equatable {
         case reply(bytes: Int?, milliseconds: Double, ttl: Int?)
         case noReply
         case failed(ToolError)
+        /// Too large with "don't fragment". No `reportedBy`: the device kept it.
+        case tooBig(mtu: Int?, reportedBy: String?)
     }
 
     let id: Int
     let kind: Kind
 }
 
+enum PingMode: Hashable {
+    /// Echo requests until stopped.
+    case ping
+    /// The largest packet that gets through unfragmented.
+    case pathMTU
+}
+
 @MainActor
 @Observable
 final class PingModel: ToolControl {
     var input = ""
+    var mode = PingMode.ping
+    /// The payload as typed, like `ping -s`. Empty means the default of 56.
+    var payloadText = ""
+    var dontFragment = false
     private(set) var isRunning = false
     private(set) var failure: ToolFailure?
     private(set) var addresses: [ResolvedAddress] = []
@@ -33,6 +46,14 @@ final class PingModel: ToolControl {
     private(set) var method: PingMethod?
     private(set) var lines: [PingLine] = []
     private(set) var statistics = PingStatistics()
+    /// The settings of the run on screen, which the fields may no longer show.
+    private(set) var settings = PingSettings()
+    // Path MTU
+    private(set) var probes: [PathMTUProbe] = []
+    private(set) var interfaceName: String?
+    private(set) var interfaceMTU: Int?
+    /// Set when the search is over. `nil` inside: not even a small packet came back.
+    private(set) var pathMTU: Int??
     private var task: Task<Void, Never>?
 
     /// At most this many replies stay in memory. The oldest fall out.
@@ -46,17 +67,37 @@ final class PingModel: ToolControl {
         addresses.contains(where: \.isIPv6) && addresses.contains(where: { !$0.isIPv6 })
     }
 
+    /// The IP packet of the typed payload, for the line under the field. IPv4
+    /// until the name is resolved.
+    var packetSizeText: String? {
+        guard let payload = try? ToolInput.payloadSize(payloadText) else { return nil }
+        let ipv6 = current?.isIPv6 ?? false
+        let packet = payload + PingSettings.headerSize(ipv6: ipv6)
+        return ipv6
+            ? String(localized: "IPv6 packet: \(String(packet)) bytes")
+            : String(localized: "IPv4 packet: \(String(packet)) bytes")
+    }
+
+    /// Sets the payload so the whole packet has `packetSize` bytes.
+    func setPacketSize(_ packetSize: Int) {
+        payloadText = String(packetSize - PingSettings.headerSize(ipv6: current?.isIPv6 ?? false))
+    }
+
     func start() {
         stop()
         failure = nil
         let host: String
-        do { host = try ToolInput.host(input) } catch let error as InputError {
+        do {
+            host = try ToolInput.host(input)
+            if mode == .ping {
+                settings = PingSettings(payloadSize: try ToolInput.payloadSize(payloadText), dontFragment: dontFragment)
+            }
+        } catch let error as InputError {
             failure = .input(error)
             return
         } catch { return }
         isRunning = true
-        lines = []
-        statistics = PingStatistics()
+        clearResults()
         addresses = []
         current = nil
         method = nil
@@ -77,10 +118,18 @@ final class PingModel: ToolControl {
         guard let address = addresses.first(where: { $0.isIPv6 == ipv6 }), address != current else { return }
         task?.cancel()
         isRunning = true
-        lines = []
-        statistics = PingStatistics()
+        clearResults()
         failure = nil
         task = Task { await run(address) }
+    }
+
+    private func clearResults() {
+        lines = []
+        statistics = PingStatistics()
+        probes = []
+        interfaceName = nil
+        interfaceMTU = nil
+        pathMTU = nil
     }
 
     func stop() {
@@ -91,7 +140,11 @@ final class PingModel: ToolControl {
 
     private func run(_ address: ResolvedAddress) async {
         current = address
-        for await event in PingTool.run(address: address) {
+        if mode == .pathMTU {
+            await findPathMTU(address)
+            return
+        }
+        for await event in PingTool.run(address: address, settings: settings) {
             switch event {
             case .started(_, let started):
                 method = started
@@ -105,6 +158,24 @@ final class PingModel: ToolControl {
                 statistics.recordLoss()
                 failure = .from(error, target: address)
                 append(PingLine(id: sequence, kind: .failed(error)))
+            case .tooBig(let sequence, let mtu, let reportedBy):
+                statistics.recordLoss()
+                append(PingLine(id: sequence, kind: .tooBig(mtu: mtu, reportedBy: reportedBy)))
+            }
+        }
+        if !Task.isCancelled { isRunning = false }
+    }
+
+    private func findPathMTU(_ address: ResolvedAddress) async {
+        method = .icmp
+        for await event in PathMTUTool.run(address: address) {
+            switch event {
+            case .started(_, let interface, let mtu):
+                interfaceName = interface
+                interfaceMTU = mtu
+            case .probe(let probe): probes.append(probe)
+            case .finished(let mtu): pathMTU = .some(mtu)
+            case .failed(let error): failure = .from(error, target: address)
             }
         }
         if !Task.isCancelled { isRunning = false }
@@ -127,6 +198,17 @@ final class PingModel: ToolControl {
         }
         model.statistics.recordLoss()
         model.lines.append(PingLine(id: 6, kind: .noReply))
+        if DemoLaunch.pingMode == .pathMTU {
+            model.mode = .pathMTU
+            model.interfaceName = "utun4"
+            model.interfaceMTU = 1420
+            model.probes = [
+                PathMTUProbe(id: 1, packetSize: 1420, result: .tooBig(mtu: 1392, reportedBy: "10.250.10.1")),
+                PathMTUProbe(id: 2, packetSize: 84, result: .passed(milliseconds: 21.4)),
+                PathMTUProbe(id: 3, packetSize: 1392, result: .passed(milliseconds: 23.0)),
+            ]
+            model.pathMTU = .some(1392)
+        }
         return model
     }
 }

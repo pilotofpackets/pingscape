@@ -85,6 +85,9 @@ public enum TracerouteTool {
                             if reply.kind != .timeExceeded { stop = true }
                         case .timeout:
                             times.append(nil)
+                        // Only with "don't fragment", which traceroute does not set.
+                        case .tooBigToSend:
+                            times.append(nil)
                         case .unsupported:
                             continuation.yield(.failed(.failed("ICMP not available")))
                             break hops

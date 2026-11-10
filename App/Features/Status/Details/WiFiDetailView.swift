@@ -173,7 +173,7 @@ final class RouterMeasurement {
                 for await event in PingTool.run(address: address, settings: settings) {
                     switch event {
                     case .reply(_, _, let milliseconds, _): statistics.recordReply(milliseconds: milliseconds)
-                    case .noReply: statistics.recordLoss()
+                    case .noReply, .tooBig: statistics.recordLoss()
                     case .failed(_, let error):
                         statistics.recordLoss()
                         failure = error

@@ -39,6 +39,21 @@ struct ICMPPacketTests {
         #expect(ICMPPacket.parse(ipv4(icmp), ipv6: false, sequence: nil)?.kind == .echoReply)
     }
 
+    @Test func takesOnlyTheReplyWithItsOwnToken() {
+        let token: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8]
+        var own = ICMPPacket.echoRequest(ipv6: false, identifier: 9, sequence: 42, payloadSize: 56, token: token)
+        own[0] = 0
+        // Another socket's request with the same sequence (the Live tab pinging meanwhile).
+        var other = ICMPPacket.echoRequest(ipv6: false, identifier: 3, sequence: 42, payloadSize: 56)
+        other[0] = 0
+        #expect(ICMPPacket.parse(ipv4(own), ipv6: false, sequence: 42, token: token)?.kind == .echoReply)
+        #expect(ICMPPacket.parse(ipv4(other), ipv6: false, sequence: 42, token: token) == nil)
+        var ownV6 = ICMPPacket.echoRequest(ipv6: true, identifier: 1, sequence: 7, payloadSize: 8, token: token)
+        ownV6[0] = 129
+        #expect(ICMPPacket.parse(ownV6, ipv6: true, sequence: 7, token: token)?.kind == .echoReply)
+        #expect(ICMPPacket.parse(ownV6, ipv6: true, sequence: 7, token: [9, 9])?.kind == nil)
+    }
+
     @Test func readsTimeExceededThroughTheQuotedRequest() {
         let original = ICMPPacket.echoRequest(ipv6: false, identifier: 9, sequence: 5, payloadSize: 4)
         var quotedHeader = [UInt8](repeating: 0, count: 20)
@@ -65,6 +80,26 @@ struct ICMPPacketTests {
         let quoted = [UInt8](repeating: 0, count: 40) + Array(ICMPPacket.echoRequest(ipv6: true, identifier: 1, sequence: 3, payloadSize: 0))
         let exceeded: [UInt8] = [3, 0, 0, 0, 0, 0, 0, 0] + quoted
         #expect(ICMPPacket.parse(exceeded, ipv6: true, sequence: 3)?.kind == .timeExceeded)
+    }
+
+    @Test func readsFragmentationNeededWithTheNextHopMTU() {
+        let original = ICMPPacket.echoRequest(ipv6: false, identifier: 9, sequence: 5, payloadSize: 1444)
+        var quotedHeader = [UInt8](repeating: 0, count: 20)
+        quotedHeader[0] = 0x45
+        // As a PPPoE router sent it on 2026-11-10: type 3, code 4, next-hop MTU 1492.
+        let icmp: [UInt8] = [3, 4, 0, 0, 0, 0, 0x05, 0xD4] + quotedHeader + Array(original.prefix(8))
+        #expect(ICMPPacket.parse(ipv4(icmp), ipv6: false, sequence: 5)?.kind == .tooBig(mtu: 1492))
+        let silent: [UInt8] = [3, 4, 0, 0, 0, 0, 0, 0] + quotedHeader + Array(original.prefix(8))
+        #expect(ICMPPacket.parse(ipv4(silent), ipv6: false, sequence: 5)?.kind == .tooBig(mtu: nil))
+        #expect(ICMPPacket.parse(ipv4(icmp), ipv6: false, sequence: 6) == nil)
+    }
+
+    @Test func readsPacketTooBigForIPv6() {
+        let quoted = [UInt8](repeating: 0, count: 40)
+            + Array(ICMPPacket.echoRequest(ipv6: true, identifier: 1, sequence: 3, payloadSize: 0))
+        let tooBig: [UInt8] = [2, 0, 0, 0, 0, 0, 0x05, 0x00] + quoted
+        #expect(ICMPPacket.parse(tooBig, ipv6: true, sequence: 3)?.kind == .tooBig(mtu: 1280))
+        #expect(ICMPPacket.parse(tooBig, ipv6: true, sequence: 4) == nil)
     }
 
     @Test func ignoresShortAndUnrelatedPackets() {
@@ -102,6 +137,63 @@ struct PingStatisticsTests {
         #expect(stats.average == nil)
         stats.recordReply(milliseconds: 5)
         #expect(stats.jitter == nil)
+    }
+}
+
+@Suite("Path MTU search")
+struct PathMTUSearchTests {
+    /// Runs the search against a path that carries packets up to `mtu`.
+    private func run(
+        ceiling: Int, small: Int = 84, answer: (Int) -> PathMTUProbe.Result
+    ) -> (sizes: [Int], result: Int?) {
+        var search = PathMTUSearch(small: small, ceiling: ceiling)
+        var sizes: [Int] = []
+        while let size = search.next, sizes.count < 40 {
+            sizes.append(size)
+            search.record(size: size, result: answer(size))
+        }
+        return (sizes, search.largestPassed)
+    }
+
+    @Test func stopsAfterOneProbeWhenTheFullSizePasses() {
+        let run = run(ceiling: 1500) { _ in .passed(milliseconds: 10) }
+        #expect(run.sizes == [1500])
+        #expect(run.result == 1500)
+    }
+
+    @Test func triesTheSizeARouterNames() {
+        let run = run(ceiling: 1500) { size in
+            size <= 1492 ? .passed(milliseconds: 10) : .tooBig(mtu: 1492, reportedBy: "10.10.20.1")
+        }
+        #expect(run.sizes == [1500, 84, 1492])
+        #expect(run.result == 1492)
+    }
+
+    @Test func findsASilentLimitByHalving() {
+        // A tunnel that drops larger packets without a message.
+        let run = run(ceiling: 1500) { size in size <= 1420 ? .passed(milliseconds: 10) : .noReply }
+        #expect(run.result == 1420)
+        #expect(run.sizes.count <= 14)
+    }
+
+    @Test func findsALimitWhenTheRouterNamesNoMTU() {
+        let run = run(ceiling: 1500) { size in
+            size <= 1400 ? .passed(milliseconds: 10) : .tooBig(mtu: nil, reportedBy: "192.0.2.1")
+        }
+        #expect(run.result == 1400)
+    }
+
+    @Test func givesUpWhenNotEvenASmallPacketComesBack() {
+        let run = run(ceiling: 1500) { _ in .noReply }
+        #expect(run.sizes == [1500, 84])
+        #expect(run.result == nil)
+    }
+
+    @Test func ignoresANamedMTUThatIsNoSmaller() {
+        let run = run(ceiling: 1500) { size in
+            size <= 1300 ? .passed(milliseconds: 10) : .tooBig(mtu: 1500, reportedBy: "192.0.2.1")
+        }
+        #expect(run.result == 1300)
     }
 }
 
@@ -152,6 +244,31 @@ struct LoopbackToolTests {
         #expect(hops.count == 1)
         #expect(hops.first?.address == "127.0.0.1")
         #expect(reached == true)
+    }
+
+    // Needs an ICMP datagram socket, which a locked-down CI machine may not give.
+    @Test(.enabled(if: ICMPEcho.isAvailable())) func pingsTheLoopbackWithALargeUnfragmentedPacket() async {
+        let settings = PingSettings(payloadSize: 9000, dontFragment: true, intervalSeconds: 0.05)
+        var bytes: Int?
+        for await event in PingTool.run(address: loopback, settings: settings) {
+            if case .reply(_, let size, _, _) = event { bytes = size; break }
+            if case .noReply = event { break }
+            if case .failed = event { break }
+        }
+        // The reply comes with its IPv4 header.
+        #expect(bytes == 9028)
+    }
+
+    // Needs an ICMP datagram socket, which a locked-down CI machine may not give.
+    @Test(.enabled(if: ICMPEcho.isAvailable())) func findsTheMTUOfTheLoopback() async {
+        var interfaceMTU: Int?
+        var pathMTU: Int?
+        for await event in PathMTUTool.run(address: loopback, timeoutSeconds: 1) {
+            if case .started(_, _, let mtu) = event { interfaceMTU = mtu }
+            if case .finished(let mtu) = event { pathMTU = mtu }
+        }
+        #expect(interfaceMTU != nil)
+        #expect(pathMTU == interfaceMTU)
     }
 
     // Needs an ICMP datagram socket, which a locked-down CI machine may not give.

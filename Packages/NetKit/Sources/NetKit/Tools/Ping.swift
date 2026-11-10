@@ -8,16 +8,29 @@ public enum PingMethod: Sendable, Equatable {
 }
 
 public struct PingSettings: Sendable, Equatable {
-    /// Payload bytes, 0 to 1400.
+    /// The largest payload of an IPv4 echo request: 65535 minus the IPv4 and ICMP headers.
+    public static let maximumPayloadSize = 65507
+
+    /// Payload bytes, 0 to `maximumPayloadSize`, like `ping -s`.
     public var payloadSize = 56
+    /// Sets the "don't fragment" flag (IPv4) or turns off fragmentation by
+    /// the sender (IPv6), so a packet too large for the path fails instead of being split.
+    public var dontFragment = false
     public var intervalSeconds = 1.0
     public var timeoutSeconds = 2.0
 
-    public init(payloadSize: Int = 56, intervalSeconds: Double = 1.0, timeoutSeconds: Double = 2.0) {
+    public init(
+        payloadSize: Int = 56, dontFragment: Bool = false, intervalSeconds: Double = 1.0, timeoutSeconds: Double = 2.0
+    ) {
         self.payloadSize = payloadSize
+        self.dontFragment = dontFragment
         self.intervalSeconds = intervalSeconds
         self.timeoutSeconds = timeoutSeconds
     }
+
+    /// The bytes an echo request adds to its payload: the IP header without
+    /// options and the 8-byte ICMP header.
+    public static func headerSize(ipv6: Bool) -> Int { ipv6 ? 48 : 28 }
 }
 
 public enum PingEvent: Sendable, Equatable {
@@ -27,6 +40,10 @@ public enum PingEvent: Sendable, Equatable {
     case noReply(sequence: Int)
     /// The attempt itself failed (no route, not permitted). Counts as lost.
     case failed(sequence: Int, ToolError)
+    /// With "don't fragment" the packet was too large. `reportedBy` is the
+    /// router that said so, with the MTU it named. Without `reportedBy` the
+    /// device did not send it at all. Counts as lost.
+    case tooBig(sequence: Int, mtu: Int?, reportedBy: String?)
 }
 
 /// Round-trip statistics over the replies of a run.
@@ -120,13 +137,14 @@ public enum PingTool {
                     sequence: sequence)
             }
             let payload = settings.payloadSize
+            let dontFragment = settings.dontFragment
             let outcome = try await Blocking.run { cancel in
                 try ICMPEcho.send(
                     to: address, sequence: UInt16(truncatingIfNeeded: sequence), timeoutMilliseconds: timeout,
-                    payloadSize: payload, cancel: cancel)
+                    payloadSize: payload, dontFragment: dontFragment, cancel: cancel)
             }
             switch outcome {
-            case .reply(let reply, _, let milliseconds, let bytes):
+            case .reply(let reply, let from, let milliseconds, let bytes):
                 switch reply.kind {
                 case .echoReply:
                     return .reply(
@@ -134,9 +152,13 @@ public enum PingTool {
                         ttl: reply.ttl.map(Int.init))
                 case .timeExceeded, .unreachable:
                     return .failed(sequence: sequence, .noRoute)
+                case .tooBig(let mtu):
+                    return .tooBig(sequence: sequence, mtu: mtu, reportedBy: from)
                 }
             case .timeout:
                 return .noReply(sequence: sequence)
+            case .tooBigToSend:
+                return .tooBig(sequence: sequence, mtu: nil, reportedBy: nil)
             case .failed(let error):
                 return .failed(sequence: sequence, error)
             case .unsupported:

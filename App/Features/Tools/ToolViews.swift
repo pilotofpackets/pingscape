@@ -18,7 +18,21 @@ struct PingView: View {
         VStack(spacing: 16) {
             ToolField(title: "Host or IP address", text: $model.input) { model.start() }
             RecentChips(items: history.recent(.ping)) { model.input = $0 }
-            ToolNote(Text("Sends echo requests until you stop it."))
+            Picker("Mode", selection: $model.mode) {
+                Text("Ping").tag(PingMode.ping)
+                Text("Path MTU").tag(PingMode.pathMTU)
+            }
+            .pickerStyle(.segmented)
+            .disabled(model.isRunning)
+            switch model.mode {
+            case .ping:
+                options
+                ToolNote(
+                    Text("Sends echo requests until you stop it.")
+                        + Text(verbatim: model.packetSizeText.map { " \($0)." } ?? ""))
+            case .pathMTU:
+                ToolNote(Text("Finds the largest packet that reaches the target and comes back unfragmented, with \"don't fragment\" set."))
+            }
             if let failure = model.failure { ErrorLine(failure: failure) }
             if model.offersFamilyChoice, let current = model.current {
                 Picker("Address family", selection: Binding(get: { current.isIPv6 }, set: { model.select(ipv6: $0) })) {
@@ -27,8 +41,107 @@ struct PingView: View {
                 }
                 .pickerStyle(.segmented)
             }
-            if model.statistics.sent > 0 { summary }
-            if !model.lines.isEmpty { replies }
+            switch model.mode {
+            case .ping:
+                if model.statistics.sent > 0 { summary }
+                if !model.lines.isEmpty { replies }
+            case .pathMTU:
+                if model.current != nil, model.interfaceName != nil || !model.probes.isEmpty { mtuResult }
+                if !model.probes.isEmpty { mtuProbes }
+            }
+        }
+    }
+
+    /// Packet size and "don't fragment". They apply from the next start.
+    private var options: some View {
+        InfoCard {
+            HStack(spacing: 8) {
+                Text("Payload")
+                Spacer(minLength: 8)
+                TextField(text: $model.payloadText, prompt: Text(verbatim: "56")) { Text("Payload") }
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .font(.system(.body, design: .monospaced))
+                    .frame(maxWidth: 90)
+                Text("bytes").foregroundStyle(.secondary)
+                Menu {
+                    Button("Default (56 bytes payload)") { model.payloadText = "" }
+                    Button("1280-byte packet (IPv6 minimum)") { model.setPacketSize(1280) }
+                    Button("1500-byte packet (Ethernet)") { model.setPacketSize(1500) }
+                    Button("9000-byte packet (jumbo frame)") { model.setPacketSize(9000) }
+                } label: {
+                    Image(systemName: "list.bullet.circle")
+                        .imageScale(.large)
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel("Packet sizes")
+            }
+            .padding(.leading, 16)
+            .padding(.trailing, 4)
+            .frame(minHeight: 44)
+            Toggle("Don't fragment", isOn: $model.dontFragment)
+                .padding(.horizontal, 16)
+                .frame(minHeight: 44)
+        }
+        .disabled(model.isRunning)
+    }
+
+    private var mtuResult: some View {
+        InfoSection(title: "Path MTU") {
+            if let address = model.current {
+                DataRow(label: "Address", value: address.text, monospaced: true, sensitive: true)
+            }
+            if let name = model.interfaceName {
+                DataRow(
+                    label: "Interface",
+                    value: model.interfaceMTU.map { String(localized: "\(name) · MTU \(String($0))") } ?? name)
+            }
+            if case .some(let found) = model.pathMTU {
+                if let found, let address = model.current {
+                    DataRow(label: "Path MTU", value: byteCount(found))
+                    DataRow(
+                        label: "Largest payload",
+                        value: byteCount(found - PingSettings.headerSize(ipv6: address.isIPv6)))
+                    if let interfaceMTU = model.interfaceMTU, interfaceMTU > found {
+                        DataRow(label: "Below interface MTU", value: byteCount(interfaceMTU - found))
+                    }
+                    if let router = limitingRouter {
+                        DataRow(label: "Limit reported by", value: router, monospaced: true, sensitive: true)
+                    } else if model.probes.contains(where: { $0.result == .noReply }) {
+                        DataRow(label: "Larger packets", value: String(localized: "Dropped without a message"))
+                    }
+                } else {
+                    DataRow(label: "Result", value: String(localized: "The target does not answer echo requests"))
+                }
+            }
+        }
+    }
+
+    /// The router that named the limit, from the "too big" message of the search.
+    private var limitingRouter: String? {
+        for probe in model.probes.reversed() {
+            if case .tooBig(_, let router) = probe.result { return router }
+        }
+        return nil
+    }
+
+    private var mtuProbes: some View {
+        InfoSection(title: "Probes") {
+            ForEach(model.probes) { probe in
+                DataRow(
+                    label: LocalizedStringResource(stringLiteral: byteCount(probe.packetSize)),
+                    value: text(probe.result))
+            }
+        }
+    }
+
+    private func text(_ result: PathMTUProbe.Result) -> String {
+        switch result {
+        case .passed(let ms): String(localized: "Passed · \(milliseconds(ms))")
+        case .tooBig(let mtu?, let router): String(localized: "Too big · \(mask.shown(router)) reports MTU \(String(mtu))")
+        case .tooBig(nil, let router): String(localized: "Too big · reported by \(mask.shown(router))")
+        case .tooBigToSend: String(localized: "Too big to send from this device")
+        case .noReply: String(localized: "No reply")
         }
     }
 
@@ -43,6 +156,10 @@ struct PingView: View {
             } else if model.method == .icmp {
                 DataRow(label: "Method", value: "ICMP")
             }
+            DataRow(
+                label: "Payload",
+                value: byteCount(model.settings.payloadSize)
+                    + (model.settings.dontFragment ? " · " + String(localized: "don't fragment") : ""))
             DataRow(label: "Sent", value: String(stats.sent))
             DataRow(label: "Received", value: String(stats.received))
             DataRow(label: "Loss", value: "\(Int(stats.lostPercent.rounded())) %")
@@ -64,10 +181,13 @@ struct PingView: View {
     private func text(_ line: PingLine) -> String {
         switch line.kind {
         case .reply(let bytes, let ms, let ttl):
-            [bytes.map { String(localized: "\($0) bytes") }, milliseconds(ms), ttl.map { "TTL \($0)" }]
+            [bytes.map(byteCount), milliseconds(ms), ttl.map { "TTL \($0)" }]
                 .compactMap { $0 }.joined(separator: " · ")
         case .noReply: String(localized: "No reply")
         case .failed(let error): error.text
+        case .tooBig(let mtu?, let router?): String(localized: "Too big · \(mask.shown(router)) reports MTU \(String(mtu))")
+        case .tooBig(nil, let router?): String(localized: "Too big · reported by \(mask.shown(router))")
+        case .tooBig(_, nil): String(localized: "Too big to send from this device")
         }
     }
 }
