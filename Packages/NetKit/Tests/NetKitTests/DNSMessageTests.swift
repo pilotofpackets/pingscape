@@ -155,3 +155,72 @@ struct DNSMessageTests {
         #expect(try DNSMessage.readName([0], 0).name == ".")
     }
 }
+
+@Suite("DNSSEC and encrypted DNS")
+struct DNSSECTests {
+    @Test func setsTheDOAndADBitsAndAddsEDNS() throws {
+        let packet = try DNSMessage.query(id: 0x1234, name: "example.com", type: .a, dnssec: true)
+        // Header flags: RD and AD.
+        #expect(Array(packet[2...3]) == [0x01, 0x20])
+        // One additional record: OPT, UDP size 1232, DO set.
+        #expect(Array(packet[10...11]) == [0, 1])
+        #expect(Array(packet.suffix(11)) == DNSFixtures.bytes("00002904d0000080000000"))
+    }
+
+    /// One answer record for example.com of `type` with `data`, behind a minimal header.
+    private func reply(type: UInt16, data: [UInt8]) -> [UInt8] {
+        let header: [UInt8] = [0x12, 0x34, 0x81, 0xA0, 0, 0, 0, 1, 0, 0, 0, 0]
+        let name = try! DNSMessage.encodeName("example.com")
+        let fixed: [UInt8] = [UInt8(type >> 8), UInt8(type & 0xFF), 0, 1, 0, 0, 0x01, 0x2C, UInt8(data.count >> 8), UInt8(data.count & 0xFF)]
+        return header + name + fixed + data
+    }
+
+    @Test func readsASignatureAsDigWritesIt() throws {
+        // Covers A, algorithm 13, 2 labels, TTL 300, 2026-11-11 19:15:26 and 2026-11-09 17:15:26 UTC, key tag 34505.
+        let data: [UInt8] = [0, 1, 13, 2, 0, 0, 1, 0x2C] + [0x6A, 0xF4, 0xBE, 0xCE] + [0x6A, 0xF1, 0xFF, 0xAE]
+            + [0x86, 0xC9] + (try DNSMessage.encodeName("example.com")) + [0xAB, 0xCD]
+        let message = try DNSMessage.parse(reply(type: 46, data: data))
+        #expect(message.answers.first?.type == "RRSIG")
+        #expect(message.answers.first?.value == "A 13 2 300 20261111191526 20261109171526 34505 example.com")
+        // The AD flag of the header.
+        #expect(DNSResponse.flagNames(message.flags).contains("AD"))
+    }
+
+    @Test func readsDSAndDNSKEY() throws {
+        let ds = try DNSMessage.parse(reply(type: 43, data: [0x09, 0x43, 13, 2, 0x32, 0x99]))
+        #expect(ds.answers.first?.value == "2371 13 2 3299")
+        let key = try DNSMessage.parse(reply(type: 48, data: [0x01, 0x01, 3, 13, 0x01, 0x02, 0x03]))
+        #expect(key.answers.first?.value == "257 3 13 AQID")
+    }
+
+    private func response(_ answers: [DNSRecord], flags: [String] = ["RD", "RA"]) -> DNSResponse {
+        DNSResponse(
+            server: "192.0.2.1", transport: .udp, responseCode: 0, responseCodeName: "NOERROR", flags: flags,
+            answers: answers, milliseconds: 10)
+    }
+
+    @Test func comparesAnswersWithoutOrderTTLAndSignatures() {
+        let one = response([
+            DNSRecord(name: "example.com", type: "A", ttl: 300, value: "192.0.2.1"),
+            DNSRecord(name: "example.com", type: "A", ttl: 300, value: "192.0.2.2"),
+            DNSRecord(name: "example.com", type: "RRSIG", ttl: 300, value: "A 13 2 300 1 2 3 example.com"),
+        ])
+        let two = response([
+            DNSRecord(name: "example.com", type: "A", ttl: 17, value: "192.0.2.2"),
+            DNSRecord(name: "example.com", type: "A", ttl: 17, value: "192.0.2.1"),
+        ])
+        let other = response([DNSRecord(name: "example.com", type: "A", ttl: 300, value: "198.51.100.7")])
+        #expect(DNSResponse.sameAnswers([one, two]))
+        #expect(!DNSResponse.sameAnswers([one, two, other]))
+        #expect(response([], flags: ["AD"]).isAuthenticated)
+    }
+
+    @Test func buildsDNSOverHTTPSAddresses() {
+        #expect(DNSEndpoint.httpsURL(from: "dns.example")?.absoluteString == "https://dns.example/dns-query")
+        #expect(DNSEndpoint.httpsURL(from: "2001:db8::53")?.absoluteString == "https://[2001:db8::53]/dns-query")
+        #expect(DNSEndpoint.httpsURL(from: "https://dns.example/q")?.absoluteString == "https://dns.example/q")
+        #expect(DNSEndpoint.httpsURL(from: "") == nil)
+        #expect(DNSEndpoint.encrypted(publicServer: "1.1.1.1")?.tlsHost == "one.one.one.one")
+        #expect(DNSEndpoint.encrypted(publicServer: "192.0.2.1") == nil)
+    }
+}

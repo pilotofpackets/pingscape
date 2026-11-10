@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 enum ToolKind: String, CaseIterable, Identifiable {
-    case ping, traceroute, dns, whois, ports, tls, http, subnet, oui
+    case ping, traceroute, dns, whois, ports, tls, http, nat, ntp, dualstack, subnet, oui
 
     var id: String { rawValue }
 }

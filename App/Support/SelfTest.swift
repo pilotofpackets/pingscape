@@ -44,6 +44,7 @@ enum SelfTest {
         if asks { await localNetwork(snapshot) }
         log("intent status-text lines=\(StatusText.make(snapshot).split(separator: "\n").count) vpn=\(snapshot.isVPNActive)")
         await internet()
+        await pathMTU()
         log("end")
     }
 
@@ -177,6 +178,36 @@ enum SelfTest {
         }
     }
 
+    /// The path MTU to a public address over IPv4 and IPv6, with every probe.
+    /// Router addresses are written as local or public only.
+    private static func pathMTU() async {
+        for target in ["1.1.1.1", "2606:4700:4700::1111"] {
+            guard let address = ResolvedAddress(literal: target) else { continue }
+            var parts: [String] = []
+            let (_, milliseconds) = await timed {
+                for await event in PathMTUTool.run(address: address) {
+                    switch event {
+                    case .started(_, let interface, let mtu): parts.append("if=\(interface ?? "-"):\(mtu ?? 0)")
+                    case .probe(let probe):
+                        let result: String
+                        switch probe.result {
+                        case .passed(let ms): result = "ok\(Int(ms.rounded()))ms"
+                        case .tooBig(let mtu, let router):
+                            let local = ResolvedAddress(literal: router)?.isLocal == true
+                            result = "toobig(\(mtu ?? 0),\(local ? "local" : "public"))"
+                        case .tooBigToSend: result = "toobigtosend"
+                        case .noReply: result = "noreply"
+                        }
+                        parts.append("\(probe.packetSize):\(result)")
+                    case .finished(let mtu): parts.append("pmtu=\(mtu ?? 0)")
+                    case .failed(let error): parts.append("failed(\(error))")
+                    }
+                }
+            }
+            log("path-mtu \(address.isIPv6 ? "v6" : "v4") \(parts.joined(separator: " ")) \(Int(milliseconds))ms")
+        }
+    }
+
     private static func pingSummary(_ address: ResolvedAddress) async -> String {
         var settings = PingSettings()
         settings.intervalSeconds = 0.3
@@ -189,6 +220,7 @@ enum SelfTest {
             case .reply(_, _, let ms, _): lines.append("\(Int(ms.rounded()))ms")
             case .noReply: lines.append("noreply")
             case .failed(_, let error): lines.append("failed(\(error))")
+            case .tooBig(_, let mtu, _): lines.append("toobig(\(mtu ?? 0))")
             }
             if lines.count >= 3 { break }
         }

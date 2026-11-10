@@ -15,6 +15,9 @@ enum DemoLaunch {
     /// `-demo -demo-tool dns` opens the Tools tab on that tool.
     static var tool: ToolKind? { value(after: "-demo-tool").flatMap(ToolKind.init(rawValue:)) }
 
+    /// `-demo -demo-ping mtu` shows the ping tool with a path MTU result.
+    static var pingMode: PingMode { value(after: "-demo-ping") == "mtu" ? .pathMTU : .ping }
+
     /// `-demo -demo-tab about` starts on that tab. Without `-demo` it is ignored.
     static var tab: AppTab {
         let arguments = ProcessInfo.processInfo.arguments

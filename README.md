@@ -14,7 +14,7 @@ Display only. No account, no ads, no tracking, no backend.
 - **VPN and tunnels:** whether a VPN is active, tunnel address, MTU
 - **LAN:** ping sweep, Bonjour and UPnP discovery of devices on the local network, with a thorough mode that also probes a few TCP ports
 - **Live:** throughput per interface, latency, jitter and loss, and a timeline of network changes (foreground only, kept in memory)
-- **Tools:** ping, traceroute, DNS, whois and RDAP, ports, TLS certificate, HTTP timing, subnet calculator, OUI lookup
+- **Tools:** ping with packet size, "don't fragment" and path MTU, traceroute and a continuous traceroute (MTR), DNS (also over TLS and HTTPS, with DNSSEC and a server comparison), whois and RDAP, ports, TLS certificate, HTTP timing with redirects and headers, NAT (STUN), NTP, dual stack (IPv4 against IPv6), subnet calculator, OUI lookup
 - **Shortcuts and widget:** network status, VPN check and ping for Shortcuts and Siri, and a status widget that shows the time it was read
 - **Diagnostic dump:** the raw collector data as JSON, with addresses replaced, for reporting a wrong reading
 

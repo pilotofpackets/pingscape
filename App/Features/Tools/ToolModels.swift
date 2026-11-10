@@ -16,16 +16,29 @@ struct PingLine: Identifiable, Equatable {
         case reply(bytes: Int?, milliseconds: Double, ttl: Int?)
         case noReply
         case failed(ToolError)
+        /// Too large with "don't fragment". No `reportedBy`: the device kept it.
+        case tooBig(mtu: Int?, reportedBy: String?)
     }
 
     let id: Int
     let kind: Kind
 }
 
+enum PingMode: Hashable {
+    /// Echo requests until stopped.
+    case ping
+    /// The largest packet that gets through unfragmented.
+    case pathMTU
+}
+
 @MainActor
 @Observable
 final class PingModel: ToolControl {
     var input = ""
+    var mode = PingMode.ping
+    /// The payload as typed, like `ping -s`. Empty means the default of 56.
+    var payloadText = ""
+    var dontFragment = false
     private(set) var isRunning = false
     private(set) var failure: ToolFailure?
     private(set) var addresses: [ResolvedAddress] = []
@@ -33,6 +46,14 @@ final class PingModel: ToolControl {
     private(set) var method: PingMethod?
     private(set) var lines: [PingLine] = []
     private(set) var statistics = PingStatistics()
+    /// The settings of the run on screen, which the fields may no longer show.
+    private(set) var settings = PingSettings()
+    // Path MTU
+    private(set) var probes: [PathMTUProbe] = []
+    private(set) var interfaceName: String?
+    private(set) var interfaceMTU: Int?
+    /// Set when the search is over. `nil` inside: not even a small packet came back.
+    private(set) var pathMTU: Int??
     private var task: Task<Void, Never>?
 
     /// At most this many replies stay in memory. The oldest fall out.
@@ -46,17 +67,37 @@ final class PingModel: ToolControl {
         addresses.contains(where: \.isIPv6) && addresses.contains(where: { !$0.isIPv6 })
     }
 
+    /// The IP packet of the typed payload, for the line under the field. IPv4
+    /// until the name is resolved.
+    var packetSizeText: String? {
+        guard let payload = try? ToolInput.payloadSize(payloadText) else { return nil }
+        let ipv6 = current?.isIPv6 ?? false
+        let packet = payload + PingSettings.headerSize(ipv6: ipv6)
+        return ipv6
+            ? String(localized: "IPv6 packet: \(String(packet)) bytes")
+            : String(localized: "IPv4 packet: \(String(packet)) bytes")
+    }
+
+    /// Sets the payload so the whole packet has `packetSize` bytes.
+    func setPacketSize(_ packetSize: Int) {
+        payloadText = String(packetSize - PingSettings.headerSize(ipv6: current?.isIPv6 ?? false))
+    }
+
     func start() {
         stop()
         failure = nil
         let host: String
-        do { host = try ToolInput.host(input) } catch let error as InputError {
+        do {
+            host = try ToolInput.host(input)
+            if mode == .ping {
+                settings = PingSettings(payloadSize: try ToolInput.payloadSize(payloadText), dontFragment: dontFragment)
+            }
+        } catch let error as InputError {
             failure = .input(error)
             return
         } catch { return }
         isRunning = true
-        lines = []
-        statistics = PingStatistics()
+        clearResults()
         addresses = []
         current = nil
         method = nil
@@ -77,10 +118,18 @@ final class PingModel: ToolControl {
         guard let address = addresses.first(where: { $0.isIPv6 == ipv6 }), address != current else { return }
         task?.cancel()
         isRunning = true
-        lines = []
-        statistics = PingStatistics()
+        clearResults()
         failure = nil
         task = Task { await run(address) }
+    }
+
+    private func clearResults() {
+        lines = []
+        statistics = PingStatistics()
+        probes = []
+        interfaceName = nil
+        interfaceMTU = nil
+        pathMTU = nil
     }
 
     func stop() {
@@ -91,7 +140,11 @@ final class PingModel: ToolControl {
 
     private func run(_ address: ResolvedAddress) async {
         current = address
-        for await event in PingTool.run(address: address) {
+        if mode == .pathMTU {
+            await findPathMTU(address)
+            return
+        }
+        for await event in PingTool.run(address: address, settings: settings) {
             switch event {
             case .started(_, let started):
                 method = started
@@ -105,6 +158,24 @@ final class PingModel: ToolControl {
                 statistics.recordLoss()
                 failure = .from(error, target: address)
                 append(PingLine(id: sequence, kind: .failed(error)))
+            case .tooBig(let sequence, let mtu, let reportedBy):
+                statistics.recordLoss()
+                append(PingLine(id: sequence, kind: .tooBig(mtu: mtu, reportedBy: reportedBy)))
+            }
+        }
+        if !Task.isCancelled { isRunning = false }
+    }
+
+    private func findPathMTU(_ address: ResolvedAddress) async {
+        method = .icmp
+        for await event in PathMTUTool.run(address: address) {
+            switch event {
+            case .started(_, let interface, let mtu):
+                interfaceName = interface
+                interfaceMTU = mtu
+            case .probe(let probe): probes.append(probe)
+            case .finished(let mtu): pathMTU = .some(mtu)
+            case .failed(let error): failure = .from(error, target: address)
             }
         }
         if !Task.isCancelled { isRunning = false }
@@ -127,17 +198,41 @@ final class PingModel: ToolControl {
         }
         model.statistics.recordLoss()
         model.lines.append(PingLine(id: 6, kind: .noReply))
+        if DemoLaunch.pingMode == .pathMTU {
+            model.mode = .pathMTU
+            model.interfaceName = "utun4"
+            model.interfaceMTU = 1420
+            model.probes = [
+                PathMTUProbe(id: 1, packetSize: 1420, result: .tooBig(mtu: 1392, reportedBy: "10.250.10.1")),
+                PathMTUProbe(id: 2, packetSize: 84, result: .passed(milliseconds: 21.4)),
+                PathMTUProbe(id: 3, packetSize: 1392, result: .passed(milliseconds: 23.0)),
+            ]
+            model.pathMTU = .some(1392)
+        }
         return model
     }
 }
 
 // MARK: Traceroute
 
+enum TracerouteMode: Hashable {
+    /// Each hop once, three probes.
+    case once
+    /// Round after round until stopped, like `mtr`.
+    case continuous
+}
+
 @MainActor
 @Observable
 final class TracerouteModel: ToolControl {
     var input = ""
+    var mode = TracerouteMode.once
     var resolveNames = true
+    // Continuous
+    private(set) var mtrHops: [MTRHop] = []
+    private(set) var mtrRounds = 0
+    private(set) var mtrReached = false
+    private(set) var namesByAddress: [String: String] = [:]
     private(set) var isRunning = false
     private(set) var failure: ToolFailure?
     private(set) var address: ResolvedAddress?
@@ -163,7 +258,12 @@ final class TracerouteModel: ToolControl {
         names = [:]
         reachedTarget = nil
         address = nil
+        mtrHops = []
+        mtrRounds = 0
+        mtrReached = false
+        namesByAddress = [:]
         let resolveNames = resolveNames
+        let mode = mode
         task = Task {
             guard let target = (try? await HostResolver.resolve(host))?.first else {
                 if !Task.isCancelled { failure = .tool(.cannotResolve) }
@@ -173,6 +273,22 @@ final class TracerouteModel: ToolControl {
             address = target
             var settings = TracerouteSettings()
             settings.resolveNames = resolveNames
+            if mode == .continuous {
+                settings.timeoutSeconds = 1
+                for await event in MTRTool.run(address: target, settings: settings) {
+                    switch event {
+                    case .started: break
+                    case .round(let number, let hops, let reached):
+                        mtrRounds = number
+                        mtrHops = hops
+                        mtrReached = reached
+                    case .name(let address, let name): namesByAddress[address] = name
+                    case .failed(let error): failure = .from(error, target: target)
+                    }
+                }
+                if !Task.isCancelled { isRunning = false }
+                return
+            }
             for await event in TracerouteTool.run(address: target, settings: settings) {
                 switch event {
                 case .started: break
@@ -205,6 +321,28 @@ final class TracerouteModel: ToolControl {
         ]
         model.names = [1: "fritz.box", 2: "edge1.example.net", 5: "one.one.one.one"]
         model.reachedTarget = true
+        if DemoLaunch.value(after: "-demo-traceroute") == "mtr" {
+            model.mode = .continuous
+            model.mtrRounds = 60
+            model.mtrReached = true
+            model.namesByAddress = ["192.168.178.1": "fritz.box", "1.1.1.1": "one.one.one.one"]
+            func hop(_ number: Int, _ address: String?, lost: Int, _ times: [Double]) -> MTRHop {
+                var hop = MTRHop(number: number)
+                for index in 0..<60 {
+                    if index < lost || address == nil { hop.record(nil) } else {
+                        hop.record((address!, times[index % times.count]))
+                    }
+                }
+                return hop
+            }
+            model.mtrHops = [
+                hop(1, "192.168.178.1", lost: 0, [2.1, 2.4, 1.9]),
+                hop(2, "203.0.113.1", lost: 0, [9.2, 9.8, 11.4]),
+                hop(3, nil, lost: 60, []),
+                hop(4, "198.51.100.14", lost: 9, [12.5, 13.1, 18.9]),
+                hop(5, "1.1.1.1", lost: 0, [12.9, 12.6, 13.4]),
+            ]
+        }
         return model
     }
 }
@@ -213,6 +351,15 @@ final class TracerouteModel: ToolControl {
 
 enum DNSServerChoice: Hashable, CaseIterable {
     case system, cloudflare, google, quad9, custom
+
+    var name: String? {
+        switch self {
+        case .cloudflare: "Cloudflare"
+        case .google: "Google"
+        case .quad9: "Quad9"
+        default: nil
+        }
+    }
 
     var address: String? {
         switch self {
@@ -224,6 +371,20 @@ enum DNSServerChoice: Hashable, CaseIterable {
     }
 }
 
+enum DNSEncryption: Hashable, CaseIterable {
+    /// UDP, TCP when the answer does not fit.
+    case none, tls, https
+}
+
+/// The answer of one server when several are compared.
+struct DNSComparisonRow: Identifiable {
+    let choice: DNSServerChoice
+    let server: String
+    let result: Result<DNSResponse, ToolFailure>
+
+    var id: DNSServerChoice { choice }
+}
+
 @MainActor
 @Observable
 final class DNSModel: ToolControl {
@@ -231,29 +392,78 @@ final class DNSModel: ToolControl {
     var type: DNSRecordType = .a
     var choice: DNSServerChoice = .system
     var customServer = ""
+    var encryption = DNSEncryption.none {
+        didSet { if !offersSystem && choice == .system { choice = .cloudflare } }
+    }
+    /// Asks for signatures and whether the resolver validated them.
+    var dnssec = false
+    /// Asks every server at once instead of the chosen one.
+    var compare = false
     /// The DNS servers of the current network or VPN, kept up to date by the view.
     var systemServers: [String] = []
     private(set) var isRunning = false
     private(set) var failure: ToolFailure?
     private(set) var response: DNSResponse?
+    private(set) var comparison: [DNSComparisonRow] = []
+    /// Whether the run on screen asked for DNSSEC.
+    private(set) var askedForDNSSEC = false
     private var task: Task<Void, Never>?
 
     var inputText: String { input }
     var canStart: Bool { !input.trimmed.isEmpty }
 
+    /// The system's resolver is only known by its plain address, so it is
+    /// asked only without encryption.
+    var offersSystem: Bool { encryption == .none }
+
     /// The server the next request goes to, for the line above the button.
     var serverText: String? {
+        guard !compare else { return nil }
+        return endpoint(for: choice)?.text
+    }
+
+    /// Where a request to `choice` goes with the chosen encryption. `nil` if
+    /// that server is not known (no system server, nothing typed).
+    func endpoint(for choice: DNSServerChoice) -> DNSEndpoint? {
         switch choice {
-        case .system: systemServers.first
-        case .custom: customServer.trimmed.isEmpty ? nil : customServer.trimmed
-        default: choice.address
+        case .system:
+            guard encryption == .none else { return nil }
+            return systemServers.first.flatMap(ResolvedAddress.init(literal:)).map(DNSEndpoint.plain)
+        case .custom:
+            let text = customServer.trimmed
+            guard !text.isEmpty else { return nil }
+            switch encryption {
+            case .none: return ResolvedAddress(literal: text).map(DNSEndpoint.plain)
+            case .tls: return (try? ToolInput.host(text)).map { DNSEndpoint.tls(host: $0) }
+            case .https: return DNSEndpoint.httpsURL(from: text).map(DNSEndpoint.https)
+            }
+        default:
+            guard let address = choice.address else { return nil }
+            switch encryption {
+            case .none: return ResolvedAddress(literal: address).map(DNSEndpoint.plain)
+            case .tls: return DNSEndpoint.encrypted(publicServer: address).map { DNSEndpoint.tls(host: $0.tlsHost) }
+            case .https: return DNSEndpoint.encrypted(publicServer: address).map { DNSEndpoint.https($0.url) }
+            }
         }
+    }
+
+    /// The servers a comparison asks: the system's (without encryption), the
+    /// three public ones and a typed one.
+    private var comparedChoices: [DNSServerChoice] {
+        [.system, .cloudflare, .google, .quad9, .custom].filter { endpoint(for: $0) != nil }
+    }
+
+    /// Whether all servers that answered gave the same records. `nil` with fewer than two answers.
+    var comparisonAgrees: Bool? {
+        let responses = comparison.compactMap { try? $0.result.get() }
+        return responses.count < 2 ? nil : DNSResponse.sameAnswers(responses)
     }
 
     func start() {
         stop()
         failure = nil
         response = nil
+        comparison = []
         let text = input.trimmed
         let isReverse = type == .ptr && (ToolInput.isIPv4(text) || ToolInput.isIPv6(text))
         let name: String
@@ -261,28 +471,66 @@ final class DNSModel: ToolControl {
             failure = .input(error)
             return
         } catch { return }
-        guard let serverText, let server = ResolvedAddress(literal: serverText) else {
+        let type = type
+        let dnssec = dnssec
+        askedForDNSSEC = dnssec
+        if compare {
+            let targets = comparedChoices.compactMap { choice in endpoint(for: choice).map { (choice, $0) } }
+            guard !targets.isEmpty else {
+                failure = .tool(.noRoute)
+                return
+            }
+            isRunning = true
+            task = Task {
+                let rows = await withTaskGroup(of: DNSComparisonRow.self) { group in
+                    for (choice, endpoint) in targets {
+                        group.addTask {
+                            let result = await Self.ask(
+                                name: name, type: type, reverse: isReverse, endpoint: endpoint, dnssec: dnssec)
+                            return DNSComparisonRow(choice: choice, server: endpoint.text, result: result)
+                        }
+                    }
+                    var rows: [DNSComparisonRow] = []
+                    for await row in group { rows.append(row) }
+                    return rows
+                }
+                guard !Task.isCancelled else { return }
+                comparison = targets.compactMap { target in rows.first { $0.choice == target.0 } }
+                isRunning = false
+            }
+            return
+        }
+        guard let endpoint = endpoint(for: choice) else {
             failure = choice == .custom ? .input(.invalidHost) : .tool(.noRoute)
             return
         }
-        let type = type
         isRunning = true
         task = Task {
-            do {
-                response =
-                    isReverse
-                    ? try await DNSClient.reverse(ip: name, server: server)
-                    : try await DNSClient.query(name: name, type: type, server: server)
-            } catch is CancellationError {
-                return
-            } catch let error as InputError {
-                failure = .input(error)
-            } catch let error as ToolError {
-                failure = .from(error, target: server)
-            } catch {
-                failure = .tool(.unreadable)
+            let result = await Self.ask(name: name, type: type, reverse: isReverse, endpoint: endpoint, dnssec: dnssec)
+            guard !Task.isCancelled else { return }
+            switch result {
+            case .success(let value): response = value
+            case .failure(let error): failure = error
             }
-            if !Task.isCancelled { isRunning = false }
+            isRunning = false
+        }
+    }
+
+    private nonisolated static func ask(
+        name: String, type: DNSRecordType, reverse: Bool, endpoint: DNSEndpoint, dnssec: Bool
+    ) async -> Result<DNSResponse, ToolFailure> {
+        let target: ResolvedAddress? = if case .plain(let address) = endpoint { address } else { nil }
+        do {
+            return .success(
+                reverse
+                    ? try await DNSClient.reverse(ip: name, endpoint: endpoint, dnssec: dnssec)
+                    : try await DNSClient.query(name: name, type: type, endpoint: endpoint, dnssec: dnssec))
+        } catch let error as InputError {
+            return .failure(.input(error))
+        } catch let error as ToolError {
+            return .failure(.from(error, target: target))
+        } catch {
+            return .failure(.tool(.unreadable))
         }
     }
 
@@ -304,6 +552,27 @@ final class DNSModel: ToolControl {
                 DNSRecord(name: "example.com", type: "MX", ttl: 3600, value: "20 backup.example.com"),
             ],
             milliseconds: 13)
+        if DemoLaunch.value(after: "-demo-dns") == "compare" {
+            model.type = .a
+            model.input = "example.com"
+            model.compare = true
+            model.dnssec = true
+            model.askedForDNSSEC = true
+            model.response = nil
+            func answer(_ server: String, _ ms: Double, _ values: [String], ad: Bool) -> DNSResponse {
+                DNSResponse(
+                    server: server, transport: .udp, responseCode: 0, responseCodeName: "NOERROR",
+                    flags: ad ? ["RD", "RA", "AD"] : ["RD", "RA"],
+                    answers: values.map { DNSRecord(name: "example.com", type: "A", ttl: 300, value: $0) },
+                    milliseconds: ms)
+            }
+            model.comparison = [
+                DNSComparisonRow(choice: .system, server: "192.168.178.1", result: .success(answer("192.168.178.1", 4.2, ["192.0.2.10"], ad: false))),
+                DNSComparisonRow(choice: .cloudflare, server: "1.1.1.1", result: .success(answer("1.1.1.1", 12.8, ["192.0.2.10"], ad: true))),
+                DNSComparisonRow(choice: .google, server: "8.8.8.8", result: .success(answer("8.8.8.8", 18.1, ["192.0.2.10"], ad: true))),
+                DNSComparisonRow(choice: .quad9, server: "9.9.9.9", result: .failure(.tool(.timeout))),
+            ]
+        }
         return model
     }
 }
@@ -633,11 +902,18 @@ final class HTTPModel: ToolControl {
             HTTPTimingStep(
                 id: 0, url: "http://example.com/", statusCode: 301, networkProtocol: "http/1.1",
                 remoteAddress: "93.184.216.34", remotePort: 80, dnsMilliseconds: 14, tcpMilliseconds: 21,
-                tlsMilliseconds: nil, waitMilliseconds: 24, totalMilliseconds: 61),
+                tlsMilliseconds: nil, waitMilliseconds: 24, totalMilliseconds: 61,
+                headers: [HTTPHeader(name: "Location", value: "https://example.com/")]),
             HTTPTimingStep(
                 id: 1, url: "https://example.com/", statusCode: 200, networkProtocol: "h2",
                 remoteAddress: "93.184.216.34", remotePort: 443, dnsMilliseconds: 0.5, tcpMilliseconds: 20,
-                tlsMilliseconds: 31, waitMilliseconds: 30, totalMilliseconds: 82),
+                tlsMilliseconds: 31, waitMilliseconds: 30, totalMilliseconds: 82,
+                headers: [
+                    HTTPHeader(name: "Cache-Control", value: "max-age=3600"),
+                    HTTPHeader(name: "Content-Type", value: "text/html; charset=utf-8"),
+                    HTTPHeader(name: "Server", value: "ECS (nyd/D11E)"),
+                    HTTPHeader(name: "Strict-Transport-Security", value: "max-age=31536000"),
+                ]),
         ]
         return model
     }

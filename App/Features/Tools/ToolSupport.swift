@@ -3,7 +3,7 @@ import Observation
 import SwiftUI
 
 /// Why a tool run stopped: what was typed, or what the network did.
-enum ToolFailure: Equatable {
+enum ToolFailure: Equatable, Error {
     case input(InputError)
     case tool(ToolError)
     /// For a target in the local network: a refusal by the system means the
@@ -36,6 +36,7 @@ extension InputError {
         case .invalidURL: String(localized: "This is not a valid web address")
         case .invalidSubnet: String(localized: "Use an address with a prefix, like 192.0.2.42/24")
         case .invalidMAC: String(localized: "Enter a MAC address or its first three bytes")
+        case .invalidPayloadSize: String(localized: "The payload must be a number from 0 to 65507")
         }
     }
 }
@@ -242,6 +243,14 @@ struct StartBar: View {
         .frame(maxWidth: .infinity)
         .sensoryFeedback(.impact(weight: .light), trigger: control.isRunning)
     }
+}
+
+/// A size in bytes as text: "1420 bytes". Without a thousands separator,
+/// so MTUs and packet sizes read as in `ifconfig` and `ping`.
+func byteCount(_ value: Int) -> String {
+    // `String(format:)` without a locale picks the plural form but, unlike
+    // `localizedStringWithFormat`, adds no grouping.
+    String(format: NSLocalizedString("%lld bytes", comment: "A size in bytes."), value)
 }
 
 /// A time in milliseconds as text: "13 ms" or "0.4 ms".

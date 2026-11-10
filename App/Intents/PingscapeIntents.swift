@@ -73,7 +73,7 @@ struct PingIntent: AppIntent {
             case .reply(_, _, let milliseconds, _):
                 let rounded = (milliseconds * 10).rounded() / 10
                 return .result(value: rounded, dialog: IntentDialog(stringLiteral: String(localized: "\(host): \(Int(milliseconds.rounded())) ms")))
-            case .noReply, .failed:
+            case .noReply, .failed, .tooBig:
                 throw Failure.noReply
             case .started:
                 continue

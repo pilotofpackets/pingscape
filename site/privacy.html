@@ -53,9 +53,11 @@
 <h3>Only when you start it</h3>
 <p>Every tool sends what you typed and nothing else, and only when you tap Start:</p>
 <ul>
-<li>Ping, traceroute, ports, TLS and HTTP timing go to the target you entered.</li>
-<li>DNS goes to the server you choose: your system’s, 1.1.1.1, 8.8.8.8, 9.9.9.9 or one of your own.</li>
+<li>Ping, traceroute, ports, TLS, HTTP timing and dual stack go to the target you entered.</li>
+<li>DNS goes to the server you choose: your system’s, 1.1.1.1, 8.8.8.8, 9.9.9.9 or one of your own. Encrypted (DNS over TLS or HTTPS) it goes to the same providers. “Compare servers” sends the same question to all of them at once.</li>
 <li>Traceroute asks your DNS server for the names of the routers on the way. You can switch that off.</li>
+<li>NAT sends a STUN request to <code>stun.cloudflare.com</code>, <code>stun.l.google.com</code> and <code>stun1.l.google.com</code>, and to your own STUN server if you entered one. They send back the public address and port the request came from.</li>
+<li>NTP asks <code>time.apple.com</code>, <code>time.cloudflare.com</code> and <code>pool.ntp.org</code> for the time, and your own time server if you entered one. The request carries only the time it was sent.</li>
 <li>Whois goes to <code>whois.iana.org</code> and on to the registry responsible for the name. RDAP goes to <code>data.iana.org</code> (which registry answers) and then to that registry.</li>
 <li>“Check internet” on the External page asks <code>captive.apple.com</code>.</li>
 <li>The optional internet ping in the Live tab is off by default. When you switch it on, it pings the host you enter once a second.</li>

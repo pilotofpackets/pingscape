@@ -12,6 +12,8 @@ public enum DNSRecordType: String, CaseIterable, Sendable {
     case ptr = "PTR"
     case srv = "SRV"
     case caa = "CAA"
+    case ds = "DS"
+    case dnskey = "DNSKEY"
     case any = "ANY"
 
     var code: UInt16 {
@@ -26,13 +28,16 @@ public enum DNSRecordType: String, CaseIterable, Sendable {
         case .aaaa: 28
         case .srv: 33
         case .caa: 257
+        case .ds: 43
+        case .dnskey: 48
         case .any: 255
         }
     }
 
     /// The name of a type code as it appears in an answer.
     static func label(forCode code: UInt16) -> String {
-        allCases.first { $0.code == code }?.rawValue ?? "TYPE\(code)"
+        if code == 46 { return "RRSIG" }
+        return allCases.first { $0.code == code }?.rawValue ?? "TYPE\(code)"
     }
 }
 
@@ -97,13 +102,18 @@ enum DNSMessage {
         return bytes
     }
 
+    /// With `dnssec` the query sets the DO bit (RFC 3225), so the answer
+    /// carries signatures, and the AD bit (RFC 6840), so the resolver says
+    /// whether it validated them. DO needs EDNS: it is added if missing.
     static func query(
-        id: UInt16, name: String, type: DNSRecordType, recursionDesired: Bool = true, ednsUDPSize: UInt16? = nil
+        id: UInt16, name: String, type: DNSRecordType, recursionDesired: Bool = true, ednsUDPSize: UInt16? = nil,
+        dnssec: Bool = false
     ) throws -> [UInt8] {
+        let ednsUDPSize = dnssec ? ednsUDPSize ?? Self.ednsUDPSize : ednsUDPSize
         var packet: [UInt8] = []
         func append16(_ value: UInt16) { packet += [UInt8(value >> 8), UInt8(value & 0xFF)] }
         append16(id)
-        append16(recursionDesired ? 0x0100 : 0)
+        append16((recursionDesired ? 0x0100 : 0) | (dnssec ? 0x0020 : 0))
         append16(1)
         append16(0)
         append16(0)
@@ -115,7 +125,7 @@ enum DNSMessage {
             packet.append(0)  // root name
             append16(41)  // OPT
             append16(ednsUDPSize)
-            packet += [0, 0, 0, 0]  // extended rcode, version, flags
+            packet += [0, 0, dnssec ? 0x80 : 0, 0]  // extended rcode, version, flags (DO)
             append16(0)  // no options
         }
         return packet
@@ -295,6 +305,24 @@ enum DNSMessage {
                 position += 1 + size
             }
             return strings.joined(separator: " ")
+        case 46:
+            // RRSIG as dig writes it, without the signature itself.
+            guard length >= 18 else { throw DNSError.malformed }
+            let covered = DNSRecordType.label(forCode: UInt16(try u16(start)))
+            let signer = try readName(data, start + 18).name
+            let fields = [
+                covered, String(data[start + 2]), String(data[start + 3]), String(try u32(start + 4)),
+                timestamp(try u32(start + 8)), timestamp(try u32(start + 12)), String(try u16(start + 16)), signer,
+            ]
+            return fields.joined(separator: " ")
+        case 43:
+            guard length >= 4 else { throw DNSError.malformed }
+            let digest = data[(start + 4)..<end].map { String(format: "%02X", $0) }.joined()
+            return "\(try u16(start)) \(data[start + 2]) \(data[start + 3]) \(digest)"
+        case 48:
+            guard length >= 4 else { throw DNSError.malformed }
+            let key = Data(data[(start + 4)..<end]).base64EncodedString()
+            return "\(try u16(start)) \(data[start + 2]) \(data[start + 3]) \(key)"
         case 257:
             guard length >= 2 else { throw DNSError.malformed }
             let tagLength = Int(data[start + 1])
@@ -306,6 +334,16 @@ enum DNSMessage {
             // Unknown type: the data as RFC 3597 writes it.
             return "\\# \(length) " + data[start..<end].map { String(format: "%02x", $0) }.joined()
         }
+    }
+
+    /// A signature time as dig writes it: YYYYMMDDHHmmSS in UTC.
+    static func timestamp(_ seconds: UInt32) -> String {
+        var time = time_t(seconds)
+        var parts = tm()
+        gmtime_r(&time, &parts)
+        return String(
+            format: "%04d%02d%02d%02d%02d%02d", parts.tm_year + 1900, parts.tm_mon + 1, parts.tm_mday,
+            parts.tm_hour, parts.tm_min, parts.tm_sec)
     }
 
     private static func quote(_ bytes: [UInt8]) -> String {

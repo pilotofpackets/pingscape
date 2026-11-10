@@ -4,6 +4,8 @@ import Foundation
 public enum DNSTransport: String, Sendable, Equatable {
     case udp = "UDP"
     case tcp = "TCP"
+    case tls = "DNS over TLS"
+    case https = "DNS over HTTPS"
 }
 
 public struct DNSResponse: Sendable, Equatable {
@@ -30,6 +32,21 @@ public struct DNSResponse: Sendable, Equatable {
         self.milliseconds = milliseconds
     }
 
+    /// The resolver says it validated the DNSSEC signatures (the AD flag).
+    public var isAuthenticated: Bool { flags.contains("AD") }
+
+    /// The records without their signatures, as "TYPE value", sorted and in
+    /// lower case: what two servers must both say to give the same answer.
+    public var comparableAnswers: [String] {
+        answers.filter { $0.type != "RRSIG" }.map { "\($0.type) \($0.value.lowercased())" }.sorted()
+    }
+
+    /// Whether all responses hold the same records, apart from TTL, order and signatures.
+    public static func sameAnswers(_ responses: [DNSResponse]) -> Bool {
+        guard let first = responses.first else { return true }
+        return responses.allSatisfy { $0.comparableAnswers == first.comparableAnswers }
+    }
+
     static func codeName(_ code: Int) -> String {
         let names = ["NOERROR", "FORMERR", "SERVFAIL", "NXDOMAIN", "NOTIMP", "REFUSED"]
         return code < names.count ? names[code] : "RCODE\(code)"
@@ -41,8 +58,10 @@ public struct DNSResponse: Sendable, Equatable {
     }
 }
 
-/// A DNS client that talks to one server directly. UDP first, TCP when the
-/// answer did not fit. No DNSSEC checks and no encrypted DNS.
+/// A DNS client that talks to one server directly: UDP first, TCP when the
+/// answer did not fit, or encrypted over TLS or HTTPS. It does not validate
+/// DNSSEC itself. With `dnssec` it asks for signatures and reports whether
+/// the resolver validated them.
 public enum DNSClient {
     public static let timeoutMilliseconds = 5000
 
@@ -59,32 +78,74 @@ public enum DNSClient {
         name: String, type: DNSRecordType, server: ResolvedAddress,
         timeoutMilliseconds: Int = timeoutMilliseconds
     ) async throws -> DNSResponse {
+        try await query(name: name, type: type, endpoint: .plain(server), timeoutMilliseconds: timeoutMilliseconds)
+    }
+
+    public static func query(
+        name: String, type: DNSRecordType, endpoint: DNSEndpoint, dnssec: Bool = false,
+        timeoutMilliseconds: Int = timeoutMilliseconds
+    ) async throws -> DNSResponse {
         let started = monotonicMilliseconds()
         if type == .any {
-            return try await queryAll(name: name, server: server, timeoutMilliseconds: timeoutMilliseconds)
+            return try await queryAll(
+                name: name, endpoint: endpoint, dnssec: dnssec, timeoutMilliseconds: timeoutMilliseconds)
         }
         let queryName = try normalized(name)
-        return try await Blocking.run { cancel in
-            var response = try attempt(
-                name: queryName, type: type, server: server, edns: true, timeout: timeoutMilliseconds,
-                cancel: cancel, started: started)
-            // Very old servers do not know EDNS and answer FORMERR. RFC 6891
-            // then asks for a second try without the OPT record.
-            if response.responseCode == 1 {
-                response = try attempt(
-                    name: queryName, type: type, server: server, edns: false, timeout: timeoutMilliseconds,
-                    cancel: cancel, started: started)
+        switch endpoint {
+        case .plain(let server):
+            return try await Blocking.run { cancel in
+                var response = try attempt(
+                    name: queryName, type: type, server: server, edns: true, dnssec: dnssec,
+                    timeout: timeoutMilliseconds, cancel: cancel, started: started)
+                // Very old servers do not know EDNS and answer FORMERR. RFC 6891
+                // then asks for a second try without the OPT record.
+                if response.responseCode == 1 && !dnssec {
+                    response = try attempt(
+                        name: queryName, type: type, server: server, edns: false, dnssec: false,
+                        timeout: timeoutMilliseconds, cancel: cancel, started: started)
+                }
+                return response
             }
-            return response
+        case .tls(let host):
+            let identifier = UInt16.random(in: 0...UInt16.max)
+            let packet = try DNSMessage.query(
+                id: identifier, name: queryName, type: type, ednsUDPSize: DNSMessage.ednsUDPSize, dnssec: dnssec)
+            let reply = try await EncryptedDNS.overTLS(packet, host: host, timeoutMilliseconds: timeoutMilliseconds)
+            return try response(reply, identifier: identifier, server: endpoint.text, transport: .tls, started: started)
+        case .https(let url):
+            // RFC 8484 asks for identifier 0, so caches can share answers.
+            let packet = try DNSMessage.query(
+                id: 0, name: queryName, type: type, ednsUDPSize: DNSMessage.ednsUDPSize, dnssec: dnssec)
+            let reply = try await EncryptedDNS.overHTTPS(packet, url: url, timeoutMilliseconds: timeoutMilliseconds)
+            return try response(reply, identifier: 0, server: endpoint.text, transport: .https, started: started)
         }
+    }
+
+    private static func response(
+        _ reply: [UInt8], identifier: UInt16, server: String, transport: DNSTransport, started: Double
+    ) throws -> DNSResponse {
+        let parsed = try DNSMessage.parse(reply)
+        guard parsed.identifier == identifier else { throw DNSError.malformed }
+        return DNSResponse(
+            server: server, transport: transport, responseCode: parsed.responseCode,
+            responseCodeName: DNSResponse.codeName(parsed.responseCode),
+            flags: DNSResponse.flagNames(parsed.flags), answers: parsed.answers,
+            milliseconds: monotonicMilliseconds() - started)
     }
 
     /// A reverse lookup of an address.
     public static func reverse(
         ip: String, server: ResolvedAddress, timeoutMilliseconds: Int = timeoutMilliseconds
     ) async throws -> DNSResponse {
+        try await reverse(ip: ip, endpoint: .plain(server), timeoutMilliseconds: timeoutMilliseconds)
+    }
+
+    public static func reverse(
+        ip: String, endpoint: DNSEndpoint, dnssec: Bool = false, timeoutMilliseconds: Int = timeoutMilliseconds
+    ) async throws -> DNSResponse {
         guard let name = DNSMessage.reverseName(of: ip) else { throw InputError.invalidHost }
-        return try await query(name: name, type: .ptr, server: server, timeoutMilliseconds: timeoutMilliseconds)
+        return try await query(
+            name: name, type: .ptr, endpoint: endpoint, dnssec: dnssec, timeoutMilliseconds: timeoutMilliseconds)
     }
 
     /// The round trip to one server, from a query for a name that always
@@ -100,13 +161,15 @@ public enum DNSClient {
     }
 
     private static func queryAll(
-        name: String, server: ResolvedAddress, timeoutMilliseconds: Int
+        name: String, endpoint: DNSEndpoint, dnssec: Bool, timeoutMilliseconds: Int
     ) async throws -> DNSResponse {
         let started = monotonicMilliseconds()
         let parts = await withTaskGroup(of: DNSResponse?.self) { group in
             for type in anyTypes {
                 group.addTask {
-                    try? await query(name: name, type: type, server: server, timeoutMilliseconds: timeoutMilliseconds)
+                    try? await query(
+                        name: name, type: type, endpoint: endpoint, dnssec: dnssec,
+                        timeoutMilliseconds: timeoutMilliseconds)
                 }
             }
             var responses: [DNSResponse] = []
@@ -121,21 +184,24 @@ public enum DNSClient {
             parts.flatMap(\.answers).filter { $0.type == type.rawValue }
         }
         let code = parts.contains { $0.responseCode == 0 } ? 0 : first.responseCode
+        // AD only if every part was validated.
+        let flags = parts.allSatisfy(\.isAuthenticated) ? first.flags : first.flags.filter { $0 != "AD" }
+        let signatures = parts.flatMap(\.answers).filter { $0.type == "RRSIG" }
         return DNSResponse(
             server: first.server, transport: first.transport, responseCode: code,
-            responseCodeName: DNSResponse.codeName(code), flags: first.flags, answers: ordered,
+            responseCodeName: DNSResponse.codeName(code), flags: flags, answers: ordered + signatures,
             milliseconds: monotonicMilliseconds() - started)
     }
 
     // MARK: One attempt
 
     private static func attempt(
-        name: String, type: DNSRecordType, server: ResolvedAddress, edns: Bool, timeout: Int,
+        name: String, type: DNSRecordType, server: ResolvedAddress, edns: Bool, dnssec: Bool, timeout: Int,
         cancel: CancelFlag, started: Double
     ) throws -> DNSResponse {
         let identifier = UInt16.random(in: 0...UInt16.max)
         let packet = try DNSMessage.query(
-            id: identifier, name: name, type: type, ednsUDPSize: edns ? DNSMessage.ednsUDPSize : nil)
+            id: identifier, name: name, type: type, ednsUDPSize: edns ? DNSMessage.ednsUDPSize : nil, dnssec: dnssec)
         let deadline = Deadline(afterMilliseconds: timeout)
 
         let reply = try udpExchange(packet, identifier: identifier, server: server, deadline: deadline, cancel: cancel)

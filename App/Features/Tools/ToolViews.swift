@@ -18,7 +18,21 @@ struct PingView: View {
         VStack(spacing: 16) {
             ToolField(title: "Host or IP address", text: $model.input) { model.start() }
             RecentChips(items: history.recent(.ping)) { model.input = $0 }
-            ToolNote(Text("Sends echo requests until you stop it."))
+            Picker("Mode", selection: $model.mode) {
+                Text("Ping").tag(PingMode.ping)
+                Text("Path MTU").tag(PingMode.pathMTU)
+            }
+            .pickerStyle(.segmented)
+            .disabled(model.isRunning)
+            switch model.mode {
+            case .ping:
+                options
+                ToolNote(
+                    Text("Sends echo requests until you stop it.")
+                        + Text(verbatim: model.packetSizeText.map { " \($0)." } ?? ""))
+            case .pathMTU:
+                ToolNote(Text("Finds the largest packet that reaches the target and comes back unfragmented, with \"don't fragment\" set."))
+            }
             if let failure = model.failure { ErrorLine(failure: failure) }
             if model.offersFamilyChoice, let current = model.current {
                 Picker("Address family", selection: Binding(get: { current.isIPv6 }, set: { model.select(ipv6: $0) })) {
@@ -27,8 +41,107 @@ struct PingView: View {
                 }
                 .pickerStyle(.segmented)
             }
-            if model.statistics.sent > 0 { summary }
-            if !model.lines.isEmpty { replies }
+            switch model.mode {
+            case .ping:
+                if model.statistics.sent > 0 { summary }
+                if !model.lines.isEmpty { replies }
+            case .pathMTU:
+                if model.current != nil, model.interfaceName != nil || !model.probes.isEmpty { mtuResult }
+                if !model.probes.isEmpty { mtuProbes }
+            }
+        }
+    }
+
+    /// Packet size and "don't fragment". They apply from the next start.
+    private var options: some View {
+        InfoCard {
+            HStack(spacing: 8) {
+                Text("Payload")
+                Spacer(minLength: 8)
+                TextField(text: $model.payloadText, prompt: Text(verbatim: "56")) { Text("Payload") }
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .font(.system(.body, design: .monospaced))
+                    .frame(maxWidth: 90)
+                Text("bytes").foregroundStyle(.secondary)
+                Menu {
+                    Button("Default (56 bytes payload)") { model.payloadText = "" }
+                    Button("1280-byte packet (IPv6 minimum)") { model.setPacketSize(1280) }
+                    Button("1500-byte packet (Ethernet)") { model.setPacketSize(1500) }
+                    Button("9000-byte packet (jumbo frame)") { model.setPacketSize(9000) }
+                } label: {
+                    Image(systemName: "list.bullet.circle")
+                        .imageScale(.large)
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel("Packet sizes")
+            }
+            .padding(.leading, 16)
+            .padding(.trailing, 4)
+            .frame(minHeight: 44)
+            Toggle("Don't fragment", isOn: $model.dontFragment)
+                .padding(.horizontal, 16)
+                .frame(minHeight: 44)
+        }
+        .disabled(model.isRunning)
+    }
+
+    private var mtuResult: some View {
+        InfoSection(title: "Path MTU") {
+            if let address = model.current {
+                DataRow(label: "Address", value: address.text, monospaced: true, sensitive: true)
+            }
+            if let name = model.interfaceName {
+                DataRow(
+                    label: "Interface",
+                    value: model.interfaceMTU.map { String(localized: "\(name) · MTU \(String($0))") } ?? name)
+            }
+            if case .some(let found) = model.pathMTU {
+                if let found, let address = model.current {
+                    DataRow(label: "Path MTU", value: byteCount(found))
+                    DataRow(
+                        label: "Largest payload",
+                        value: byteCount(found - PingSettings.headerSize(ipv6: address.isIPv6)))
+                    if let interfaceMTU = model.interfaceMTU, interfaceMTU > found {
+                        DataRow(label: "Below interface MTU", value: byteCount(interfaceMTU - found))
+                    }
+                    if let router = limitingRouter {
+                        DataRow(label: "Limit reported by", value: router, monospaced: true, sensitive: true)
+                    } else if model.probes.contains(where: { $0.result == .noReply }) {
+                        DataRow(label: "Larger packets", value: String(localized: "Dropped without a message"))
+                    }
+                } else {
+                    DataRow(label: "Result", value: String(localized: "The target does not answer echo requests"))
+                }
+            }
+        }
+    }
+
+    /// The router that named the limit, from the "too big" message of the search.
+    private var limitingRouter: String? {
+        for probe in model.probes.reversed() {
+            if case .tooBig(_, let router) = probe.result { return router }
+        }
+        return nil
+    }
+
+    private var mtuProbes: some View {
+        InfoSection(title: "Probes") {
+            ForEach(model.probes) { probe in
+                DataRow(
+                    label: LocalizedStringResource(stringLiteral: byteCount(probe.packetSize)),
+                    value: text(probe.result))
+            }
+        }
+    }
+
+    private func text(_ result: PathMTUProbe.Result) -> String {
+        switch result {
+        case .passed(let ms): String(localized: "Passed · \(milliseconds(ms))")
+        case .tooBig(let mtu?, let router): String(localized: "Too big · \(mask.shown(router)) reports MTU \(String(mtu))")
+        case .tooBig(nil, let router): String(localized: "Too big · reported by \(mask.shown(router))")
+        case .tooBigToSend: String(localized: "Too big to send from this device")
+        case .noReply: String(localized: "No reply")
         }
     }
 
@@ -43,6 +156,10 @@ struct PingView: View {
             } else if model.method == .icmp {
                 DataRow(label: "Method", value: "ICMP")
             }
+            DataRow(
+                label: "Payload",
+                value: byteCount(model.settings.payloadSize)
+                    + (model.settings.dontFragment ? " · " + String(localized: "don't fragment") : ""))
             DataRow(label: "Sent", value: String(stats.sent))
             DataRow(label: "Received", value: String(stats.received))
             DataRow(label: "Loss", value: "\(Int(stats.lostPercent.rounded())) %")
@@ -64,10 +181,13 @@ struct PingView: View {
     private func text(_ line: PingLine) -> String {
         switch line.kind {
         case .reply(let bytes, let ms, let ttl):
-            [bytes.map { String(localized: "\($0) bytes") }, milliseconds(ms), ttl.map { "TTL \($0)" }]
+            [bytes.map(byteCount), milliseconds(ms), ttl.map { "TTL \($0)" }]
                 .compactMap { $0 }.joined(separator: " · ")
         case .noReply: String(localized: "No reply")
         case .failed(let error): error.text
+        case .tooBig(let mtu?, let router?): String(localized: "Too big · \(mask.shown(router)) reports MTU \(String(mtu))")
+        case .tooBig(nil, let router?): String(localized: "Too big · reported by \(mask.shown(router))")
+        case .tooBig(_, nil): String(localized: "Too big to send from this device")
         }
     }
 }
@@ -82,14 +202,26 @@ struct TracerouteView: View {
         VStack(spacing: 16) {
             ToolField(title: "Host or IP address", text: $model.input) { model.start() }
             RecentChips(items: history.recent(.traceroute)) { model.input = $0 }
+            Picker("Mode", selection: $model.mode) {
+                Text("Once").tag(TracerouteMode.once)
+                Text("Continuous (MTR)").tag(TracerouteMode.continuous)
+            }
+            .pickerStyle(.segmented)
+            .disabled(model.isRunning)
             InfoCard {
                 Toggle("Look up names", isOn: $model.resolveNames)
                     .padding(.horizontal, 16)
                     .frame(minHeight: 44)
             }
+            .disabled(model.isRunning)
+            if model.mode == .continuous {
+                ToolNote(Text("Sends one echo request to every hop each second until you stop it, and keeps loss and times per hop."))
+            }
             ToolNote(Text("Names come from your DNS server, which then sees the addresses of the routers on the way."))
             if let failure = model.failure { ErrorLine(failure: failure) }
-            if !model.hops.isEmpty {
+            if model.mode == .continuous {
+                if !model.mtrHops.isEmpty { continuous }
+            } else if !model.hops.isEmpty {
                 InfoSection(title: "Route") {
                     ForEach(model.hops) { hop in
                         HopRow(hop: hop, name: model.names[hop.number])
@@ -102,6 +234,92 @@ struct TracerouteView: View {
                 }
             }
         }
+    }
+}
+
+extension TracerouteView {
+    /// The hops up to the last one that ever answered. Beyond it there is
+    /// nothing measured to show.
+    private var shownHops: [MTRHop] {
+        guard let last = model.mtrHops.lastIndex(where: { $0.statistics.received > 0 }) else { return [] }
+        return Array(model.mtrHops[...last])
+    }
+
+    var continuous: some View {
+        InfoSection(title: "Route") {
+            ForEach(shownHops) { hop in
+                MTRHopRow(hop: hop, names: hop.addresses.compactMap { model.namesByAddress[$0] })
+            }
+            DataRow(label: "Rounds", value: String(model.mtrRounds))
+            DataRow(
+                label: "Result",
+                value: model.mtrReached ? String(localized: "Target reached") : String(localized: "Target not reached"))
+        }
+    }
+}
+
+/// A hop of the continuous traceroute: its addresses, then loss and times.
+private struct MTRHopRow: View {
+    @Environment(PrivacyMask.self) private var mask
+    let hop: MTRHop
+    let names: [String]
+
+    private var addressText: String {
+        hop.addresses.isEmpty ? String(localized: "No reply") : hop.addresses.map { mask.shown($0) }.joined(separator: "\n")
+    }
+
+    private var figures: String {
+        let stats = hop.statistics
+        var parts = ["\(String(localized: "Loss")) \(Int(stats.lostPercent.rounded())) %"]
+        if let last = hop.last { parts.append("\(String(localized: "Last")) \(milliseconds(last))") }
+        if let average = stats.average { parts.append("\(String(localized: "Avg")) \(milliseconds(average))") }
+        if let minimum = stats.minimum, let maximum = stats.maximum {
+            parts.append("\(String(localized: "Best")) \(milliseconds(minimum))")
+            parts.append("\(String(localized: "Worst")) \(milliseconds(maximum))")
+        }
+        if let jitter = stats.jitter { parts.append("\(String(localized: "Jitter")) \(milliseconds(jitter))") }
+        // A line breaks between the figures, never inside one ("1.9 / ms").
+        return parts.map { $0.replacingOccurrences(of: " ", with: "\u{00A0}") }.joined(separator: " · ")
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(verbatim: "\(hop.number)")
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .frame(minWidth: 24, alignment: .trailing)
+                Text(addressText)
+                    .font(hop.addresses.isEmpty ? .body : .system(.body, design: .monospaced))
+                    .foregroundStyle(hop.addresses.isEmpty ? .secondary : .primary)
+                Spacer(minLength: 8)
+                if hop.statistics.lostPercent > 0 {
+                    StatusDot(tone: hop.statistics.received == 0 ? .critical : .warning)
+                        .accessibilityHidden(true)
+                }
+            }
+            Text(figures)
+                .font(.footnote.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .padding(.leading, 36)
+            ForEach(names, id: \.self) { name in
+                Text(mask.shown(name))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 36)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .contextMenu { RowCopyMenu(value: (hop.addresses + names).joined(separator: " · ")) }
+        .accessibilityElement(children: .combine)
+        .recordRow(
+            label: LocalizedStringResource(stringLiteral: "\(hop.number)"),
+            value: ([addressText.replacingOccurrences(of: "\n", with: ", "), figures] + names.map { mask.shown($0) })
+                .joined(separator: " · "))
     }
 }
 
@@ -176,35 +394,124 @@ struct DNSView: View {
                 .padding(.horizontal, 16)
                 .frame(minHeight: 44)
                 HStack {
-                    Text("Server")
+                    Text("Protocol")
                     Spacer()
-                    Picker("Server", selection: $model.choice) {
-                        Text("System").tag(DNSServerChoice.system)
-                        Text(verbatim: "Cloudflare").tag(DNSServerChoice.cloudflare)
-                        Text(verbatim: "Google").tag(DNSServerChoice.google)
-                        Text(verbatim: "Quad9").tag(DNSServerChoice.quad9)
-                        Text("Custom").tag(DNSServerChoice.custom)
+                    Picker("Protocol", selection: $model.encryption) {
+                        Text(verbatim: "UDP/TCP").tag(DNSEncryption.none)
+                        Text("DNS over TLS").tag(DNSEncryption.tls)
+                        Text("DNS over HTTPS").tag(DNSEncryption.https)
                     }
                     .labelsHidden()
                 }
                 .padding(.horizontal, 16)
                 .frame(minHeight: 44)
-                if model.choice == .custom {
-                    TextField("DNS server address", text: $model.customServer)
-                        .keyboardType(.numbersAndPunctuation)
+                Toggle("Compare servers", isOn: $model.compare)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 44)
+                if !model.compare {
+                    HStack {
+                        Text("Server")
+                        Spacer()
+                        Picker("Server", selection: $model.choice) {
+                            if model.offersSystem { Text("System").tag(DNSServerChoice.system) }
+                            Text(verbatim: "Cloudflare").tag(DNSServerChoice.cloudflare)
+                            Text(verbatim: "Google").tag(DNSServerChoice.google)
+                            Text(verbatim: "Quad9").tag(DNSServerChoice.quad9)
+                            Text("Custom").tag(DNSServerChoice.custom)
+                        }
+                        .labelsHidden()
+                    }
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 44)
+                }
+                if model.compare || model.choice == .custom {
+                    TextField(customPrompt, text: $model.customServer)
+                        .keyboardType(model.encryption == .none ? .numbersAndPunctuation : .URL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .font(.system(.body, design: .monospaced))
                         .padding(.horizontal, 16)
                         .frame(minHeight: 44)
                 }
+                Toggle("Request DNSSEC", isOn: $model.dnssec)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 44)
             }
+            .disabled(model.isRunning)
             if let server = model.serverText {
                 ToolNote(Text("The request goes to \(model.choice == .system ? mask.shown(server) : server)"))
+            } else if model.compare {
+                if model.offersSystem {
+                    ToolNote(Text("Asks the system's server, Cloudflare, Google, Quad9 and your own server at once."))
+                } else {
+                    ToolNote(Text("Asks Cloudflare, Google, Quad9 and your own server at once. The system's server is only known by its plain address."))
+                }
+            }
+            if model.encryption != .none {
+                ToolNote(Text("Each request opens a new connection, so the time includes the TCP and TLS handshakes."))
             }
             if let failure = model.failure { ErrorLine(failure: failure) }
             if let response = model.response { result(response) }
+            if !model.comparison.isEmpty { comparison }
         }
+    }
+
+    private var customPrompt: LocalizedStringKey {
+        switch (model.compare, model.encryption) {
+        case (true, _): "Own server (optional)"
+        case (false, .none): "DNS server address"
+        case (false, .tls): "Server name or address"
+        case (false, .https): "Server name or DoH URL"
+        }
+    }
+
+    private var comparison: some View {
+        VStack(spacing: 16) {
+            if let agrees = model.comparisonAgrees {
+                InfoSection(title: "Comparison") {
+                    StatusRow(
+                        label: "Answers",
+                        text: agrees ? String(localized: "Same at all servers") : String(localized: "Differ between servers"),
+                        tone: agrees ? .good : .warning)
+                }
+            }
+            ForEach(model.comparison) { row in
+                InfoSection(title: LocalizedStringResource(stringLiteral: title(of: row.choice))) {
+                    DataRow(label: "Server", value: row.server, monospaced: true, sensitive: row.choice == .system)
+                    switch row.result {
+                    case .success(let response):
+                        StatusRow(
+                            label: "Response code", text: response.responseCodeName,
+                            tone: response.responseCode == 0 ? .good : .warning)
+                        DataRow(label: "Time", value: milliseconds(response.milliseconds))
+                        if model.askedForDNSSEC { dnssecRow(response) }
+                        DataRow(
+                            label: "Records",
+                            value: response.comparableAnswers.isEmpty
+                                ? String(localized: "No records") : response.comparableAnswers.joined(separator: "\n"),
+                            monospaced: true, stacked: true)
+                    case .failure(let failure):
+                        StatusRow(label: "Result", text: failure.text, tone: .critical)
+                    }
+                }
+            }
+        }
+    }
+
+    private func title(of choice: DNSServerChoice) -> String {
+        switch choice {
+        case .system: String(localized: "System")
+        case .custom: String(localized: "Custom")
+        default: choice.name ?? ""
+        }
+    }
+
+    private func dnssecRow(_ response: DNSResponse) -> some View {
+        DataRow(
+            label: "DNSSEC",
+            value: response.isAuthenticated
+                ? String(localized: "Validated by the server (AD)")
+                : String(localized: "Not validated by the server"))
     }
 
     private func result(_ response: DNSResponse) -> some View {
@@ -217,6 +524,7 @@ struct DNSView: View {
                     DataRow(label: "Flags", value: response.flags.joined(separator: " "))
                 }
                 DataRow(label: "Time", value: milliseconds(response.milliseconds))
+                if model.askedForDNSSEC { dnssecRow(response) }
                 DataRow(label: "Transport", value: response.transport.rawValue)
                 DataRow(label: "Server", value: response.server, monospaced: true, sensitive: true)
             }
@@ -477,10 +785,19 @@ struct HTTPView: View {
             RecentChips(items: history.recent(.http)) { model.input = $0 }
             ToolNote(Text("Loads the page once, with no cache, and reads only the headers."))
             if let failure = model.failure { ErrorLine(failure: failure) }
+            if model.steps.count > 1, let last = model.steps.last {
+                InfoSection(title: "Redirects") {
+                    DataRow(label: "Redirects", value: String(model.steps.count - 1))
+                    DataRow(label: "Final address", value: last.url, monospaced: true, stacked: true)
+                }
+            }
             ForEach(model.steps) { step in
                 InfoSection(title: model.steps.count > 1 ? "Request \(step.id + 1)" : "Result") {
                     DataRow(label: "Address", value: step.url, monospaced: true, stacked: true)
                     if let status = step.statusCode { DataRow(label: "Status", value: String(status)) }
+                    if let location = step.location {
+                        DataRow(label: "Redirects to", value: location, monospaced: true, stacked: true)
+                    }
                     if let networkProtocol = step.networkProtocol { DataRow(label: "Protocol", value: networkProtocol) }
                     if let address = step.remoteAddress {
                         DataRow(
@@ -492,6 +809,15 @@ struct HTTPView: View {
                     if let value = step.tlsMilliseconds { DataRow(label: "TLS handshake", value: milliseconds(value)) }
                     if let value = step.waitMilliseconds { DataRow(label: "Time to first byte", value: milliseconds(value)) }
                     if let value = step.totalMilliseconds { DataRow(label: "Total until first byte", value: milliseconds(value)) }
+                }
+            }
+            if let last = model.steps.last, !last.headers.isEmpty {
+                InfoSection(title: "Response headers") {
+                    ForEach(last.headers) { header in
+                        DataRow(
+                            label: LocalizedStringResource(stringLiteral: header.name), value: header.value,
+                            monospaced: true, stacked: true)
+                    }
                 }
             }
         }
