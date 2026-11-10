@@ -296,6 +296,15 @@ final class TracerouteModel: ToolControl {
 enum DNSServerChoice: Hashable, CaseIterable {
     case system, cloudflare, google, quad9, custom
 
+    var name: String? {
+        switch self {
+        case .cloudflare: "Cloudflare"
+        case .google: "Google"
+        case .quad9: "Quad9"
+        default: nil
+        }
+    }
+
     var address: String? {
         switch self {
         case .cloudflare: "1.1.1.1"
@@ -306,6 +315,20 @@ enum DNSServerChoice: Hashable, CaseIterable {
     }
 }
 
+enum DNSEncryption: Hashable, CaseIterable {
+    /// UDP, TCP when the answer does not fit.
+    case none, tls, https
+}
+
+/// The answer of one server when several are compared.
+struct DNSComparisonRow: Identifiable {
+    let choice: DNSServerChoice
+    let server: String
+    let result: Result<DNSResponse, ToolFailure>
+
+    var id: DNSServerChoice { choice }
+}
+
 @MainActor
 @Observable
 final class DNSModel: ToolControl {
@@ -313,29 +336,78 @@ final class DNSModel: ToolControl {
     var type: DNSRecordType = .a
     var choice: DNSServerChoice = .system
     var customServer = ""
+    var encryption = DNSEncryption.none {
+        didSet { if !offersSystem && choice == .system { choice = .cloudflare } }
+    }
+    /// Asks for signatures and whether the resolver validated them.
+    var dnssec = false
+    /// Asks every server at once instead of the chosen one.
+    var compare = false
     /// The DNS servers of the current network or VPN, kept up to date by the view.
     var systemServers: [String] = []
     private(set) var isRunning = false
     private(set) var failure: ToolFailure?
     private(set) var response: DNSResponse?
+    private(set) var comparison: [DNSComparisonRow] = []
+    /// Whether the run on screen asked for DNSSEC.
+    private(set) var askedForDNSSEC = false
     private var task: Task<Void, Never>?
 
     var inputText: String { input }
     var canStart: Bool { !input.trimmed.isEmpty }
 
+    /// The system's resolver is only known by its plain address, so it is
+    /// asked only without encryption.
+    var offersSystem: Bool { encryption == .none }
+
     /// The server the next request goes to, for the line above the button.
     var serverText: String? {
+        guard !compare else { return nil }
+        return endpoint(for: choice)?.text
+    }
+
+    /// Where a request to `choice` goes with the chosen encryption. `nil` if
+    /// that server is not known (no system server, nothing typed).
+    func endpoint(for choice: DNSServerChoice) -> DNSEndpoint? {
         switch choice {
-        case .system: systemServers.first
-        case .custom: customServer.trimmed.isEmpty ? nil : customServer.trimmed
-        default: choice.address
+        case .system:
+            guard encryption == .none else { return nil }
+            return systemServers.first.flatMap(ResolvedAddress.init(literal:)).map(DNSEndpoint.plain)
+        case .custom:
+            let text = customServer.trimmed
+            guard !text.isEmpty else { return nil }
+            switch encryption {
+            case .none: return ResolvedAddress(literal: text).map(DNSEndpoint.plain)
+            case .tls: return (try? ToolInput.host(text)).map { DNSEndpoint.tls(host: $0) }
+            case .https: return DNSEndpoint.httpsURL(from: text).map(DNSEndpoint.https)
+            }
+        default:
+            guard let address = choice.address else { return nil }
+            switch encryption {
+            case .none: return ResolvedAddress(literal: address).map(DNSEndpoint.plain)
+            case .tls: return DNSEndpoint.encrypted(publicServer: address).map { DNSEndpoint.tls(host: $0.tlsHost) }
+            case .https: return DNSEndpoint.encrypted(publicServer: address).map { DNSEndpoint.https($0.url) }
+            }
         }
+    }
+
+    /// The servers a comparison asks: the system's (without encryption), the
+    /// three public ones and a typed one.
+    private var comparedChoices: [DNSServerChoice] {
+        [.system, .cloudflare, .google, .quad9, .custom].filter { endpoint(for: $0) != nil }
+    }
+
+    /// Whether all servers that answered gave the same records. `nil` with fewer than two answers.
+    var comparisonAgrees: Bool? {
+        let responses = comparison.compactMap { try? $0.result.get() }
+        return responses.count < 2 ? nil : DNSResponse.sameAnswers(responses)
     }
 
     func start() {
         stop()
         failure = nil
         response = nil
+        comparison = []
         let text = input.trimmed
         let isReverse = type == .ptr && (ToolInput.isIPv4(text) || ToolInput.isIPv6(text))
         let name: String
@@ -343,28 +415,66 @@ final class DNSModel: ToolControl {
             failure = .input(error)
             return
         } catch { return }
-        guard let serverText, let server = ResolvedAddress(literal: serverText) else {
+        let type = type
+        let dnssec = dnssec
+        askedForDNSSEC = dnssec
+        if compare {
+            let targets = comparedChoices.compactMap { choice in endpoint(for: choice).map { (choice, $0) } }
+            guard !targets.isEmpty else {
+                failure = .tool(.noRoute)
+                return
+            }
+            isRunning = true
+            task = Task {
+                let rows = await withTaskGroup(of: DNSComparisonRow.self) { group in
+                    for (choice, endpoint) in targets {
+                        group.addTask {
+                            let result = await Self.ask(
+                                name: name, type: type, reverse: isReverse, endpoint: endpoint, dnssec: dnssec)
+                            return DNSComparisonRow(choice: choice, server: endpoint.text, result: result)
+                        }
+                    }
+                    var rows: [DNSComparisonRow] = []
+                    for await row in group { rows.append(row) }
+                    return rows
+                }
+                guard !Task.isCancelled else { return }
+                comparison = targets.compactMap { target in rows.first { $0.choice == target.0 } }
+                isRunning = false
+            }
+            return
+        }
+        guard let endpoint = endpoint(for: choice) else {
             failure = choice == .custom ? .input(.invalidHost) : .tool(.noRoute)
             return
         }
-        let type = type
         isRunning = true
         task = Task {
-            do {
-                response =
-                    isReverse
-                    ? try await DNSClient.reverse(ip: name, server: server)
-                    : try await DNSClient.query(name: name, type: type, server: server)
-            } catch is CancellationError {
-                return
-            } catch let error as InputError {
-                failure = .input(error)
-            } catch let error as ToolError {
-                failure = .from(error, target: server)
-            } catch {
-                failure = .tool(.unreadable)
+            let result = await Self.ask(name: name, type: type, reverse: isReverse, endpoint: endpoint, dnssec: dnssec)
+            guard !Task.isCancelled else { return }
+            switch result {
+            case .success(let value): response = value
+            case .failure(let error): failure = error
             }
-            if !Task.isCancelled { isRunning = false }
+            isRunning = false
+        }
+    }
+
+    private nonisolated static func ask(
+        name: String, type: DNSRecordType, reverse: Bool, endpoint: DNSEndpoint, dnssec: Bool
+    ) async -> Result<DNSResponse, ToolFailure> {
+        let target: ResolvedAddress? = if case .plain(let address) = endpoint { address } else { nil }
+        do {
+            return .success(
+                reverse
+                    ? try await DNSClient.reverse(ip: name, endpoint: endpoint, dnssec: dnssec)
+                    : try await DNSClient.query(name: name, type: type, endpoint: endpoint, dnssec: dnssec))
+        } catch let error as InputError {
+            return .failure(.input(error))
+        } catch let error as ToolError {
+            return .failure(.from(error, target: target))
+        } catch {
+            return .failure(.tool(.unreadable))
         }
     }
 
@@ -386,6 +496,27 @@ final class DNSModel: ToolControl {
                 DNSRecord(name: "example.com", type: "MX", ttl: 3600, value: "20 backup.example.com"),
             ],
             milliseconds: 13)
+        if DemoLaunch.value(after: "-demo-dns") == "compare" {
+            model.type = .a
+            model.input = "example.com"
+            model.compare = true
+            model.dnssec = true
+            model.askedForDNSSEC = true
+            model.response = nil
+            func answer(_ server: String, _ ms: Double, _ values: [String], ad: Bool) -> DNSResponse {
+                DNSResponse(
+                    server: server, transport: .udp, responseCode: 0, responseCodeName: "NOERROR",
+                    flags: ad ? ["RD", "RA", "AD"] : ["RD", "RA"],
+                    answers: values.map { DNSRecord(name: "example.com", type: "A", ttl: 300, value: $0) },
+                    milliseconds: ms)
+            }
+            model.comparison = [
+                DNSComparisonRow(choice: .system, server: "192.168.178.1", result: .success(answer("192.168.178.1", 4.2, ["192.0.2.10"], ad: false))),
+                DNSComparisonRow(choice: .cloudflare, server: "1.1.1.1", result: .success(answer("1.1.1.1", 12.8, ["192.0.2.10"], ad: true))),
+                DNSComparisonRow(choice: .google, server: "8.8.8.8", result: .success(answer("8.8.8.8", 18.1, ["192.0.2.10"], ad: true))),
+                DNSComparisonRow(choice: .quad9, server: "9.9.9.9", result: .failure(.tool(.timeout))),
+            ]
+        }
         return model
     }
 }

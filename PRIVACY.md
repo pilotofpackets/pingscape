@@ -27,7 +27,7 @@ Each of these servers sees your public IP address, as with any internet request.
 
 **Only when you start them.** Every tool sends what you typed and nothing else:
 
-- Ping, traceroute, ports, TLS, HTTP timing and DNS go to the target you entered, and DNS to the server you chose (your system's, 1.1.1.1, 8.8.8.8, 9.9.9.9 or your own).
+- Ping, traceroute, ports, TLS, HTTP timing and DNS go to the target you entered, and DNS to the server you chose (your system's, 1.1.1.1, 8.8.8.8, 9.9.9.9 or your own). Encrypted, it goes to the same providers: over TLS to `one.one.one.one`, `dns.google` or `dns.quad9.net`, over HTTPS to `cloudflare-dns.com`, `dns.google` or `dns.quad9.net`. "Compare servers" sends the same question to all of them at once.
 - Traceroute asks your DNS server for the names of the routers on the way, unless you switch that off.
 - Whois goes to `whois.iana.org` and on to the registry responsible for the name. RDAP goes to `data.iana.org` (which registry answers) and then to that registry.
 - "Check internet" in the External page asks `captive.apple.com`.

@@ -3,7 +3,7 @@ import Observation
 import SwiftUI
 
 /// Why a tool run stopped: what was typed, or what the network did.
-enum ToolFailure: Equatable {
+enum ToolFailure: Equatable, Error {
     case input(InputError)
     case tool(ToolError)
     /// For a target in the local network: a refusal by the system means the

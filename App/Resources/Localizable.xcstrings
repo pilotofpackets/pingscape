@@ -1351,6 +1351,41 @@
         }
       }
     },
+    "Answers" : {
+      "comment" : "Row: whether the compared servers gave the same records.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antworten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuestas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponses"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risposte"
+          }
+        }
+      }
+    },
     "Answers to ping" : {
       "localizations" : {
         "de" : {
@@ -1517,6 +1552,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Richiesti al caricamento"
+          }
+        }
+      }
+    },
+    "Asks Cloudflare, Google, Quad9 and your own server at once. The system's server is only known by its plain address." : {
+      "comment" : "Note when comparing servers with encrypted DNS.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragt Cloudflare, Google, Quad9 und deinen eigenen Server gleichzeitig. Vom Server des Systems ist nur die unverschlüsselte Adresse bekannt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asks Cloudflare, Google, Quad9 and your own server at once. The system's server is only known by its plain address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consulta a la vez Cloudflare, Google, Quad9 y tu propio servidor. Del servidor del sistema solo se conoce la dirección sin cifrar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interroge en même temps Cloudflare, Google, Quad9 et votre propre serveur. Seule l’adresse non chiffrée du serveur du système est connue."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interroga contemporaneamente Cloudflare, Google, Quad9 e il tuo server. Del server di sistema è noto solo l’indirizzo non cifrato."
+          }
+        }
+      }
+    },
+    "Asks the system's server, Cloudflare, Google, Quad9 and your own server at once." : {
+      "comment" : "Note under the DNS settings when comparing servers.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragt den Server des Systems, Cloudflare, Google, Quad9 und deinen eigenen Server gleichzeitig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asks the system's server, Cloudflare, Google, Quad9 and your own server at once."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consulta a la vez el servidor del sistema, Cloudflare, Google, Quad9 y tu propio servidor."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interroge en même temps le serveur du système, Cloudflare, Google, Quad9 et votre propre serveur."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interroga contemporaneamente il server di sistema, Cloudflare, Google, Quad9 e il tuo server."
           }
         }
       }
@@ -2064,6 +2169,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Porte comuni (%lld)"
+          }
+        }
+      }
+    },
+    "Compare servers" : {
+      "comment" : "DNS tool switch: ask several servers at once.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server vergleichen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compare servers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparar servidores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparer les serveurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confronta server"
+          }
+        }
+      }
+    },
+    "Comparison" : {
+      "comment" : "Section title of a DNS server comparison.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergleich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparison"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparaison"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confronto"
           }
         }
       }
@@ -2784,6 +2959,41 @@
         }
       }
     },
+    "Differ between servers" : {
+      "comment" : "The compared DNS servers gave different records.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterschiedlich je Server"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Differ between servers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distintas según el servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Différentes selon le serveur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diverse tra i server"
+          }
+        }
+      }
+    },
     "DNS" : {
       "localizations" : {
         "de" : {
@@ -2882,6 +3092,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ricerca DNS"
+          }
+        }
+      }
+    },
+    "DNS over HTTPS" : {
+      "comment" : "DNS protocol choice (RFC 8484). Usually not translated.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over HTTPS"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over HTTPS"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over HTTPS"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over HTTPS"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over HTTPS"
+          }
+        }
+      }
+    },
+    "DNS over TLS" : {
+      "comment" : "DNS protocol choice (RFC 7858). Usually not translated.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over TLS"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over TLS"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over TLS"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over TLS"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS over TLS"
           }
         }
       }
@@ -3018,6 +3298,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Server DNS"
+          }
+        }
+      }
+    },
+    "DNSSEC" : {
+      "comment" : "Row label. Not translated.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNSSEC"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNSSEC"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNSSEC"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNSSEC"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNSSEC"
           }
         }
       }
@@ -3191,6 +3506,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scartati senza messaggio"
+          }
+        }
+      }
+    },
+    "Each request opens a new connection, so the time includes the TCP and TLS handshakes." : {
+      "comment" : "Note for encrypted DNS.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jede Anfrage öffnet eine neue Verbindung, die Zeit enthält also den TCP- und TLS-Handshake."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each request opens a new connection, so the time includes the TCP and TLS handshakes."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada consulta abre una conexión nueva, así que el tiempo incluye los handshakes TCP y TLS."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque requête ouvre une nouvelle connexion : le temps inclut les poignées de main TCP et TLS."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ogni richiesta apre una nuova connessione, quindi il tempo include gli handshake TCP e TLS."
           }
         }
       }
@@ -8102,6 +8452,41 @@
         }
       }
     },
+    "Not validated by the server" : {
+      "comment" : "The resolver did not set the AD flag.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vom Server nicht validiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not validated by the server"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No validado por el servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non validé par le serveur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non convalidato dal server"
+          }
+        }
+      }
+    },
     "Off" : {
       "localizations" : {
         "de" : {
@@ -8780,6 +9165,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Panoramica mostra se sei online e come: Wi-Fi, rete cellulare o una VPN. Tocca Dettagli su una scheda per tutto quello che c'è dietro."
+          }
+        }
+      }
+    },
+    "Own server (optional)" : {
+      "comment" : "Placeholder: an extra DNS server in a comparison, an address or a name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eigener Server (optional)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Own server (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor (opcional)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre serveur (facultatif)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il tuo server (facoltativo)"
           }
         }
       }
@@ -10829,6 +11249,41 @@
         }
       }
     },
+    "Request DNSSEC" : {
+      "comment" : "DNS tool switch: ask for signatures and validation (DO bit).",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNSSEC anfordern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request DNSSEC"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitar DNSSEC"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demander DNSSEC"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiedi DNSSEC"
+          }
+        }
+      }
+    },
     "Response" : {
       "localizations" : {
         "de" : {
@@ -11233,6 +11688,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Viene eseguito sul tuo dispositivo. Non viene inviato nulla."
+          }
+        }
+      }
+    },
+    "Same at all servers" : {
+      "comment" : "All compared DNS servers gave the same records.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei allen Servern gleich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same at all servers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iguales en todos los servidores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identiques sur tous les serveurs"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uguali su tutti i server"
           }
         }
       }
@@ -11777,6 +12267,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Certificato del server"
+          }
+        }
+      }
+    },
+    "Server name or address" : {
+      "comment" : "Placeholder for a DNS over TLS server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servername oder Adresse"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server name or address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre o dirección del servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom ou adresse du serveur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome o indirizzo del server"
+          }
+        }
+      }
+    },
+    "Server name or DoH URL" : {
+      "comment" : "Placeholder for a DNS over HTTPS server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servername oder DoH-URL"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server name or DoH URL"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre del servidor o URL DoH"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom du serveur ou URL DoH"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome del server o URL DoH"
           }
         }
       }
@@ -14766,6 +15326,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Valido fino al"
+          }
+        }
+      }
+    },
+    "Validated by the server (AD)" : {
+      "comment" : "The resolver set the AD flag: it validated the DNSSEC signatures.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vom Server validiert (AD)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validated by the server (AD)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validado por el servidor (AD)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validé par le serveur (AD)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convalidato dal server (AD)"
           }
         }
       }

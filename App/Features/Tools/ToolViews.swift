@@ -296,35 +296,124 @@ struct DNSView: View {
                 .padding(.horizontal, 16)
                 .frame(minHeight: 44)
                 HStack {
-                    Text("Server")
+                    Text("Protocol")
                     Spacer()
-                    Picker("Server", selection: $model.choice) {
-                        Text("System").tag(DNSServerChoice.system)
-                        Text(verbatim: "Cloudflare").tag(DNSServerChoice.cloudflare)
-                        Text(verbatim: "Google").tag(DNSServerChoice.google)
-                        Text(verbatim: "Quad9").tag(DNSServerChoice.quad9)
-                        Text("Custom").tag(DNSServerChoice.custom)
+                    Picker("Protocol", selection: $model.encryption) {
+                        Text(verbatim: "UDP/TCP").tag(DNSEncryption.none)
+                        Text("DNS over TLS").tag(DNSEncryption.tls)
+                        Text("DNS over HTTPS").tag(DNSEncryption.https)
                     }
                     .labelsHidden()
                 }
                 .padding(.horizontal, 16)
                 .frame(minHeight: 44)
-                if model.choice == .custom {
-                    TextField("DNS server address", text: $model.customServer)
-                        .keyboardType(.numbersAndPunctuation)
+                Toggle("Compare servers", isOn: $model.compare)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 44)
+                if !model.compare {
+                    HStack {
+                        Text("Server")
+                        Spacer()
+                        Picker("Server", selection: $model.choice) {
+                            if model.offersSystem { Text("System").tag(DNSServerChoice.system) }
+                            Text(verbatim: "Cloudflare").tag(DNSServerChoice.cloudflare)
+                            Text(verbatim: "Google").tag(DNSServerChoice.google)
+                            Text(verbatim: "Quad9").tag(DNSServerChoice.quad9)
+                            Text("Custom").tag(DNSServerChoice.custom)
+                        }
+                        .labelsHidden()
+                    }
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 44)
+                }
+                if model.compare || model.choice == .custom {
+                    TextField(customPrompt, text: $model.customServer)
+                        .keyboardType(model.encryption == .none ? .numbersAndPunctuation : .URL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .font(.system(.body, design: .monospaced))
                         .padding(.horizontal, 16)
                         .frame(minHeight: 44)
                 }
+                Toggle("Request DNSSEC", isOn: $model.dnssec)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 44)
             }
+            .disabled(model.isRunning)
             if let server = model.serverText {
                 ToolNote(Text("The request goes to \(model.choice == .system ? mask.shown(server) : server)"))
+            } else if model.compare {
+                if model.offersSystem {
+                    ToolNote(Text("Asks the system's server, Cloudflare, Google, Quad9 and your own server at once."))
+                } else {
+                    ToolNote(Text("Asks Cloudflare, Google, Quad9 and your own server at once. The system's server is only known by its plain address."))
+                }
+            }
+            if model.encryption != .none {
+                ToolNote(Text("Each request opens a new connection, so the time includes the TCP and TLS handshakes."))
             }
             if let failure = model.failure { ErrorLine(failure: failure) }
             if let response = model.response { result(response) }
+            if !model.comparison.isEmpty { comparison }
         }
+    }
+
+    private var customPrompt: LocalizedStringKey {
+        switch (model.compare, model.encryption) {
+        case (true, _): "Own server (optional)"
+        case (false, .none): "DNS server address"
+        case (false, .tls): "Server name or address"
+        case (false, .https): "Server name or DoH URL"
+        }
+    }
+
+    private var comparison: some View {
+        VStack(spacing: 16) {
+            if let agrees = model.comparisonAgrees {
+                InfoSection(title: "Comparison") {
+                    StatusRow(
+                        label: "Answers",
+                        text: agrees ? String(localized: "Same at all servers") : String(localized: "Differ between servers"),
+                        tone: agrees ? .good : .warning)
+                }
+            }
+            ForEach(model.comparison) { row in
+                InfoSection(title: LocalizedStringResource(stringLiteral: title(of: row.choice))) {
+                    DataRow(label: "Server", value: row.server, monospaced: true, sensitive: row.choice == .system)
+                    switch row.result {
+                    case .success(let response):
+                        StatusRow(
+                            label: "Response code", text: response.responseCodeName,
+                            tone: response.responseCode == 0 ? .good : .warning)
+                        DataRow(label: "Time", value: milliseconds(response.milliseconds))
+                        if model.askedForDNSSEC { dnssecRow(response) }
+                        DataRow(
+                            label: "Records",
+                            value: response.comparableAnswers.isEmpty
+                                ? String(localized: "No records") : response.comparableAnswers.joined(separator: "\n"),
+                            monospaced: true, stacked: true)
+                    case .failure(let failure):
+                        StatusRow(label: "Result", text: failure.text, tone: .critical)
+                    }
+                }
+            }
+        }
+    }
+
+    private func title(of choice: DNSServerChoice) -> String {
+        switch choice {
+        case .system: String(localized: "System")
+        case .custom: String(localized: "Custom")
+        default: choice.name ?? ""
+        }
+    }
+
+    private func dnssecRow(_ response: DNSResponse) -> some View {
+        DataRow(
+            label: "DNSSEC",
+            value: response.isAuthenticated
+                ? String(localized: "Validated by the server (AD)")
+                : String(localized: "Not validated by the server"))
     }
 
     private func result(_ response: DNSResponse) -> some View {
@@ -337,6 +426,7 @@ struct DNSView: View {
                     DataRow(label: "Flags", value: response.flags.joined(separator: " "))
                 }
                 DataRow(label: "Time", value: milliseconds(response.milliseconds))
+                if model.askedForDNSSEC { dnssecRow(response) }
                 DataRow(label: "Transport", value: response.transport.rawValue)
                 DataRow(label: "Server", value: response.server, monospaced: true, sensitive: true)
             }
