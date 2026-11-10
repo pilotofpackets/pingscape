@@ -1869,6 +1869,41 @@
         }
       }
     },
+    "Attempts" : {
+      "comment" : "Dual stack row: the time of each attempt.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attempts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intentos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tentatives"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tentativi"
+          }
+        }
+      }
+    },
     "Avg" : {
       "comment" : "Continuous traceroute: average round trip, short.",
       "localizations" : {
@@ -3860,6 +3895,41 @@
         }
       }
     },
+    "Dual stack" : {
+      "comment" : "Name of the tool that races IPv4 against IPv6.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dual-Stack"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dual stack"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doble pila"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double pile"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dual stack"
+          }
+        }
+      }
+    },
     "Each request opens a new connection, so the time includes the TCP and TLS handshakes." : {
       "comment" : "Note for encrypted DNS.",
       "localizations" : {
@@ -4446,6 +4516,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le richieste esterne caricano il tuo indirizzo IP pubblico, il suo nome DNS inverso e il provider (ipify, RIPEstat). Sono disattivate finché non le consenti."
+          }
+        }
+      }
+    },
+    "Faster" : {
+      "comment" : "Dual stack row: which family connected faster.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schneller"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más rápido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus rapide"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Più veloce"
           }
         }
       }
@@ -5129,6 +5234,41 @@
         }
       }
     },
+    "Host (optionally with :port)" : {
+      "comment" : "Field of the dual stack tool. Port 443 if none.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host (optional mit :Port)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host (optionally with :port)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host (opcionalmente con :puerto)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hôte (éventuellement avec :port)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host (facoltativamente con :porta)"
+          }
+        }
+      }
+    },
     "Host name" : {
       "localizations" : {
         "de" : {
@@ -5674,6 +5814,41 @@
         }
       }
     },
+    "IPv4, by %@" : {
+      "comment" : "IPv4 was faster by this time (e.g. 4 ms).",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv4, um %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv4, by %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv4, por %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv4, de %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv4, di %@"
+          }
+        }
+      }
+    },
     "IPv6" : {
       "localizations" : {
         "de" : {
@@ -5773,6 +5948,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pacchetto IPv6: %@ byte"
+          }
+        }
+      }
+    },
+    "IPv6, by %@" : {
+      "comment" : "IPv6 was faster by this time (e.g. 4 ms).",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv6, um %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv6, by %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv6, por %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv6, de %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv6, di %@"
           }
         }
       }
@@ -8438,6 +8648,41 @@
         }
       }
     },
+    "No connection" : {
+      "comment" : "The system's own connection did not succeed.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Verbindung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No connection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de connexion"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna connessione"
+          }
+        }
+      }
+    },
     "No connection to watch" : {
       "localizations" : {
         "de" : {
@@ -9625,6 +9870,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open source. Senza account. Senza pubblicità. Senza tracciamento."
+          }
+        }
+      }
+    },
+    "Opens TCP connections over IPv4 and IPv6 side by side, three times, then one the way the system picks itself (Happy Eyeballs). No data is sent." : {
+      "comment" : "Note of the dual stack tool.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet dreimal nebeneinander TCP-Verbindungen über IPv4 und IPv6, dann eine so, wie das System selbst wählt (Happy Eyeballs). Es werden keine Daten gesendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens TCP connections over IPv4 and IPv6 side by side, three times, then one the way the system picks itself (Happy Eyeballs). No data is sent."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre tres veces, en paralelo, conexiones TCP por IPv4 e IPv6, y luego una como la elige el propio sistema (Happy Eyeballs). No se envían datos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre trois fois côte à côte des connexions TCP en IPv4 et en IPv6, puis une comme le système la choisit lui-même (Happy Eyeballs). Aucune donnée n’est envoyée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apre tre volte, in parallelo, connessioni TCP su IPv4 e IPv6, poi una come la sceglie il sistema stesso (Happy Eyeballs). Non vengono inviati dati."
           }
         }
       }
@@ -14685,6 +14965,41 @@
         }
       }
     },
+    "TCP handshake (median)" : {
+      "comment" : "Dual stack row: the middle of the handshake times.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TCP-Handshake (Median)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TCP handshake (median)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handshake TCP (mediana)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poignée de main TCP (médiane)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handshake TCP (mediana)"
+          }
+        }
+      }
+    },
     "TCP ping, port %lld" : {
       "localizations" : {
         "de" : {
@@ -15159,6 +15474,41 @@
         }
       }
     },
+    "The system connected over" : {
+      "comment" : "Dual stack row: the family the system's own connection used.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das System nutzte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The system connected over"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sistema se conectó por"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le système s’est connecté en"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sistema si è collegato via"
+          }
+        }
+      }
+    },
     "The system did not allow the request" : {
       "localizations" : {
         "de" : {
@@ -15189,6 +15539,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il sistema non ha consentito la richiesta"
+          }
+        }
+      }
+    },
+    "The system gave no IPv4 address" : {
+      "comment" : "The name resolved to no IPv4 address on this network.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das System hat keine IPv4-Adresse geliefert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The system gave no IPv4 address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sistema no dio ninguna dirección IPv4"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le système n’a fourni aucune adresse IPv4"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sistema non ha fornito alcun indirizzo IPv4"
+          }
+        }
+      }
+    },
+    "The system gave no IPv6 address" : {
+      "comment" : "The name resolved to no IPv6 address on this network.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das System hat keine IPv6-Adresse geliefert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The system gave no IPv6 address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sistema no dio ninguna dirección IPv6"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le système n’a fourni aucune adresse IPv6"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sistema non ha fornito alcun indirizzo IPv6"
           }
         }
       }

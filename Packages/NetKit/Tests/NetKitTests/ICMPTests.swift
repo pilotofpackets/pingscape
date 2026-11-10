@@ -431,3 +431,36 @@ struct NTPTests {
         #expect(NTPPacket.parse(other, request: request, sentAt: sentAt, receivedAt: base) == nil)
     }
 }
+
+@Suite("Dual stack")
+struct DualStackTests {
+    @Test func namesTheFasterFamily() {
+        let four = DualStackFamily(address: "192.0.2.1", medianMilliseconds: 18, attempts: [18, 20, 17], error: nil)
+        let six = DualStackFamily(address: "2001:db8::1", medianMilliseconds: 12, attempts: [12, 11, 30], error: nil)
+        let none = DualStackFamily(address: nil, medianMilliseconds: nil, attempts: [], error: nil)
+        let both = DualStackReport(ipv4: four, ipv6: six, systemAddress: "2001:db8::1", systemUsedIPv6: true, systemMilliseconds: 14)
+        #expect(both.faster?.ipv6 == true)
+        #expect(both.faster?.byMilliseconds == 6)
+        let onlyFour = DualStackReport(ipv4: four, ipv6: none, systemAddress: nil, systemUsedIPv6: nil, systemMilliseconds: nil)
+        #expect(onlyFour.faster == nil)
+    }
+
+    // Needs a listening socket on the loopback, which every Mac gives.
+    @Test func connectsToALocalListener() async throws {
+        let listener = try POSIXSocket(family: AF_INET, type: SOCK_STREAM)
+        var address = sockaddr_in()
+        address.sin_family = sa_family_t(AF_INET)
+        address.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+        address.sin_addr.s_addr = inet_addr("127.0.0.1")
+        _ = withUnsafePointer(to: &address) {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(listener.fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) }
+        }
+        listen(listener.fd, 8)
+        let port = try #require(listener.localPort())
+        let report = try await DualStackTool.run(host: "127.0.0.1", port: port)
+        #expect(report.ipv4.address == "127.0.0.1")
+        #expect(report.ipv4.attempts.count == DualStackTool.attempts)
+        #expect(report.ipv4.medianMilliseconds != nil)
+        #expect(report.ipv6.address == nil)
+    }
+}
