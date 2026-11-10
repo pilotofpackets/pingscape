@@ -1,6 +1,76 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ ahead" : {
+      "comment" : "NTP: the device's clock is ahead by this time (e.g. 6.8 ms).",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ vor"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ahead"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ de adelanto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ d’avance"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ avanti"
+          }
+        }
+      }
+    },
+    "%@ behind" : {
+      "comment" : "NTP: the device's clock is behind by this time (e.g. 1.4 ms).",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ nach"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ behind"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ de retraso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ de retard"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ indietro"
+          }
+        }
+      }
+    },
     "%@ · MTU %@" : {
       "comment" : "The interface the packets leave on and its MTU.",
       "localizations" : {
@@ -1386,6 +1456,41 @@
         }
       }
     },
+    "Announced for the end of the day" : {
+      "comment" : "NTP: a leap second comes at the end of the day.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für das Ende des Tages angekündigt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Announced for the end of the day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anunciado para el final del día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annoncée pour la fin de la journée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annunciato per la fine della giornata"
+          }
+        }
+      }
+    },
     "Answers" : {
       "comment" : "Row: whether the compared servers gave the same records.",
       "localizations" : {
@@ -1657,6 +1762,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Interroga contemporaneamente il server di sistema, Cloudflare, Google, Quad9 e il tuo server."
+          }
+        }
+      }
+    },
+    "Asks time.apple.com, time.cloudflare.com and pool.ntp.org at once (SNTP, UDP port 123)." : {
+      "comment" : "Note of the NTP tool.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragt time.apple.com, time.cloudflare.com und pool.ntp.org gleichzeitig (SNTP, UDP-Port 123)."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asks time.apple.com, time.cloudflare.com and pool.ntp.org at once (SNTP, UDP port 123)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consulta a la vez time.apple.com, time.cloudflare.com y pool.ntp.org (SNTP, puerto UDP 123)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interroge en même temps time.apple.com, time.cloudflare.com et pool.ntp.org (SNTP, port UDP 123)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interroga contemporaneamente time.apple.com, time.cloudflare.com e pool.ntp.org (SNTP, porta UDP 123)."
           }
         }
       }
@@ -6150,6 +6290,41 @@
         }
       }
     },
+    "Leap second" : {
+      "comment" : "NTP row: a leap second is announced.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schaltsekunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leap second"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segundo intercalar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seconde intercalaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secondo intercalare"
+          }
+        }
+      }
+    },
     "License" : {
       "localizations" : {
         "de" : {
@@ -8768,6 +8943,41 @@
         }
       }
     },
+    "Not synchronized" : {
+      "comment" : "NTP: the server's clock is not synchronized.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht synchronisiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not synchronized"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No sincronizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non synchronisée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sincronizzato"
+          }
+        }
+      }
+    },
     "Not trusted" : {
       "localizations" : {
         "de" : {
@@ -8833,6 +9043,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non convalidato dal server"
+          }
+        }
+      }
+    },
+    "NTP" : {
+      "comment" : "Name of the time server tool. Not translated.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NTP"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NTP"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NTP"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NTP"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NTP"
           }
         }
       }
@@ -9620,6 +9865,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il tuo server STUN (facoltativo)"
+          }
+        }
+      }
+    },
+    "Own time server (optional)" : {
+      "comment" : "Field of the NTP tool.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eigener Zeitserver (optional)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Own time server (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor de hora (opcional)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre serveur de temps (facultatif)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il tuo server orario (facoltativo)"
           }
         }
       }
@@ -11466,6 +11746,41 @@
         }
       }
     },
+    "Reference" : {
+      "comment" : "NTP reference: the clock or upstream server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Referenz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reference"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Referencia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Référence"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riferimento"
+          }
+        }
+      }
+    },
     "Registered" : {
       "localizations" : {
         "de" : {
@@ -11905,6 +12220,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DNS inverso"
+          }
+        }
+      }
+    },
+    "Round trip" : {
+      "comment" : "NTP row: network round trip without server processing.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Round trip"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ida y vuelta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aller-retour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andata e ritorno"
           }
         }
       }
@@ -12901,6 +13251,41 @@
         }
       }
     },
+    "Server clock" : {
+      "comment" : "NTP row: state of the server's clock.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveruhr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server clock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reloj del servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horloge du serveur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orologio del server"
+          }
+        }
+      }
+    },
     "Server name or address" : {
       "comment" : "Placeholder for a DNS over TLS server.",
       "localizations" : {
@@ -12967,6 +13352,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nome del server o URL DoH"
+          }
+        }
+      }
+    },
+    "Server time" : {
+      "comment" : "NTP: the server's time when it answered.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora del servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heure du serveur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ora del server"
           }
         }
       }
@@ -13750,6 +14170,41 @@
         }
       }
     },
+    "Stratum" : {
+      "comment" : "NTP stratum. Usually not translated.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stratum"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stratum"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estrato"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strate"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strato"
+          }
+        }
+      }
+    },
     "Subnet" : {
       "localizations" : {
         "de" : {
@@ -14499,6 +14954,41 @@
         }
       }
     },
+    "The server refused to answer (%@)" : {
+      "comment" : "NTP kiss of death: the server refused, with its code (RATE, DENY …).",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server hat die Antwort verweigert (%@)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server refused to answer (%@)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor se negó a responder (%@)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur a refusé de répondre (%@)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server ha rifiutato di rispondere (%@)"
+          }
+        }
+      }
+    },
     "The server sent an unexpected answer" : {
       "comment" : "The server sent an unexpected answer.",
       "isCommentAutoGenerated" : true,
@@ -14765,6 +15255,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo dispositivo non ha un indirizzo IPv4 locale. Connettiti a una rete Wi-Fi per cercare dispositivi."
+          }
+        }
+      }
+    },
+    "This device's clock" : {
+      "comment" : "NTP row: how far the device's clock is off.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhr dieses Geräts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This device's clock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reloj de este dispositivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horloge de cet appareil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orologio di questo dispositivo"
           }
         }
       }

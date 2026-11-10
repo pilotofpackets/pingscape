@@ -397,3 +397,37 @@ struct MTRTests {
         #expect(last.first?.statistics.received == 3)
     }
 }
+
+@Suite("NTP")
+struct NTPTests {
+    @Test func roundTripsATimestamp() {
+        let date = Date(timeIntervalSince1970: 1_794_424_526.25)
+        let back = NTPPacket.date(NTPPacket.timestamp(date)[...])
+        #expect(abs(back.timeIntervalSince(date)) < 0.000_001)
+    }
+
+    @Test func computesOffsetAndDelay() throws {
+        // Sent at 0 s, the server received at 10.050 s and answered at
+        // 10.051 s, back at 0.101 s: 50 ms each way, the server 10 s ahead.
+        let base = Date(timeIntervalSince1970: 1_794_424_500)
+        let sentAt = base
+        let request = NTPPacket.request(sentAt: sentAt)
+        var reply = [UInt8](repeating: 0, count: 48)
+        reply[0] = 0x24  // version 4, mode 4 (server)
+        reply[1] = 1
+        reply.replaceSubrange(12..<16, with: Array("GPS".utf8) + [0])
+        reply.replaceSubrange(24..<32, with: Array(request[40..<48]))
+        reply.replaceSubrange(32..<40, with: NTPPacket.timestamp(base.addingTimeInterval(10.050)))
+        reply.replaceSubrange(40..<48, with: NTPPacket.timestamp(base.addingTimeInterval(10.051)))
+        let result = try #require(
+            NTPPacket.parse(reply, request: request, sentAt: sentAt, receivedAt: base.addingTimeInterval(0.101)))
+        #expect(abs(result.offsetMilliseconds - 10_000) < 0.01)
+        #expect(abs(result.delayMilliseconds - 100) < 0.01)
+        #expect(result.stratum == 1)
+        #expect(result.reference == "GPS")
+        // An answer to another request is not ours.
+        var other = reply
+        other[30] ^= 0xFF
+        #expect(NTPPacket.parse(other, request: request, sentAt: sentAt, receivedAt: base) == nil)
+    }
+}
