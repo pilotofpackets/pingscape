@@ -45,6 +45,7 @@ enum SelfTest {
         log("intent status-text lines=\(StatusText.make(snapshot).split(separator: "\n").count) vpn=\(snapshot.isVPNActive)")
         await internet()
         await pathMTU()
+        if ProcessInfo.processInfo.arguments.contains("-selftest-intents") { await intents(snapshot) }
         log("end")
     }
 
@@ -300,6 +301,78 @@ enum SelfTest {
             let report = try await TLSInspector.inspect(host: "example.com")
             log("tls ok protocol=\(report.protocolVersion ?? "-") chain=\(report.chain.count) trust=\(report.trust) days=\(report.chain.first?.daysUntilExpiry() ?? 0)")
         } catch { log("tls failed \(error)") }
+    }
+
+    /// `-selftest-intents` runs every Shortcuts action once and reads every
+    /// widget value. Only whether each worked is printed, never a value.
+    private static func intents(_ snapshot: NetworkSnapshot) async {
+        for value in NetworkValue.allCases {
+            let state =
+                switch value.read(from: snapshot) {
+                case .success(let items): "items=\(items.count)"
+                case .failure(let missing): "missing=\(missing)"
+                }
+            log("value \(value.rawValue) \(state)")
+        }
+        let pagesOK = AppPage.allCases.allSatisfy { AppPage(url: $0.url) == $0 }
+        log("deeplinks \(AppPage.allCases.count) roundtrip=\(pagesOK)")
+
+        func run(_ name: String, _ work: () async throws -> Void) async {
+            let (error, ms) = await timed { () async -> (any Error)? in
+                do { try await work(); return nil } catch { return error }
+            }
+            let outcome = error.map { "error \(IntentMessage($0).text)" } ?? "ok"
+            log("intent \(name) \(outcome) \(Int(ms)) ms")
+        }
+        for query in NetworkQuery.allCases {
+            let intent = GetNetworkValueIntent()
+            intent.value = query
+            await run("value.\(query.rawValue)") { _ = try await intent.perform() }
+        }
+        await run("details") { _ = try await GetNetworkDetailsIntent().perform() }
+        await run("status") { _ = try await NetworkStatusIntent().perform() }
+        await run("vpn") { _ = try await VPNActiveIntent().perform() }
+        let ping = PingIntent()
+        ping.host = "one.one.one.one"
+        await run("ping") { _ = try await ping.perform() }
+        for type in [DNSQueryType.a, .aaaa, .mx, .txt] {
+            let dns = DNSLookupIntent()
+            dns.name = "example.com"
+            dns.type = type
+            dns.server = .system
+            await run("dns.\(type.rawValue)") { _ = try await dns.perform() }
+        }
+        let ptr = DNSLookupIntent()
+        ptr.name = "1.1.1.1"
+        ptr.type = .ptr
+        ptr.server = .cloudflare
+        await run("dns.ptr") { _ = try await ptr.perform() }
+        let nxdomain = DNSLookupIntent()
+        nxdomain.name = "does-not-exist.pingscape.app"
+        nxdomain.type = .a
+        nxdomain.server = .quad9
+        await run("dns.nxdomain") { _ = try await nxdomain.perform() }
+        for port in [443, 81] {
+            let check = CheckPortIntent()
+            check.host = "example.com"
+            check.port = port
+            await run("port.\(port)") { _ = try await check.perform() }
+        }
+        let tls = CertificateExpiryIntent()
+        tls.host = "example.com"
+        await run("tls") { _ = try await tls.perform() }
+        let http = HTTPCheckIntent()
+        http.address = "http://apple.com"
+        await run("http") { _ = try await http.perform() }
+        let trace = TracerouteIntent()
+        trace.host = "one.one.one.one"
+        await run("traceroute") { _ = try await trace.perform() }
+        let mtu = PathMTUIntent()
+        mtu.host = "one.one.one.one"
+        await run("pathmtu") { _ = try await mtu.perform() }
+        let clock = ClockOffsetIntent()
+        clock.server = "time.apple.com"
+        await run("ntp") { _ = try await clock.perform() }
     }
 }
 #endif

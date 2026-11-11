@@ -18,7 +18,7 @@
 </div></header>
 <main><div class="wrap">
 <h1>Privacy</h1>
-<p class="small">Last updated: 2026-11-01</p>
+<p class="small">Last updated: 2026-11-11</p>
 <p class="lead">Pingscape has no account, no analytics, no advertising and no server of its own. The developer collects no data about you.</p>
 
 <h2>Who is responsible</h2>
@@ -30,7 +30,7 @@
 <h2>Permissions</h2>
 <table>
 <tr><th>Permission</th><th>What for</th></tr>
-<tr><td>Location (while in use)</td><td>iOS only lets an app read the name of the Wi-Fi network it is connected to if it has this permission. Pingscape does not read, use or store your location.</td></tr>
+<tr><td>Location (while in use)</td><td>iOS only lets an app read the name of the Wi-Fi network it is connected to if it has this permission. The Siri answers and the widgets use the same permission for the Wi-Fi name. Pingscape does not read, use or store your location.</td></tr>
 <tr><td>Local network</td><td>To look for devices on your own network and to ask your router about itself. The results stay on your device.</td></tr>
 <tr><td>Photos (add only)</td><td>Only to save the image of a report to your photo library, when you choose “Save image to Photos” in the share menu. Pingscape can add that image but cannot read your photos.</td></tr>
 </table>
@@ -66,8 +66,16 @@
 <h3>On your local network</h3>
 <p>The device search pings the addresses of your own network and listens for Bonjour, including for service types beyond the ones built into the app. It also sends an SSDP search to find UPnP devices such as routers, media servers and printers, and asks each one, including your router, for its UPnP description. This traffic stays inside your network.</p>
 
-<h2>Shortcuts and widget</h2>
-<p>The Shortcuts actions run when you start them and return their result to you. The widget reads whether the device is online, over what and whether a VPN is active, and shows the time it was read. Neither sends anything anywhere.</p>
+<h2>Shortcuts, Siri, widgets and Control Center</h2>
+<p>The Shortcuts actions run only when you start them: in the Shortcuts app, from an automation you set up or by asking Siri. They return their result to you or to the next action. Nothing runs in the background on its own.</p>
+<ul>
+<li>Network values and network details are read on your device. Actions that return addresses or network names (IP addresses, gateway, DNS servers, Wi-Fi name, BSSID, VPN address) only run on an unlocked device.</li>
+<li>If “Hide values by default” is on, Siri says a placeholder instead of an address or name. The shortcut itself still gets the real value, as Copy does in the app.</li>
+<li>The public IP address and the provider are only loaded when external requests are on, from the servers listed above.</li>
+<li>Ping, DNS lookup, port check, certificate, website check, traceroute, path MTU and clock check send what you entered to the target or server you chose, like the tools in the app. The clock check asks <code>time.apple.com</code> unless you enter another server. The traceroute action does not look up router names.</li>
+<li>When you talk to Siri, Apple processes your request under <a href="https://www.apple.com/legal/privacy/">Apple’s privacy policy</a>. Pingscape receives only the action and the values it needs, not what you said.</li>
+</ul>
+<p>The widgets read the values you choose on your device, for example whether it is online, the IP address, the Wi-Fi name or the gateway, and show the time they were read. While the device is locked, addresses and names are hidden. The Ping widget pings the host you entered, or your default gateway if you entered none, when iOS refreshes the widget and when you tap ↻. For the Wi-Fi name the widgets use the location permission you gave the app. The Control Center controls read the connection type and whether a VPN is active, and open the app. Pingscape stores nothing for them; iOS keeps your widget settings and the last state shown on the device. Widgets and controls send nothing anywhere except that ping.</p>
 
 <h2>Diagnostic dump and sharing</h2>
 <p>Reports, lists and the diagnostic dump are only shared when you choose to share them, using the system share sheet. By default the diagnostic dump replaces addresses and names. If you choose “Save image to Photos”, the image of the report is added to your photo library. What you do with a shared file is up to you.</p>

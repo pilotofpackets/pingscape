@@ -211,6 +211,11 @@ struct ToolsView: View {
     /// A device in the LAN list opens a tool with its address filled in.
     private func apply(_ request: ToolRequest) {
         selected = request.tool
+        // A deep link only picks the tool and keeps what was typed.
+        guard !request.target.isEmpty else {
+            navigation.toolRequest = nil
+            return
+        }
         switch request.tool {
         case .ping: ping.input = request.target
         case .traceroute: traceroute.input = request.target

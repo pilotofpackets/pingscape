@@ -31,6 +31,7 @@ targets:
     platform: iOS
     sources:
       - path: App
+      - path: Shared
     dependencies:
       - package: NetKit
       - target: PingscapeWidgets
@@ -68,6 +69,10 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleLocalizations: [en, de, fr, es, it]
         UILaunchScreen: {}
+        # Deep links from widgets and Control Center (Shared/NetworkValue.swift, AppPage).
+        CFBundleURLTypes:
+          - CFBundleURLName: app.pingscape.ios
+            CFBundleURLSchemes: [pingscape]
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
@@ -117,6 +122,7 @@ targets:
     platform: iOS
     sources:
       - path: Widgets
+      - path: Shared
     dependencies:
       - package: NetKit
     settings:
@@ -147,8 +153,14 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleLocalizations: [en, de, fr, es, it]
+        # The Wi-Fi name in a widget needs the app's location permission.
+        NSWidgetWantsLocation: true
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Widgets/PingscapeWidgets.entitlements
+      properties:
+        com.apple.developer.networking.wifi-info: true
 
 schemes:
   Pingscape:
