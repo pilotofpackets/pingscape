@@ -18,7 +18,7 @@
 </div></header>
 <main><div class="wrap">
 <h1>Datenschutz</h1>
-<p class="small">Stand: 01.11.2026</p>
+<p class="small">Stand: 11.11.2026</p>
 <p class="lead">Pingscape hat kein Konto, keine Analyse, keine Werbung und keinen eigenen Server. Der Entwickler erhebt keine Daten über dich.</p>
 
 <h2>Verantwortlich</h2>
@@ -30,7 +30,7 @@
 <h2>Berechtigungen</h2>
 <table>
 <tr><th>Berechtigung</th><th>Wofür</th></tr>
-<tr><td>Ortung (wenn in Benutzung)</td><td>iOS gibt den Namen des verbundenen WLANs nur an Apps weiter, die diese Berechtigung haben. Pingscape liest, nutzt und speichert deinen Standort nicht.</td></tr>
+<tr><td>Ortung (wenn in Benutzung)</td><td>iOS gibt den Namen des verbundenen WLANs nur an Apps weiter, die diese Berechtigung haben. Siri-Antworten und Widgets nutzen dieselbe Berechtigung für den WLAN-Namen. Pingscape liest, nutzt und speichert deinen Standort nicht.</td></tr>
 <tr><td>Lokales Netzwerk</td><td>Um Geräte in deinem eigenen Netz zu suchen und deinen Router nach sich selbst zu fragen. Die Ergebnisse bleiben auf deinem Gerät.</td></tr>
 <tr><td>Fotos (nur hinzufügen)</td><td>Nur um das Bild eines Berichts in deiner Fotomediathek abzulegen, wenn du im Teilen-Menü „Bild in Fotos sichern“ wählst. Pingscape kann dieses Bild hinzufügen, deine Fotos aber nicht lesen.</td></tr>
 </table>
@@ -66,8 +66,16 @@
 <h3>In deinem lokalen Netz</h3>
 <p>Die Gerätesuche pingt die Adressen deines eigenen Netzes und hört auf Bonjour, auch für Diensttypen über die fest eingebauten hinaus. Zusätzlich sucht sie per SSDP nach UPnP-Geräten wie Routern, Mediaservern und Druckern und fragt jedes gefundene Gerät, einschließlich deines Routers, nach seiner UPnP-Beschreibung. Dieser Verkehr bleibt in deinem Netz.</p>
 
-<h2>Kurzbefehle und Widget</h2>
-<p>Die Aktionen in Kurzbefehle laufen, wenn du sie startest, und geben dir ihr Ergebnis zurück. Das Widget liest, ob das Gerät online ist, worüber und ob ein VPN aktiv ist, und zeigt, wann es gelesen wurde. Beides sendet nichts irgendwohin.</p>
+<h2>Kurzbefehle, Siri, Widgets und Kontrollzentrum</h2>
+<p>Die Aktionen in Kurzbefehle laufen nur, wenn du sie startest: in der App Kurzbefehle, über eine Automation, die du eingerichtet hast, oder wenn du Siri fragst. Sie geben ihr Ergebnis dir oder der nächsten Aktion zurück. Von sich aus läuft nichts im Hintergrund.</p>
+<ul>
+<li>Netzwerkwerte und Netzwerkdetails werden auf deinem Gerät gelesen. Aktionen, die Adressen oder Netzwerknamen zurückgeben (IP-Adressen, Gateway, DNS-Server, WLAN-Name, BSSID, VPN-Adresse), laufen nur auf einem entsperrten Gerät.</li>
+<li>Ist „Werte standardmäßig verbergen“ an, sagt Siri statt einer Adresse oder eines Namens einen Platzhalter. Der Kurzbefehl selbst bekommt trotzdem den echten Wert, wie „Kopieren“ in der App.</li>
+<li>Die öffentliche IP-Adresse und der Provider werden nur geladen, wenn externe Abfragen an sind, und zwar von den oben genannten Servern.</li>
+<li>Ping, DNS-Abfrage, Port-Check, Zertifikat, Website-Check, Traceroute, Pfad-MTU und Uhr-Prüfung senden, was du eingegeben hast, an das Ziel oder den Server, den du gewählt hast, wie die Werkzeuge in der App. Die Uhr-Prüfung fragt <code>time.apple.com</code>, wenn du keinen anderen Server einträgst. Die Traceroute-Aktion fragt keine Router-Namen ab.</li>
+<li>Wenn du mit Siri sprichst, verarbeitet Apple deine Anfrage nach der <a href="https://www.apple.com/de/legal/privacy/">Datenschutzrichtlinie von Apple</a>. Pingscape bekommt nur die Aktion und die Werte, die sie braucht, nicht das, was du gesagt hast.</li>
+</ul>
+<p>Die Widgets lesen die Werte, die du auswählst, auf deinem Gerät, etwa ob es online ist, die IP-Adresse, den WLAN-Namen oder das Gateway, und zeigen, wann sie gelesen wurden. Solange das Gerät gesperrt ist, sind Adressen und Namen verborgen. Das Ping-Widget pingt den Host, den du eingetragen hast, oder dein Standard-Gateway, wenn du keinen eingetragen hast, wenn iOS das Widget aktualisiert und wenn du auf ↻ tippst. Für den WLAN-Namen nutzen die Widgets die Ortungsberechtigung, die du der App gegeben hast. Die Steuerelemente im Kontrollzentrum lesen die Verbindungsart und ob ein VPN aktiv ist, und öffnen die App. Pingscape speichert dafür nichts; iOS behält deine Widget-Einstellungen und den zuletzt angezeigten Stand auf dem Gerät. Widgets und Steuerelemente senden nichts irgendwohin außer diesem Ping.</p>
 
 <h2>Diagnose-Dump und Teilen</h2>
 <p>Berichte, Listen und der Diagnose-Dump werden nur geteilt, wenn du sie über das System-Teilen-Blatt teilst. Standardmäßig ersetzt der Diagnose-Dump Adressen und Namen. Wenn du „Bild in Fotos sichern“ wählst, wird das Bild des Berichts in deiner Fotomediathek abgelegt. Was du mit einer geteilten Datei machst, liegt bei dir.</p>
