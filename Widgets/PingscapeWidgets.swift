@@ -5,7 +5,9 @@ import WidgetKit
 // A widget shows a state that iOS asked for at a time of its own choosing,
 // not the state right now. So it always shows its own time ("As of 14:05") and
 // nothing that would be wrong when old: no addresses, no names. Only whether
-// the device is online, over what, and whether a VPN is active.
+// the device is online, over what, and whether a VPN is active. Addresses and
+// names are in the "Network values" widget (ValuesWidget.swift), which the
+// user sets up for them and which has a ↻ button.
 
 struct StatusEntry: WidgetKit.TimelineEntry {
     let date: Date
@@ -35,7 +37,7 @@ struct StatusProvider: TimelineProvider {
     }
 
     private static func entry() async -> StatusEntry {
-        let snapshot = await LiveSnapshotProvider().snapshot()
+        let snapshot = await WidgetSnapshot.read()
         return StatusEntry(
             date: Date(), isOnline: snapshot.isOnline, connection: snapshot.connectionKind, isVPNActive: snapshot.isVPNActive)
     }
@@ -114,7 +116,7 @@ struct StatusWidgetView: View {
                     Label("VPN active", systemImage: "lock.shield").font(.subheadline)
                 }
                 Spacer(minLength: 0)
-                stand.font(.caption).foregroundStyle(.secondary)
+                WidgetFooter(date: entry.date)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -137,5 +139,9 @@ struct StatusWidget: Widget {
 struct PingscapeWidgetBundle: WidgetBundle {
     var body: some Widget {
         StatusWidget()
+        ValuesWidget()
+        PingWidget()
+        ConnectionControl()
+        OpenPageControl()
     }
 }

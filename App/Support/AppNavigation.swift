@@ -34,4 +34,15 @@ final class AppNavigation {
         toolRequest = ToolRequest(tool: tool, target: target)
         tab = .tools
     }
+
+    /// A page from a deep link. A tool opens with its field as it was.
+    func open(_ page: AppPage) {
+        switch page {
+        case .overview: tab = .overview
+        case .lan: tab = .lan
+        case .live: tab = .live
+        default:
+            if let tool = ToolKind(rawValue: page.rawValue) { open(tool, target: "") }
+        }
+    }
 }
