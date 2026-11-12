@@ -114,6 +114,9 @@ struct ToolField: View {
                 .submitLabel(.go)
                 .font(monospaced ? .system(.body, design: .monospaced) : .body)
                 .onSubmit(onSubmit)
+                // The whole height of the capsule takes the tap, not only the
+                // line of text (17 points at the smallest text size).
+                .frame(minHeight: 44)
                 .accessibilityIdentifier("tool.field")
             if !text.isEmpty {
                 Button {

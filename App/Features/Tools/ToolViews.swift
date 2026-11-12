@@ -306,11 +306,11 @@ private struct MTRHopRow: View {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 Text(verbatim: "\(hop.number)")
                     .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .frame(minWidth: 24, alignment: .trailing)
                 Text(addressText)
                     .font(hop.addresses.isEmpty ? .body : .system(.body, design: .monospaced))
-                    .foregroundStyle(hop.addresses.isEmpty ? .secondary : .primary)
+                    .foregroundStyle(hop.addresses.isEmpty ? Color.subdued : Color.primary)
                 Spacer(minLength: 8)
                 if hop.statistics.lostPercent > 0 {
                     StatusDot(tone: hop.statistics.received == 0 ? .critical : .warning)
@@ -319,12 +319,12 @@ private struct MTRHopRow: View {
             }
             Text(figures)
                 .font(.footnote.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
                 .padding(.leading, 36)
             ForEach(names, id: \.self) { name in
                 Text(mask.shown(name))
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .padding(.leading, 36)
             }
         }
@@ -362,7 +362,7 @@ private struct HopRow: View {
                     .frame(minWidth: 24, alignment: .trailing)
                 Text(hop.address.map { mask.shown($0) } ?? address)
                     .font(hop.address == nil ? .body : .system(.body, design: .monospaced))
-                    .foregroundStyle(hop.address == nil ? .secondary : .primary)
+                    .foregroundStyle(hop.address == nil ? Color.subdued : Color.primary)
             }
             Text(verbatim: times)
                 .font(.system(.footnote, design: .monospaced))
