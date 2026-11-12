@@ -145,8 +145,47 @@ struct ToolModelTests {
         #expect(!ping.canStart)
         ping.input = " 1.1.1.1 "
         #expect(ping.canStart)
-        let models: [any ToolControl] = [TracerouteModel(), DNSModel(), WhoisModel(), TLSModel(), HTTPModel()]
+        let models: [any ToolControl] = [TracerouteModel(), DNSModel(), WhoisModel(), TLSModel(), HTTPModel(), DualStackModel()]
         for model in models { #expect(!model.canStart) }
+    }
+
+    @Test("NTP and NAT start without input: their own server is optional")
+    func optionalServer() {
+        #expect(NTPModel().canStart)
+        #expect(NATModel().canStart)
+    }
+
+    @Test("An invalid own server or host is turned down and nothing starts", arguments: ["keinhost!!!", "a b", "host:99999", "host:abc"])
+    func invalidServer(_ input: String) {
+        let nat = NATModel()
+        nat.customServer = input
+        nat.start()
+        #expect(!nat.isRunning)
+        #expect(nat.failure != nil, "NAT took “\(input)”")
+        nat.stop()
+
+        let dualstack = DualStackModel()
+        dualstack.input = input
+        dualstack.start()
+        #expect(!dualstack.isRunning)
+        #expect(dualstack.failure != nil, "Dual stack took “\(input)”")
+        dualstack.stop()
+
+        if !input.contains(":") {
+            let ntp = NTPModel()
+            ntp.customServer = input
+            ntp.start()
+            #expect(!ntp.isRunning)
+            #expect(ntp.failure != nil, "NTP took “\(input)”")
+            ntp.stop()
+        }
+    }
+
+    @Test("The demos of the new tools have a result")
+    func newToolDemos() {
+        #expect(NATModel.demo().report != nil)
+        #expect(!NTPModel.demo().rows.isEmpty)
+        #expect(DualStackModel.demo().report != nil)
     }
 
     @Test("An invalid host is turned down at once and nothing starts", arguments: ["keinhost!!!", "a b", "http://", "-x"])

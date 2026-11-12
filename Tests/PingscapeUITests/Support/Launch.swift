@@ -8,6 +8,8 @@ enum Start {
     case live
     case tool(String, extra: [String] = [])
     case about
+    /// About › Siri and Shortcuts.
+    case shortcutsHelp
     /// The first launch: the tour, then the question about external requests.
     case firstRun
 
@@ -20,6 +22,7 @@ enum Start {
         case .live: ["-demo-tab", "live"]
         case .tool(let tool, let extra): ["-demo-tab", "tools", "-demo-tool", tool] + extra
         case .about: ["-demo-tab", "about"]
+        case .shortcutsHelp: ["-demo-tab", "about", "-demo-about", "shortcuts"]
         case .firstRun: ["-demo-tab", "overview", "-demo-firstrun", "1"]
         }
     }
@@ -109,14 +112,18 @@ extension XCUIApplication {
     func tab(_ title: String) -> XCUIElement {
         let inBar = tabBars.buttons[title]
         if inBar.exists { return inBar }
-        let button = buttons.matching(NSPredicate(format: "label == %@", title)).firstMatch
+        let label = NSPredicate(format: "label == %@", title)
+        let button = buttons.matching(label).firstMatch
         if button.exists { return button }
         // The iPad's tab bar at the top shows only what fits; at large text
-        // sizes the last tabs are behind its arrow. The sidebar lists them all.
-        let sidebar = buttons.matching(NSPredicate(format: "label CONTAINS[c] 'sidebar'")).firstMatch
-        if sidebar.exists {
-            sidebar.tap()
-            _ = button.waitForExistence(timeout: 2)
+        // sizes the last tabs are behind its arrow, and at AX5 there is only
+        // the sidebar, whose rows are cells.
+        let row = cells.matching(label).firstMatch
+        if row.exists { return row }
+        let toggle = buttons["ToggleSidebar"]
+        if toggle.exists {
+            toggle.tap()
+            if row.waitForExistence(timeout: 2) { return row }
         }
         return button
     }
@@ -204,11 +211,27 @@ extension XCUIApplication {
     /// Scrolls until `element` is hittable, at most `pages` pages.
     @discardableResult
     func scrollTo(_ element: XCUIElement, pages: Int = 25) -> Bool {
+        let window = windows.firstMatch.frame
         for _ in 0..<pages {
             if element.exists, element.isHittable { return true }
-            scrollPage()
+            // Already passed (a list keeps its place when a page is closed):
+            // back up instead of scrolling on to the end.
+            let above = element.exists && !element.frame.isEmpty && element.frame.maxY < window.midY
+            scrollPage(down: !above)
         }
         return element.exists && element.isHittable
+    }
+
+    /// Back from a page pushed onto `page`'s stack. On the iPad the sidebar
+    /// has a bar of its own, whose first button is not Back.
+    func goBack(from page: String? = nil) {
+        if let page, navigationBars[page].exists {
+            navigationBars[page].buttons.element(boundBy: 0).tap()
+        } else if buttons["BackButton"].exists {
+            buttons["BackButton"].firstMatch.tap()
+        } else {
+            navigationBars.buttons.element(boundBy: 0).tap()
+        }
     }
 }
 

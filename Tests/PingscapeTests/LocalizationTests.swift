@@ -42,12 +42,17 @@ struct LocalizationTests {
         .sorted { $0.key < $1.key }
     }
 
-    /// Every `stringUnit` of a localization, also inside plural and device variations.
+    /// Every `stringUnit` and `stringSet` of a localization, also inside plural and device variations.
     static func units(in node: Any) -> [(value: String, state: String)] {
         guard let node = node as? [String: Any] else { return [] }
         var found: [(String, String)] = []
         if let unit = node["stringUnit"] as? [String: Any] {
             found.append((unit["value"] as? String ?? "", unit["state"] as? String ?? ""))
+        }
+        // Siri phrases: several ways to say one shortcut.
+        if let set = node["stringSet"] as? [String: Any] {
+            let state = set["state"] as? String ?? ""
+            found += (set["values"] as? [String] ?? []).map { ($0, state) }
         }
         if let variations = node["variations"] as? [String: Any] {
             for (_, kind) in variations {

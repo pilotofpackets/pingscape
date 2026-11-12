@@ -59,6 +59,7 @@ final class ToolScreenTests: UITestCase {
     func testPing() { checkScreen("Tools › Ping", .tool("ping")) }
     func testPathMTU() { checkScreen("Tools › Ping › Path MTU", .tool("ping", extra: ["-demo-ping", "mtu"])) }
     func testTraceroute() { checkScreen("Tools › Traceroute", .tool("traceroute")) }
+    func testMTR() { checkScreen("Tools › Traceroute › Continuous", .tool("traceroute", extra: ["-demo-traceroute", "mtr"])) }
     func testDNS() { checkScreen("Tools › DNS", .tool("dns")) }
     func testDNSCompare() { checkScreen("Tools › DNS › Compare", .tool("dns", extra: ["-demo-dns", "compare"])) }
 }
@@ -74,8 +75,16 @@ final class LookupToolScreenTests: UITestCase {
 }
 
 @MainActor
+final class NewToolScreenTests: UITestCase {
+    func testDualStack() { checkScreen("Tools › Dual stack", .tool("dualstack")) }
+    func testNTP() { checkScreen("Tools › NTP", .tool("ntp")) }
+    func testNAT() { checkScreen("Tools › NAT", .tool("nat")) }
+}
+
+@MainActor
 final class AboutScreenTests: UITestCase {
     func testAbout() { checkScreen("About", .about) }
+    func testShortcutsHelp() { checkScreen("About › Siri and Shortcuts", .shortcutsHelp) }
 
     func testDiagnosticDump() {
         let config = TestConfig.current

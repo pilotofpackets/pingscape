@@ -30,7 +30,7 @@ final class NavigationFlowTests: UITestCase {
             }
             link.tap()
             guard expect(app.navigationBars[page], "page \(page)") else { continue }
-            app.navigationBars.buttons.element(boundBy: 0).tap()
+            app.goBack(from: page)
             expect(app.navigationBars["Overview"], "back from \(page)")
         }
     }
@@ -49,7 +49,7 @@ final class NavigationFlowTests: UITestCase {
             }
             link.tap()
             XCTAssertFalse(app.navigationBars["Overview"].waitForExistence(timeout: 1), "Details \(index + 1) did not open a page")
-            app.navigationBars.buttons.element(boundBy: 0).tap()
+            app.goBack()
             expect(app.navigationBars["Overview"])
         }
     }
@@ -249,12 +249,14 @@ final class PrivacyFlowTests: UITestCase {
         guard expect(toggle) else { return }
         XCTAssertEqual(toggle.value as? String, "1", "Anonymizing should be on by default")
         let content = { app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'snapshot' OR label CONTAINS '{'")).firstMatch }
-        guard expect(content(), "the dump") else { return }
+        // The list makes its rows only when they come on screen: at AX5 the
+        // content is below the long footer.
+        guard app.scrollTo(content()) || expect(content(), "the dump") else { return }
         for secret in ["192.168.178.42", "HomeNet", "3C:A6:2F:1B:D3:22", "2001:db8:4a1c"] {
             XCTAssertFalse(content().label.contains(secret), "The anonymized dump contains \(secret)")
         }
         toggle.set(on: false)
-        XCTAssertTrue(content().waitForExistence(timeout: 3))
+        XCTAssertTrue(app.scrollTo(content()), "The dump is gone after the switch [\(config)]")
         XCTAssertTrue(content().label.contains("192.168.178.42"), "With the switch off the dump should hold the real address")
     }
 }
@@ -263,7 +265,7 @@ final class PrivacyFlowTests: UITestCase {
 final class ToolFlowTests: UITestCase {
     let config = TestConfig.current.english
 
-    static let tools = ["ping", "traceroute", "dns", "whois", "ports", "tls", "http", "subnet", "oui"]
+    static let tools = ["ping", "traceroute", "dns", "whois", "ports", "tls", "http", "dualstack", "ntp", "nat", "subnet", "oui"]
     static let withoutStart: Set<String> = ["subnet", "oui"]
 
     func testEveryChipSelectsItsTool() {
@@ -332,7 +334,7 @@ final class ToolFlowTests: UITestCase {
     }
 
     func testClearEmptiesTheFieldAndDisablesStart() {
-        for tool in ["ping", "dns", "whois", "tls", "http"] {
+        for tool in ["ping", "dns", "whois", "tls", "http", "dualstack"] {
             let app = launch(.tool(tool), config: config)
             let clear = app.element("tool.clear")
             guard expect(clear, tool) else { continue }
@@ -347,12 +349,13 @@ final class ToolFlowTests: UITestCase {
     /// A target that is no host name or address is turned down without a crash,
     /// and the tool does not start.
     func testInvalidInputIsRejected() {
-        for tool in ["ping", "traceroute", "dns", "tls", "http"] {
+        for tool in ["ping", "traceroute", "dns", "tls", "http", "dualstack", "ntp", "nat"] {
             let app = launch(.tool(tool), config: config)
-            let clear = app.element("tool.clear")
-            guard expect(clear, tool) else { continue }
-            clear.tap()
             let field = app.element("tool.field")
+            guard expect(field, tool) else { continue }
+            // NTP and NAT start with an empty field: their own server is optional.
+            let clear = app.element("tool.clear")
+            if clear.waitForExistence(timeout: 2) { clear.tap() }
             field.tap()
             field.typeText("keinhost!!!")
             let start = app.element("tool.start")

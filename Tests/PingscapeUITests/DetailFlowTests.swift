@@ -81,9 +81,10 @@ final class DetailPageFlowTests: UITestCase {
                 XCTFail("\(name) is not in the list or cannot be reached [\(config)]")
                 continue
             }
+            app.reveal(row)
             row.tap()
             expect(app.navigationBars[name], "the page of \(name)")
-            app.navigationBars.buttons.element(boundBy: 0).tap()
+            app.goBack(from: name)
             expect(app.navigationBars["Interfaces"], "back from \(name)")
         }
     }
@@ -182,7 +183,7 @@ final class ToolOptionFlowTests: UITestCase {
     }
 
     func testEveryToolHasAResultToCopyAndShare() {
-        for tool in ["ping", "traceroute", "dns", "whois", "ports", "tls", "http"] {
+        for tool in ["ping", "traceroute", "dns", "whois", "ports", "tls", "http", "dualstack", "ntp", "nat"] {
             let app = launch(.tool(tool), config: config)
             let copy = app.buttons["Copy"]
             let share = app.element("share")

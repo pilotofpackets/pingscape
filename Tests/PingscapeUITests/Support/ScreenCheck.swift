@@ -57,23 +57,31 @@ struct ScreenCheck {
 
     private func audit(screen: String, page: Int, file: StaticString, line: UInt) {
         let bars = glassAreas()
+        let window = app.windows.firstMatch.frame
         let screenshot = XCUIScreen.main.screenshot()
-        let pixelsMatch = screenshotMatchesWindow(screenshot)
+        // In landscape the simulator's screenshots are unreliable: on the iPad
+        // mini ours had landscape size but the content half a screen down under
+        // black, and the audit's own crop of an element came out rotated, so
+        // "Details" (5.5:1 in portrait) measured 1.0–1.8:1 (2026-11-12). The
+        // colors are the same in both orientations and judged in portrait.
+        let pixelsMatch = !config.landscape && screenshotMatchesWindow(screenshot)
         let pixels = pixelsMatch ? PixelContrast(screenshot) : nil
         if !pixelsMatch {
-            XCTContext.runActivity(named: "\(screen) page \(page): the screenshot is not in the window's orientation, contrast is not judged") { _ in }
+            XCTContext.runActivity(named: "\(screen) page \(page): landscape or rotated screenshot, contrast is only a warning here") { _ in }
         }
         // One audit per kind of check. All kinds in one call never returned on
         // the iPhone SE (iOS 27) on some pages, while each kind alone took a
         // second or two (found 2026-11-11).
         for type in AuditVerdict.kinds where config.auditTypes.contains(type) {
-            audit(type, screen: screen, page: page, pixelsMatch: pixelsMatch, pixels: pixels, bars: bars, file: file, line: line)
+            audit(
+                type, screen: screen, page: page, pixelsMatch: pixelsMatch, pixels: pixels, bars: bars, window: window,
+                file: file, line: line)
         }
     }
 
     private func audit(
         _ type: XCUIAccessibilityAuditType, screen: String, page: Int, pixelsMatch: Bool, pixels: PixelContrast?,
-        bars: [CGRect],
+        bars: [CGRect], window: CGRect,
         file: StaticString, line: UInt
     ) {
         do {
@@ -82,7 +90,7 @@ struct ScreenCheck {
                 // snapshot inside the audit's handler never returned on the
                 // iPhone SE on some pages (2026-11-11).
                 let element: (any XCUIElementAttributes)? = issue.element
-                var verdict = AuditVerdict(issue, element: element, config: config, bars: bars)
+                var verdict = AuditVerdict(issue, element: element, config: config, bars: bars, window: window)
                 if !pixelsMatch, issue.auditType == .contrast, verdict == .failure { verdict = .warning }
                 // A second opinion from the pixels: below 4.5:1 there too, or it is only a warning.
                 var measured: Double?
@@ -137,8 +145,12 @@ struct ScreenCheck {
         // Without a bar (a sheet), the status bar and its edge are still glass.
         let top = max(bars.map(\.maxY).max() ?? 0, 60) + 32
         areas.append(CGRect(x: window.minX, y: window.minY, width: window.width, height: top))
+        // Above the tab bar the content fades into its glass like under the
+        // top bar: a footer just above it measured 3.3:1 there and passed
+        // one page further (2026-11-12).
         for bar in app.tabBars.allElementsBoundByIndex where !bar.frame.isEmpty {
-            areas.append(bar.frame.insetBy(dx: -8, dy: -16))
+            let frame = bar.frame
+            areas.append(CGRect(x: frame.minX - 8, y: frame.minY - 40, width: frame.width + 16, height: frame.height + 56))
         }
         // The home indicator's strip, where a row is cut off by the screen's edge.
         areas.append(CGRect(x: window.minX, y: window.maxY - 40, width: window.width, height: 40))
@@ -218,7 +230,10 @@ enum AuditVerdict: Equatable {
     }
 
     @MainActor
-    init(_ issue: XCUIAccessibilityAuditIssue, element: (any XCUIElementAttributes)?, config: TestConfig, bars: [CGRect]) {
+    init(
+        _ issue: XCUIAccessibilityAuditIssue, element: (any XCUIElementAttributes)?, config: TestConfig, bars: [CGRect],
+        window: CGRect? = nil
+    ) {
         guard let element else {
             self = .ignored
             return
@@ -229,6 +244,12 @@ enum AuditVerdict: Equatable {
         }
         let frame = element.frame
         if !frame.isEmpty, bars.contains(where: { $0.intersects(frame) }) {
+            self = .ignored
+            return
+        }
+        // Scrolled off the screen, above the bar (y −20 in landscape): there
+        // are no pixels to measure. It is checked on the page where it shows.
+        if issue.auditType == .contrast, !frame.isEmpty, let window, !window.insetBy(dx: -1, dy: -1).contains(frame) {
             self = .ignored
             return
         }
