@@ -335,6 +335,17 @@ final class ToolFlowTests: UITestCase {
         }
     }
 
+    /// The capsule around the field takes the tap too, not only its line of text.
+    func testTapOnTheCapsuleEdgeFocusesTheField() {
+        let app = launch(.tool("ping"), config: config)
+        let field = app.element("tool.field")
+        guard expect(field) else { return }
+        // In the capsule's padding, left of the text.
+        let edge = field.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: -8, dy: 0))
+        edge.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5), "A tap on the capsule's edge did not focus the field [\(config)]")
+    }
+
     func testClearEmptiesTheFieldAndDisablesStart() {
         for tool in ["ping", "dns", "whois", "tls", "http", "dualstack"] {
             let app = launch(.tool(tool), config: config)
