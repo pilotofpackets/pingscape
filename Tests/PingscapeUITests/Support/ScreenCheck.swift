@@ -33,7 +33,7 @@ struct ScreenCheck {
 
             attachScreenshot("\(name) \(page + 1)")
             checkEdges(snapshot, screen: name, page: page + 1, file: file, line: line)
-            if config.audit { audit(screen: name, page: page + 1, file: file, line: line) }
+            if config.audit { audit(screen: name, page: page + 1, seen: snapshot, file: file, line: line) }
             if scroll { app.scrollPage() ; settle() }
         }
         XCTAssertEqual(app.state, .runningForeground, "\(name): the app is no longer running", file: file, line: line)
@@ -55,9 +55,10 @@ struct ScreenCheck {
 
     // MARK: Accessibility audit
 
-    private func audit(screen: String, page: Int, file: StaticString, line: UInt) {
+    private func audit(screen: String, page: Int, seen: XCUIElementSnapshot, file: StaticString, line: UInt) {
         let bars = glassAreas()
         let window = app.windows.firstMatch.frame
+        let shown = Self.frames(in: seen, visibleIn: window)
         let screenshot = XCUIScreen.main.screenshot()
         // In landscape the simulator's screenshots are unreliable: on the iPad
         // mini ours had landscape size but the content half a screen down under
@@ -79,13 +80,13 @@ struct ScreenCheck {
             }
             audit(
                 type, screen: screen, page: page, pixelsMatch: pixelsMatch, pixels: pixels, bars: bars, window: window,
-                file: file, line: line)
+                shown: shown, file: file, line: line)
         }
     }
 
     private func audit(
         _ type: XCUIAccessibilityAuditType, screen: String, page: Int, pixelsMatch: Bool, pixels: PixelContrast?,
-        bars: [CGRect], window: CGRect,
+        bars: [CGRect], window: CGRect, shown: [String: [CGRect]],
         file: StaticString, line: UInt
     ) {
         do {
@@ -96,6 +97,18 @@ struct ScreenCheck {
                 let element: (any XCUIElementAttributes)? = issue.element
                 var verdict = AuditVerdict(issue, element: element, config: config, bars: bars, window: window)
                 if !pixelsMatch, issue.auditType == .contrast, verdict == .failure { verdict = .warning }
+                // The audit scrolls on its own and then measured rows of a
+                // list mid-scroll as clipped, at places where the screenshot
+                // showed other text (Siri phrases at AX5, 2026-11-12). Only
+                // what was on screen, where it was, fails.
+                var moved = false
+                if issue.auditType == .textClipped, verdict == .failure, let element, !element.label.isEmpty {
+                    let near = { (a: CGRect, b: CGRect) in abs(a.minY - b.minY) < 2 && abs(a.height - b.height) < 2 }
+                    if !(shown[element.label] ?? []).contains(where: { near($0, element.frame) }) {
+                        verdict = .warning
+                        moved = true
+                    }
+                }
                 // A second opinion from the pixels: below 4.5:1 there too, or it is only a warning.
                 var measured: Double?
                 if issue.auditType == .contrast, verdict == .failure, let element, let pixels {
@@ -111,6 +124,7 @@ struct ScreenCheck {
                     Element: \(element.map { "“\($0.label)” \($0.identifier)" } ?? "–")
                     Frame: \(element.map { "\($0.frame)" } ?? "–")
                     Measured: \(measured.map { String(format: "%.2f:1", $0) } ?? "–")
+                    \(moved ? "Not where the screenshot showed it: the audit had scrolled." : "")
                     """
                 XCTContext.runActivity(named: "\(verdict.title): \(screen) page \(page): \(issue.compactDescription)") { activity in
                     let attachment = XCTAttachment(string: text)
@@ -196,6 +210,19 @@ struct ScreenCheck {
         for problem in problems {
             XCTFail("\(screen) page \(page) [\(config)]: sticks out of the window: \(problem)", file: file, line: line)
         }
+    }
+
+    /// The frames of the elements on screen, by label.
+    static func frames(in root: XCUIElementSnapshot, visibleIn window: CGRect) -> [String: [CGRect]] {
+        var frames: [String: [CGRect]] = [:]
+        func visit(_ element: XCUIElementSnapshot) {
+            if !element.label.isEmpty, element.frame.intersects(window) {
+                frames[element.label, default: []].append(element.frame)
+            }
+            element.children.forEach(visit)
+        }
+        visit(root)
+        return frames
     }
 
     /// What is on screen, to tell whether a scroll moved anything. Built from

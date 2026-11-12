@@ -120,10 +120,17 @@ extension XCUIApplication {
         // the sidebar, whose rows are cells.
         let row = cells.matching(label).firstMatch
         if row.exists { return row }
-        let toggle = buttons["ToggleSidebar"]
+        // The arrow at the end of the iPad's tab bar pages to the hidden tabs.
+        let next = buttons["Next Page"]
+        if next.exists, next.isHittable {
+            next.tap()
+            if button.waitForExistence(timeout: 2), button.isHittable { return button }
+        }
+        // "ToggleSideBar" on iOS 27; matched without case in case it changes.
+        let toggle = buttons.matching(NSPredicate(format: "identifier ==[c] 'ToggleSidebar'")).firstMatch
         if toggle.exists {
             toggle.tap()
-            if row.waitForExistence(timeout: 2) { return row }
+            if row.waitForExistence(timeout: 3) { return row }
         }
         return button
     }
@@ -208,15 +215,17 @@ extension XCUIApplication {
         }
     }
 
-    /// Scrolls until `element` is hittable, at most `pages` pages.
+    /// Scrolls until `element` is hittable, at most `pages` pages. `up` for
+    /// an element above in a lazy list, which is not there until it comes
+    /// back on screen.
     @discardableResult
-    func scrollTo(_ element: XCUIElement, pages: Int = 25) -> Bool {
+    func scrollTo(_ element: XCUIElement, pages: Int = 25, up: Bool = false) -> Bool {
         let window = windows.firstMatch.frame
         for _ in 0..<pages {
             if element.exists, element.isHittable { return true }
             // Already passed (a list keeps its place when a page is closed):
             // back up instead of scrolling on to the end.
-            let above = element.exists && !element.frame.isEmpty && element.frame.maxY < window.midY
+            let above = up || (element.exists && !element.frame.isEmpty && element.frame.maxY < window.midY)
             scrollPage(down: !above)
         }
         return element.exists && element.isHittable

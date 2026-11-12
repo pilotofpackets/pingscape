@@ -103,10 +103,12 @@ struct ToolField: View {
     var keyboard: UIKeyboardType = .URL
     var monospaced = false
     var onSubmit: () -> Void = {}
+    @FocusState private var focused: Bool
 
     var body: some View {
         HStack(spacing: 8) {
             TextField(text: $text, prompt: Text(title)) { Text(title) }
+                .focused($focused)
                 .keyboardType(keyboard)
                 .textContentType(.URL)
                 .textInputAutocapitalization(.never)
@@ -114,8 +116,11 @@ struct ToolField: View {
                 .submitLabel(.go)
                 .font(monospaced ? .system(.body, design: .monospaced) : .body)
                 .onSubmit(onSubmit)
-                // The whole height of the capsule takes the tap, not only the
-                // line of text (17 points at the smallest text size).
+                // SwiftUI does not stretch the UIKit field inside to a
+                // larger frame: at the smallest text size it stayed 18.5
+                // points high, too small a target for the accessibility
+                // audit (2026-11-12). From size L on it is large enough.
+                .dynamicTypeSize(.large...)
                 .frame(minHeight: 44)
                 .accessibilityIdentifier("tool.field")
             if !text.isEmpty {
@@ -137,6 +142,10 @@ struct ToolField: View {
         .background(
             Color(.secondarySystemGroupedBackground),
             in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        // A tap anywhere on the capsule, not only on the line of text, puts
+        // the cursor into the field. The clear button keeps its own tap.
+        .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .onTapGesture { focused = true }
     }
 }
 

@@ -255,6 +255,8 @@ final class PrivacyFlowTests: UITestCase {
         for secret in ["192.168.178.42", "HomeNet", "3C:A6:2F:1B:D3:22", "2001:db8:4a1c"] {
             XCTAssertFalse(content().label.contains(secret), "The anonymized dump contains \(secret)")
         }
+        // The switch is at the top of the lazy list, gone once it scrolled away.
+        guard app.scrollTo(toggle, up: true) else { return XCTFail("The switch cannot be reached again [\(config)]") }
         toggle.set(on: false)
         XCTAssertTrue(app.scrollTo(content()), "The dump is gone after the switch [\(config)]")
         XCTAssertTrue(content().label.contains("192.168.178.42"), "With the switch off the dump should hold the real address")
@@ -440,7 +442,7 @@ final class FirstRunFlowTests: UITestCase {
         expect(app.navigationBars["Overview"])
         app.tab("About").tap()
         let toggle = app.element("about.externalRequests")
-        if expect(toggle) { XCTAssertEqual(toggle.value as? String, "0", "“Not now” must leave external requests off") }
+        if app.scrollTo(toggle) || expect(toggle) { XCTAssertEqual(toggle.value as? String, "0", "“Not now” must leave external requests off") }
     }
 
     func testYesTurnsOnExternalRequests() {
@@ -454,7 +456,7 @@ final class FirstRunFlowTests: UITestCase {
         expectGone(yes)
         app.tab("About").tap()
         let toggle = app.element("about.externalRequests")
-        if expect(toggle) { XCTAssertEqual(toggle.value as? String, "1", "“Yes, show” must turn external requests on") }
+        if app.scrollTo(toggle) || expect(toggle) { XCTAssertEqual(toggle.value as? String, "1", "“Yes, show” must turn external requests on") }
     }
 
     func testTourCanBeShownAgainFromAbout() {
