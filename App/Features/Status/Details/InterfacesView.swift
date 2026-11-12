@@ -36,7 +36,7 @@ private struct InterfaceRow: View {
                 .font(.system(.body, design: .monospaced))
                 .foregroundStyle(.primary)
             if let label = interface.kind.label {
-                Text(label).font(.footnote).foregroundStyle(.secondary)
+                Text(label).font(.footnote).foregroundStyle(.subdued)
             }
         }
     }
@@ -45,7 +45,7 @@ private struct InterfaceRow: View {
         HStack(spacing: 6) {
             StatusDot(tone: interface.isRunning ? .good : .neutral)
             Text(interface.isRunning ? "Running" : "Not running")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
         }
         .font(.footnote)
     }

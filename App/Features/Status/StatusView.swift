@@ -35,7 +35,7 @@ struct StatusView: View {
                         technicalDetails(snapshot)
                         Text("As of \(snapshot.takenAt.formatted(date: .omitted, time: .standard))")
                             .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.subdued)
                             .frame(maxWidth: .infinity)
                     } else {
                         ProgressView()
@@ -85,6 +85,7 @@ struct StatusView: View {
                         Image(systemName: mask.isMasked ? "eye.slash" : "eye")
                     }
                     .accessibilityLabel("Hide values")
+                    .accessibilityIdentifier("overview.hideValues")
                     .accessibilityAddTraits(mask.isMasked ? .isSelected : [])
                 }
             }

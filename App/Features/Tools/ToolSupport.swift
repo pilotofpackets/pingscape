@@ -114,13 +114,19 @@ struct ToolField: View {
                 .submitLabel(.go)
                 .font(monospaced ? .system(.body, design: .monospaced) : .body)
                 .onSubmit(onSubmit)
+                .accessibilityIdentifier("tool.field")
             if !text.isEmpty {
                 Button {
                     text = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        // The symbol alone was a target of about 20 points.
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
+                .padding(.trailing, -12)
                 .accessibilityLabel("Clear")
+                .accessibilityIdentifier("tool.clear")
             }
         }
         .padding(.horizontal, 16)
@@ -140,7 +146,7 @@ struct ToolNote: View {
     var body: some View {
         text
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.subdued)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
     }
@@ -190,6 +196,7 @@ struct RecentChips: View {
             }
             .scrollClipDisabled()
             .accessibilityLabel("Recent")
+            .accessibilityIdentifier("tool.recent")
         }
     }
 }
@@ -237,6 +244,7 @@ struct StartBar: View {
                 .glassSurface(cornerRadius: 25)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("tool.start")
         .disabled(!control.isRunning && !control.canStart)
         .opacity(!control.isRunning && !control.canStart ? 0.5 : 1)
         .padding(.bottom, 8)

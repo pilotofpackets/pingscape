@@ -43,7 +43,7 @@ struct LiveView: View {
             StatusDot(tone: isVisible || DemoLaunch.isDemo ? .good : .neutral)
             Text(isVisible || DemoLaunch.isDemo ? "Running" : "Paused")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
         }
         .accessibilityElement(children: .combine)
     }
@@ -165,10 +165,12 @@ struct LiveView: View {
             }
             InfoCard {
                 Toggle("Ping a host on the internet", isOn: $model.usesInternetTarget)
+                    .accessibilityIdentifier("live.internetToggle")
                     .padding(.horizontal, 16)
                     .frame(minHeight: 44)
                 if model.usesInternetTarget {
                     TextField("Host", text: $model.internetHost)
+                        .accessibilityIdentifier("live.host")
                         .keyboardType(.URL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -186,7 +188,7 @@ struct LiveView: View {
     private func footnote(_ text: Text) -> some View {
         text
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.subdued)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 4)
     }
@@ -254,7 +256,7 @@ private struct ChartCard: View {
             HStack(alignment: .firstTextBaseline) {
                 Text(title)
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .textCase(.uppercase)
                 Spacer()
                 Text(points.last.map { style.text($0.value) } ?? "–")

@@ -34,14 +34,14 @@ private struct ReportImageView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.title2.bold())
                 ForEach(header, id: \.self) { line in
-                    Text(line).font(.footnote).foregroundStyle(.secondary)
+                    Text(line).font(.footnote).foregroundStyle(.subdued)
                 }
             }
             ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
                 VStack(alignment: .leading, spacing: 6) {
                     Text(section.title.uppercased())
                         .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.subdued)
                     VStack(spacing: 0) {
                         ForEach(Array(section.rows.enumerated()), id: \.offset) { index, row in
                             rowView(row)
@@ -63,7 +63,7 @@ private struct ReportImageView: View {
             if row.isPreformatted {
                 VStack(alignment: .leading, spacing: 4) {
                     if !row.label.isEmpty {
-                        Text(row.label).foregroundStyle(.secondary)
+                        Text(row.label).foregroundStyle(.subdued)
                     }
                     Text(row.value).font(.system(.footnote, design: .monospaced))
                 }
@@ -73,7 +73,7 @@ private struct ReportImageView: View {
                     Text(row.label)
                     Spacer(minLength: 8)
                     Text(row.value)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.subdued)
                         .multilineTextAlignment(.trailing)
                 }
             }

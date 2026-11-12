@@ -18,6 +18,7 @@ struct ExportMenu: View {
             Image(systemName: "square.and.arrow.up")
         }
         .accessibilityLabel("Share")
+        .accessibilityIdentifier("share")
     }
 }
 

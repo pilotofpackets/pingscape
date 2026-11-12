@@ -74,7 +74,7 @@ struct LinkRow<Value: Hashable>: View {
                 Spacer(minLength: 8)
                 if let detail {
                     Text(detail)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.subdued)
                         .multilineTextAlignment(.trailing)
                 }
                 Image(systemName: "chevron.right")

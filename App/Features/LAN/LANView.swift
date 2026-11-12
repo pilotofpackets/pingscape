@@ -117,7 +117,7 @@ struct LANView: View {
     private func footnote(_ text: LocalizedStringResource) -> some View {
         Text(text)
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.subdued)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 4)
     }
@@ -153,6 +153,7 @@ struct LANView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
+                .accessibilityIdentifier("lan.search")
             }
             if lan.isCapped {
                 footnote("The network is large. Only \(LANScanner.addressLimit) addresses around this device are searched.")
@@ -177,7 +178,7 @@ struct LANView: View {
                     if let progress = lan.progress, lan.phase == .searching {
                         Text("\(progress.done) / \(progress.total)")
                             .monospacedDigit()
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.subdued)
                     }
                 }
                 if let progress = lan.progress, lan.phase == .searching {
@@ -304,7 +305,7 @@ private struct DeviceRow: View {
         VStack(alignment: .leading, spacing: 2) {
             Text(shownTitle)
             if !subtitle.isEmpty {
-                Text(verbatim: subtitle).font(.footnote).foregroundStyle(.secondary)
+                Text(verbatim: subtitle).font(.footnote).foregroundStyle(.subdued)
             }
         }
     }
@@ -312,7 +313,7 @@ private struct DeviceRow: View {
     private var address: some View {
         Text(mask.shown(device.ip))
             .font(.system(.body, design: .monospaced))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.subdued)
     }
 
     var body: some View {
@@ -331,6 +332,7 @@ private struct DeviceRow: View {
         }
         .contextMenu { RowCopyMenu(value: device.ip) }
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("lan.device.\(device.ip)")
         // What is on screen: hidden names and addresses stay hidden in a copy.
         .recordRow(label: LocalizedStringResource(stringLiteral: shownTitle), value: mask.shown(device.ip))
     }

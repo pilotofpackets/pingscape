@@ -2104,41 +2104,6 @@
         }
       }
     },
-    "Coming soon." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kommt bald."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coming soon."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Próximamente."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bientôt disponible."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prossimamente."
-          }
-        }
-      }
-    },
     "Common ports (%lld)" : {
       "localizations" : {
         "de" : {
@@ -2613,41 +2578,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Connessione dati"
-          }
-        }
-      }
-    },
-    "Data SIM" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daten-SIM"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data SIM"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SIM de datos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SIM de données"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SIM dati"
           }
         }
       }
@@ -3681,41 +3611,6 @@
         }
       }
     },
-    "Everything runs on your device. Nothing is collected or sent anywhere." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alles läuft auf deinem Gerät. Es wird nichts gesammelt oder irgendwohin gesendet."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Everything runs on your device. Nothing is collected or sent anywhere."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todo se ejecuta en tu dispositivo. No se recopila ni se envía nada."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tout s’exécute sur votre appareil. Rien n’est collecté ni envoyé."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tutto viene eseguito sul tuo dispositivo. Non viene raccolto né inviato nulla."
-          }
-        }
-      }
-    },
     "Everything runs on your device. Requests to the internet happen only when you allow or start them, and only to the servers listed under Licenses and sources." : {
       "localizations" : {
         "de" : {
@@ -4331,41 +4226,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Per questo Pingscape interroga due servizi su Internet: ipify (ipify.org, con icanhazip.com come riserva) per il tuo indirizzo IP pubblico e RIPEstat (RIPE NCC) per il provider e l’organizzazione. Ciascuno vede il tuo indirizzo IP pubblico, come per qualsiasi richiesta, e non viene inviato altro. Non abbiamo un server nostro. Puoi cambiare questa scelta in qualsiasi momento in Info."
-          }
-        }
-      }
-    },
-    "For this, Pingscape asks two services on the internet: ipify (ipify.org) for your public IP address, and RIPEstat (RIPE NCC) for the provider and organization. Each of them sees your public IP address, as with any request, and nothing else is sent. There is no server of ours. You can change this at any time under About." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dafür fragt Pingscape zwei Dienste im Internet: ipify (ipify.org) nach deiner öffentlichen IP-Adresse und RIPEstat (RIPE NCC) nach Provider und Organisation. Beide sehen deine öffentliche IP-Adresse, wie bei jeder Anfrage, sonst wird nichts gesendet. Einen Server von uns gibt es nicht. Ändern kannst du das jederzeit unter Über."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "For this, Pingscape asks two services on the internet: ipify (ipify.org) for your public IP address, and RIPEstat (RIPE NCC) for the provider and organization. Each of them sees your public IP address, as with any request, and nothing else is sent. There is no server of ours. You can change this at any time under About."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Para ello, Pingscape consulta dos servicios de internet: ipify (ipify.org) para tu dirección IP pública y RIPEstat (RIPE NCC) para el proveedor y la organización. Cada uno ve tu dirección IP pública, como en cualquier petición, y no se envía nada más. No tenemos servidor propio. Puedes cambiarlo en cualquier momento en Acerca de."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pour cela, Pingscape interroge deux services sur Internet : ipify (ipify.org) pour votre adresse IP publique et RIPEstat (RIPE NCC) pour le fournisseur et l’organisation. Chacun voit votre adresse IP publique, comme pour toute requête, et rien d’autre n’est envoyé. Nous n’avons pas de serveur. Vous pouvez modifier ce choix à tout moment dans À propos."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Per questo Pingscape interroga due servizi su Internet: ipify (ipify.org) per il tuo indirizzo IP pubblico e RIPEstat (RIPE NCC) per il provider e l’organizzazione. Ciascuno vede il tuo indirizzo IP pubblico, come per qualsiasi richiesta, e non viene inviato altro. Non abbiamo un server nostro. Puoi cambiare questa scelta in qualsiasi momento in Info."
           }
         }
       }
@@ -8691,41 +8551,6 @@
         }
       }
     },
-    "Only needed to read the name of your Wi-Fi network. Pingscape does not use your location." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nur nötig, um den Namen deines WLANs zu lesen. Pingscape nutzt deinen Standort nicht."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Only needed to read the name of your Wi-Fi network. Pingscape does not use your location."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solo hace falta para leer el nombre de tu red Wi-Fi. Pingscape no usa tu ubicación."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nécessaire uniquement pour lire le nom de votre réseau Wi-Fi. Pingscape n’utilise pas votre position."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Serve solo per leggere il nome della tua rete Wi-Fi. Pingscape non usa la tua posizione."
-          }
-        }
-      }
-    },
     "Only scan devices that belong to you or that you have permission to scan. Outside your own network only the common ports are scanned." : {
       "localizations" : {
         "de" : {
@@ -9028,41 +8853,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Altro"
-          }
-        }
-      }
-    },
-    "Other SIM" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weitere SIM"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Other SIM"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Otra SIM"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autre SIM"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Altra SIM"
           }
         }
       }
@@ -15565,41 +15355,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "tramite rete cellulare"
-          }
-        }
-      }
-    },
-    "via Cellular (%@)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "über Mobilfunk (%@)"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "via Cellular (%@)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vía red móvil (%@)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "via le réseau cellulaire (%@)"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "tramite rete cellulare (%@)"
           }
         }
       }

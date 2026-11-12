@@ -34,5 +34,6 @@ struct KeyboardDoneBarButton: View {
                 .glassSurface(cornerRadius: 25)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("keyboard.done")
     }
 }

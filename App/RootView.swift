@@ -69,6 +69,7 @@ struct RootView: View {
 /// public address and the provider? Asked once, and it can be changed under About.
 struct ExternalPromptSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(AppSettings.self) private var settings
 
     var body: some View {
@@ -83,7 +84,7 @@ struct ExternalPromptSheet: View {
                 Text(
                     "For this, Pingscape asks two services on the internet: ipify (ipify.org, with icanhazip.com as a backup) for your public IP address, and RIPEstat (RIPE NCC) for the provider and organization. Each of them sees your public IP address, as with any request, and nothing else is sent. There is no server of ours. You can change this at any time under About."
                 )
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
                 Button {
                     settings.externalLookups = true
                     settings.externalPromptShown = true
@@ -93,6 +94,7 @@ struct ExternalPromptSheet: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
+                .accessibilityIdentifier("externalPrompt.yes")
                 Button {
                     settings.externalPromptShown = true
                     dismiss()
@@ -101,10 +103,13 @@ struct ExternalPromptSheet: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
+                .accessibilityIdentifier("externalPrompt.no")
             }
             .padding(24)
         }
-        .presentationDetents([.medium, .large])
+        // At the accessibility sizes half a screen showed the title and two
+        // words, with both buttons far below; there it opens in full.
+        .presentationDetents(dynamicTypeSize.isAccessibilitySize ? [.large] : [.medium, .large])
         .interactiveDismissDisabled()
     }
 }

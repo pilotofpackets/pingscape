@@ -18,6 +18,7 @@ struct OnboardingView: View {
                 if page < Self.pageCount - 1 {
                     Button("Skip", action: onFinish)
                         .font(.subheadline.weight(.semibold))
+                        .accessibilityIdentifier("onboarding.skip")
                 }
             }
             .frame(height: 20)
@@ -47,6 +48,7 @@ struct OnboardingView: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
+            .accessibilityIdentifier("onboarding.next")
             .padding(.horizontal, 24)
             .padding(.top, 12)
             .padding(.bottom, 16)
@@ -76,7 +78,7 @@ private struct OnboardingPage<Diagram: View>: View {
                     .font(.title2.bold())
                     .multilineTextAlignment(.center)
                 Text(message)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .multilineTextAlignment(.center)
                 diagram
                     .padding(.top, 6)
@@ -97,15 +99,23 @@ private struct WelcomePage: View {
             message:
                 "Pingscape shows what is going on with this connection — on this iPhone, in the local network, and on the internet. A short tour of what's here."
         ) {
-            HStack(spacing: 18) {
-                stop("square.grid.2x2", "Overview")
-                stop("network", "LAN")
-                stop("waveform.path.ecg", "Live")
-                stop("wrench.and.screwdriver", "Tools")
-                stop("info.circle", "About")
+            // In one row while it fits. At the accessibility sizes the row was
+            // wider than the screen and cut the paragraph above at both edges.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 18) { stops }
+                FlowLayout(spacing: 18) { stops }
             }
             .padding(.top, 8)
         }
+    }
+
+    @ViewBuilder
+    private var stops: some View {
+        stop("square.grid.2x2", "Overview")
+        stop("network", "LAN")
+        stop("waveform.path.ecg", "Live")
+        stop("wrench.and.screwdriver", "Tools")
+        stop("info.circle", "About")
     }
 
     private func stop(_ symbol: String, _ title: LocalizedStringResource) -> some View {
@@ -116,7 +126,7 @@ private struct WelcomePage: View {
                 .accessibilityHidden(true)
             Text(title)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
         }
         .accessibilityElement(children: .combine)
     }
@@ -233,7 +243,7 @@ private struct PrivacyPage: View {
                 }
                 Text("You can watch this introduction again any time, under About.")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
                     .padding(.top, 4)
@@ -290,13 +300,13 @@ private struct RowLine: View {
     var body: some View {
         ViewThatFits(in: .horizontal) {
             HStack(alignment: .firstTextBaseline, spacing: 16) {
-                Text(label).foregroundStyle(.secondary)
+                Text(label).foregroundStyle(.subdued)
                 Spacer(minLength: 8)
                 valueText.multilineTextAlignment(.trailing)
             }
             .fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 2) {
-                Text(label).font(.footnote).foregroundStyle(.secondary)
+                Text(label).font(.footnote).foregroundStyle(.subdued)
                 valueText
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -316,7 +326,7 @@ private struct Callout: View {
                 .accessibilityHidden(true)
             Text(text)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }

@@ -102,7 +102,7 @@ struct DNSProxyView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("A server with no answer may be on your local network (most home routers). That needs the \"Local network\" permission, which is off for Pingscape. Allow it in Settings.")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
             }
