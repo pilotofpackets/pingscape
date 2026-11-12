@@ -3,34 +3,49 @@
   "strings": {
     "Network status in ${applicationName}": {
       "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Netzwerkstatus in ${applicationName}\n${applicationName} Netzwerkstatus"
-          }
-        },
         "en": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Network status in ${applicationName}\n${applicationName} network status"
+            "values": [
+              "Network status in ${applicationName}",
+              "${applicationName} network status"
+            ]
           }
         },
-        "es": {
-          "stringUnit": {
+        "de": {
+          "stringSet": {
             "state": "translated",
-            "value": "Estado de la red en ${applicationName}\nEstado de red de ${applicationName}"
+            "values": [
+              "Netzwerkstatus in ${applicationName}",
+              "${applicationName} Netzwerkstatus"
+            ]
           }
         },
         "fr": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "État du réseau dans ${applicationName}\nÉtat du réseau ${applicationName}"
+            "values": [
+              "État du réseau dans ${applicationName}",
+              "État du réseau ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Estado de la red en ${applicationName}",
+              "Estado de red de ${applicationName}"
+            ]
           }
         },
         "it": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Stato della rete in ${applicationName}\nStato della rete di ${applicationName}"
+            "values": [
+              "Stato della rete in ${applicationName}",
+              "Stato della rete di ${applicationName}"
+            ]
           }
         }
       }
@@ -38,33 +53,48 @@
     "Is a VPN active in ${applicationName}": {
       "localizations": {
         "de": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Ist ein VPN aktiv in ${applicationName}\n${applicationName} VPN-Status"
+            "values": [
+              "Ist ein VPN aktiv in ${applicationName}",
+              "${applicationName} VPN-Status"
+            ]
           }
         },
         "en": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Is a VPN active in ${applicationName}\n${applicationName} VPN status"
+            "values": [
+              "Is a VPN active in ${applicationName}",
+              "${applicationName} VPN status"
+            ]
           }
         },
         "es": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "VPN activa en ${applicationName}\nEstado de la VPN de ${applicationName}"
+            "values": [
+              "VPN activa en ${applicationName}",
+              "Estado de la VPN de ${applicationName}"
+            ]
           }
         },
         "fr": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "VPN actif dans ${applicationName}\nStatut VPN ${applicationName}"
+            "values": [
+              "VPN actif dans ${applicationName}",
+              "Statut VPN ${applicationName}"
+            ]
           }
         },
         "it": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "VPN attiva in ${applicationName}\nStato VPN di ${applicationName}"
+            "values": [
+              "VPN attiva in ${applicationName}",
+              "Stato VPN di ${applicationName}"
+            ]
           }
         }
       }
@@ -72,33 +102,366 @@
     "Ping a host with ${applicationName}": {
       "localizations": {
         "de": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Mit ${applicationName} einen Host anpingen"
+            "values": [
+              "Mit ${applicationName} einen Host anpingen"
+            ]
           }
         },
         "en": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Ping a host with ${applicationName}"
+            "values": [
+              "Ping a host with ${applicationName}"
+            ]
           }
         },
         "es": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Hacer ping a un host con ${applicationName}"
+            "values": [
+              "Hacer ping a un host con ${applicationName}"
+            ]
           }
         },
         "fr": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Envoyer un ping à un hôte avec ${applicationName}"
+            "values": [
+              "Envoyer un ping à un hôte avec ${applicationName}"
+            ]
           }
         },
         "it": {
-          "stringUnit": {
+          "stringSet": {
             "state": "translated",
-            "value": "Fai il ping a un host con ${applicationName}"
+            "values": [
+              "Fai il ping a un host con ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "What is my ${value} in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "What is my ${value} in ${applicationName}",
+              "${value} in ${applicationName}",
+              "Get network value with ${applicationName}"
+            ]
+          }
+        },
+        "de": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "${value} in ${applicationName}",
+              "Zeig ${value} in ${applicationName}",
+              "Netzwerkwert mit ${applicationName} abrufen"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "${value} dans ${applicationName}",
+              "Affiche ${value} dans ${applicationName}",
+              "Obtenir une valeur réseau avec ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "${value} en ${applicationName}",
+              "Muestra ${value} en ${applicationName}",
+              "Obtener un valor de red con ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "${value} in ${applicationName}",
+              "Mostra ${value} in ${applicationName}",
+              "Ottieni un valore di rete con ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Look up DNS records with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Look up DNS records with ${applicationName}",
+              "DNS lookup in ${applicationName}"
+            ]
+          }
+        },
+        "de": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "DNS-Einträge mit ${applicationName} abfragen",
+              "DNS-Abfrage in ${applicationName}"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Rechercher des enregistrements DNS avec ${applicationName}",
+              "Requête DNS dans ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Consultar registros DNS con ${applicationName}",
+              "Consulta DNS en ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Cerca record DNS con ${applicationName}",
+              "Ricerca DNS in ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Check a port with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Check a port with ${applicationName}"
+            ]
+          }
+        },
+        "de": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Port mit ${applicationName} prüfen"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Vérifier un port avec ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Comprobar un puerto con ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Controlla una porta con ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Check a certificate with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Check a certificate with ${applicationName}"
+            ]
+          }
+        },
+        "de": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Zertifikat mit ${applicationName} prüfen"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Vérifier un certificat avec ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Comprobar un certificado con ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Controlla un certificato con ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Check a website with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Check a website with ${applicationName}"
+            ]
+          }
+        },
+        "de": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Website mit ${applicationName} prüfen"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Vérifier un site web avec ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Comprobar un sitio web con ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Controlla un sito web con ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Trace a route with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Trace a route with ${applicationName}"
+            ]
+          }
+        },
+        "de": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Route mit ${applicationName} verfolgen"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Tracer une route avec ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Trazar una ruta con ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Traccia un percorso con ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Check the clock with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Check the clock with ${applicationName}"
+            ]
+          }
+        },
+        "de": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Uhr mit ${applicationName} prüfen"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Vérifier l’horloge avec ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Comprobar el reloj con ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Controlla l’orologio con ${applicationName}"
+            ]
           }
         }
       }

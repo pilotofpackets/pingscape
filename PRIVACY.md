@@ -27,15 +27,17 @@ Each of these servers sees your public IP address, as with any internet request.
 
 **Only when you start them.** Every tool sends what you typed and nothing else:
 
-- Ping, traceroute, ports, TLS, HTTP timing and DNS go to the target you entered, and DNS to the server you chose (your system's, 1.1.1.1, 8.8.8.8, 9.9.9.9 or your own). Encrypted, it goes to the same providers: over TLS to `one.one.one.one`, `dns.google` or `dns.quad9.net`, over HTTPS to `cloudflare-dns.com`, `dns.google` or `dns.quad9.net`. "Compare servers" sends the same question to all of them at once.
+- Ping, traceroute, ports, TLS, HTTP timing, dual stack and DNS go to the target you entered, and DNS to the server you chose (your system's, 1.1.1.1, 8.8.8.8, 9.9.9.9 or your own). Encrypted, it goes to the same providers: over TLS to `one.one.one.one`, `dns.google` or `dns.quad9.net`, over HTTPS to `cloudflare-dns.com`, `dns.google` or `dns.quad9.net`. "Compare servers" sends the same question to all of them at once.
 - Traceroute asks your DNS server for the names of the routers on the way, unless you switch that off.
+- NAT sends a STUN request to `stun.cloudflare.com`, `stun.l.google.com` and `stun1.l.google.com`, and to your own STUN server if you entered one. They see the public address and port the request came from and send them back.
+- NTP asks `time.apple.com`, `time.cloudflare.com` and `pool.ntp.org` for the time, and your own time server if you entered one. The request carries only the time it was sent.
 - Whois goes to `whois.iana.org` and on to the registry responsible for the name. RDAP goes to `data.iana.org` (which registry answers) and then to that registry.
 - "Check internet" in the External page asks `captive.apple.com`.
 - The optional internet ping in the Live tab (off by default) pings the host you enter, once a second.
 
 **On your local network.** The device search pings addresses of your own network and listens for Bonjour, including for service types beyond the ones built into the app, using Apple's multicast networking entitlement. It also sends an SSDP search to the multicast address `239.255.255.250` to find UPnP devices (routers, media servers, printers) and asks each one that answers, and the router's own address directly, for its UPnP description. This never leaves your network.
 
-**Shortcuts and widget.** The Shortcuts actions (network status, VPN check, ping) run when you start them and return their result to you. The status widget reads whether the device is online, over what and whether a VPN is active, and shows the time it was read. Neither sends anything anywhere except the ping you ask for.
+**Shortcuts, Siri, widgets and Control Center.** The Shortcuts actions (network status and values, network details, VPN check, ping, DNS lookup, port check, certificate expiry, website check, traceroute, path MTU, clock check) run only when you start them and return their result to you. Actions that show addresses or network names need an unlocked device. With "Hide values by default" on, Siri says a placeholder instead of an address or name; the shortcut still gets the real value, as Copy does in the app. When you talk to Siri, Apple processes the request; Pingscape only receives the action and its values. The public address and the provider are only asked for when external requests are on. The widgets read the values you choose (for example online state, IP address, Wi-Fi name, ping time), show the time they were read and hide addresses and names while the device is locked. The Control Center controls read the connection type and open the app. None of them send anything anywhere except the measurement you ask for (ping, DNS, port, TLS, HTTP, traceroute, NTP) and, with your consent, the public address lookup.
 
 The full policy, in English and German, is on the website: `pingscape.app/privacy.html`.
 

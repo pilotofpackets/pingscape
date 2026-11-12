@@ -9,6 +9,8 @@ struct AboutView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(PrivacyMask.hideByDefaultKey) private var hideByDefault = false
     @State private var showsOnboarding = false
+    /// `-demo -demo-tab about -demo-about shortcuts` opens the Shortcuts and Siri page.
+    @State private var showsShortcutsHelp = DemoLaunch.value(after: "-demo-about") == "shortcuts"
 
     private static let repository = URL(string: "https://github.com/pilotofpackets/pingscape")!
     private static let issues = URL(string: "https://github.com/pilotofpackets/pingscape/issues")!
@@ -66,6 +68,7 @@ struct AboutView: View {
                 }
                 permissions
                 Section("More") {
+                    NavigationLink("Shortcuts and Siri") { ShortcutsHelpView() }
                     Button("Show introduction again") { showsOnboarding = true }
                         .accessibilityIdentifier("about.intro")
                     NavigationLink("Diagnostic dump") { DiagnosticDumpView() }
@@ -92,6 +95,7 @@ struct AboutView: View {
                 }
             }
             .navigationTitle("About")
+            .navigationDestination(isPresented: $showsShortcutsHelp) { ShortcutsHelpView() }
             .pingscapeCloseButton()
             .fullScreenCover(isPresented: $showsOnboarding) {
                 OnboardingView { showsOnboarding = false }

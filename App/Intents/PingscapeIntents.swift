@@ -3,12 +3,10 @@ import Foundation
 import NetKit
 
 // Shortcuts and Siri. The actions only read: they run when the user starts
-// them, return a value and change nothing. No widget or background task
-// polls the network on its own.
+// them, return a value and change nothing. No background task polls the
+// network on its own. More actions: NetworkValueIntents.swift, ToolIntents.swift.
 
-private func currentSnapshot() async -> NetworkSnapshot {
-    await LiveSnapshotProvider(locationAuthorized: { LocationAccess.isAuthorized }).snapshot()
-}
+private func currentSnapshot() async -> NetworkSnapshot { await IntentSupport.snapshot() }
 
 struct NetworkStatusIntent: AppIntent {
     static let title: LocalizedStringResource = "Network status"
@@ -46,7 +44,7 @@ struct PingIntent: AppIntent {
     static let description = IntentDescription("Sends echo requests to a host and returns the round trip in milliseconds.")
     static let openAppWhenRun = false
 
-    @Parameter(title: "Host", description: "A host name or IP address")
+    @Parameter(title: "Host", description: "A host name or IP address", requestValueDialog: "Which host?")
     var host: String
 
     static var parameterSummary: some ParameterSummary { Summary("Ping \(\.$host)") }
@@ -83,12 +81,21 @@ struct PingIntent: AppIntent {
     }
 }
 
+/// What Siri knows without setting anything up. Apple allows ten; the other
+/// actions (network details, path MTU) are in the Shortcuts app.
 struct PingscapeShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
             intent: NetworkStatusIntent(),
             phrases: ["Network status in \(.applicationName)", "\(.applicationName) network status"],
             shortTitle: "Network status", systemImageName: "network")
+        AppShortcut(
+            intent: GetNetworkValueIntent(),
+            phrases: [
+                "What is my \(\.$value) in \(.applicationName)", "\(\.$value) in \(.applicationName)",
+                "Get network value with \(.applicationName)",
+            ],
+            shortTitle: "Get network value", systemImageName: "list.bullet.rectangle")
         AppShortcut(
             intent: VPNActiveIntent(),
             phrases: ["Is a VPN active in \(.applicationName)", "\(.applicationName) VPN status"],
@@ -97,5 +104,29 @@ struct PingscapeShortcuts: AppShortcutsProvider {
             intent: PingIntent(),
             phrases: ["Ping a host with \(.applicationName)"],
             shortTitle: "Ping a host", systemImageName: "dot.radiowaves.left.and.right")
+        AppShortcut(
+            intent: DNSLookupIntent(),
+            phrases: ["Look up DNS records with \(.applicationName)", "DNS lookup in \(.applicationName)"],
+            shortTitle: "Look up DNS records", systemImageName: "server.rack")
+        AppShortcut(
+            intent: CheckPortIntent(),
+            phrases: ["Check a port with \(.applicationName)"],
+            shortTitle: "Check a port", systemImageName: "door.left.hand.open")
+        AppShortcut(
+            intent: CertificateExpiryIntent(),
+            phrases: ["Check a certificate with \(.applicationName)"],
+            shortTitle: "Certificate expiry", systemImageName: "lock.doc")
+        AppShortcut(
+            intent: HTTPCheckIntent(),
+            phrases: ["Check a website with \(.applicationName)"],
+            shortTitle: "Check a website", systemImageName: "stopwatch")
+        AppShortcut(
+            intent: TracerouteIntent(),
+            phrases: ["Trace a route with \(.applicationName)"],
+            shortTitle: "Traceroute", systemImageName: "point.topleft.down.to.point.bottomright.curvepath")
+        AppShortcut(
+            intent: ClockOffsetIntent(),
+            phrases: ["Check the clock with \(.applicationName)"],
+            shortTitle: "Check the clock", systemImageName: "clock")
     }
 }

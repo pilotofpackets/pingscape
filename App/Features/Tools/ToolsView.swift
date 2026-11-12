@@ -11,6 +11,9 @@ extension ToolKind {
         case .ports: "Ports"
         case .tls: "TLS"
         case .http: "HTTP"
+        case .dualstack: "Dual stack"
+        case .ntp: "NTP"
+        case .nat: "NAT"
         case .subnet: "Subnet"
         case .oui: "OUI"
         }
@@ -31,6 +34,9 @@ struct ToolsView: View {
     @State private var ports: PortsModel
     @State private var tls: TLSModel
     @State private var http: HTTPModel
+    @State private var nat: NATModel
+    @State private var ntp: NTPModel
+    @State private var dualstack: DualStackModel
     @State private var subnetInput = ""
     @State private var ouiInput = ""
     @State private var keyboardShown = false
@@ -45,6 +51,9 @@ struct ToolsView: View {
         _ports = State(initialValue: demo ? .demo() : PortsModel())
         _tls = State(initialValue: demo ? .demo() : TLSModel())
         _http = State(initialValue: demo ? .demo() : HTTPModel())
+        _nat = State(initialValue: demo ? .demo() : NATModel())
+        _ntp = State(initialValue: demo ? .demo() : NTPModel())
+        _dualstack = State(initialValue: demo ? .demo() : DualStackModel())
         _subnetInput = State(initialValue: demo ? "192.168.178.42/24" : "")
         _ouiInput = State(initialValue: demo ? "3C:A6:2F:1B:D3:22" : "")
     }
@@ -105,7 +114,7 @@ struct ToolsView: View {
     }
 
     private func stopAll() {
-        let controls: [any ToolControl] = [ping, traceroute, dns, whois, ports, tls, http]
+        let controls: [any ToolControl] = [ping, traceroute, dns, whois, ports, tls, http, nat, ntp, dualstack]
         for control in controls where control.isRunning { control.stop() }
     }
 
@@ -197,6 +206,9 @@ struct ToolsView: View {
         case .ports: PortsView(model: ports, history: history)
         case .tls: TLSView(model: tls, history: history)
         case .http: HTTPView(model: http, history: history)
+        case .nat: NATView(model: nat, history: history)
+        case .ntp: NTPView(model: ntp, history: history)
+        case .dualstack: DualStackView(model: dualstack, history: history)
         case .subnet: SubnetView(input: $subnetInput)
         case .oui: OUIView(input: $ouiInput)
         }
@@ -211,6 +223,9 @@ struct ToolsView: View {
         case .ports: ports
         case .tls: tls
         case .http: http
+        case .nat: nat
+        case .ntp: ntp
+        case .dualstack: dualstack
         case .subnet, .oui: nil
         }
     }
@@ -220,6 +235,11 @@ struct ToolsView: View {
     /// A device in the LAN list opens a tool with its address filled in.
     private func apply(_ request: ToolRequest) {
         selected = request.tool
+        // A deep link only picks the tool and keeps what was typed.
+        guard !request.target.isEmpty else {
+            navigation.toolRequest = nil
+            return
+        }
         switch request.tool {
         case .ping: ping.input = request.target
         case .traceroute: traceroute.input = request.target
@@ -230,7 +250,7 @@ struct ToolsView: View {
         case .whois: whois.input = request.target
         case .tls: tls.input = request.target
         case .http: http.input = request.target
-        case .subnet, .oui: break
+        case .dualstack, .ntp, .nat, .subnet, .oui: break
         }
         navigation.toolRequest = nil
     }

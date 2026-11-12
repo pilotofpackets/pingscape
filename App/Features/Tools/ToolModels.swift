@@ -215,11 +215,24 @@ final class PingModel: ToolControl {
 
 // MARK: Traceroute
 
+enum TracerouteMode: Hashable {
+    /// Each hop once, three probes.
+    case once
+    /// Round after round until stopped, like `mtr`.
+    case continuous
+}
+
 @MainActor
 @Observable
 final class TracerouteModel: ToolControl {
     var input = ""
+    var mode = TracerouteMode.once
     var resolveNames = true
+    // Continuous
+    private(set) var mtrHops: [MTRHop] = []
+    private(set) var mtrRounds = 0
+    private(set) var mtrReached = false
+    private(set) var namesByAddress: [String: String] = [:]
     private(set) var isRunning = false
     private(set) var failure: ToolFailure?
     private(set) var address: ResolvedAddress?
@@ -245,7 +258,12 @@ final class TracerouteModel: ToolControl {
         names = [:]
         reachedTarget = nil
         address = nil
+        mtrHops = []
+        mtrRounds = 0
+        mtrReached = false
+        namesByAddress = [:]
         let resolveNames = resolveNames
+        let mode = mode
         task = Task {
             guard let target = (try? await HostResolver.resolve(host))?.first else {
                 if !Task.isCancelled { failure = .tool(.cannotResolve) }
@@ -255,6 +273,22 @@ final class TracerouteModel: ToolControl {
             address = target
             var settings = TracerouteSettings()
             settings.resolveNames = resolveNames
+            if mode == .continuous {
+                settings.timeoutSeconds = 1
+                for await event in MTRTool.run(address: target, settings: settings) {
+                    switch event {
+                    case .started: break
+                    case .round(let number, let hops, let reached):
+                        mtrRounds = number
+                        mtrHops = hops
+                        mtrReached = reached
+                    case .name(let address, let name): namesByAddress[address] = name
+                    case .failed(let error): failure = .from(error, target: target)
+                    }
+                }
+                if !Task.isCancelled { isRunning = false }
+                return
+            }
             for await event in TracerouteTool.run(address: target, settings: settings) {
                 switch event {
                 case .started: break
@@ -287,6 +321,28 @@ final class TracerouteModel: ToolControl {
         ]
         model.names = [1: "fritz.box", 2: "edge1.example.net", 5: "one.one.one.one"]
         model.reachedTarget = true
+        if DemoLaunch.value(after: "-demo-traceroute") == "mtr" {
+            model.mode = .continuous
+            model.mtrRounds = 60
+            model.mtrReached = true
+            model.namesByAddress = ["192.168.178.1": "fritz.box", "1.1.1.1": "one.one.one.one"]
+            func hop(_ number: Int, _ address: String?, lost: Int, _ times: [Double]) -> MTRHop {
+                var hop = MTRHop(number: number)
+                for index in 0..<60 {
+                    if index < lost || address == nil { hop.record(nil) } else {
+                        hop.record((address!, times[index % times.count]))
+                    }
+                }
+                return hop
+            }
+            model.mtrHops = [
+                hop(1, "192.168.178.1", lost: 0, [2.1, 2.4, 1.9]),
+                hop(2, "203.0.113.1", lost: 0, [9.2, 9.8, 11.4]),
+                hop(3, nil, lost: 60, []),
+                hop(4, "198.51.100.14", lost: 9, [12.5, 13.1, 18.9]),
+                hop(5, "1.1.1.1", lost: 0, [12.9, 12.6, 13.4]),
+            ]
+        }
         return model
     }
 }
@@ -846,11 +902,18 @@ final class HTTPModel: ToolControl {
             HTTPTimingStep(
                 id: 0, url: "http://example.com/", statusCode: 301, networkProtocol: "http/1.1",
                 remoteAddress: "93.184.216.34", remotePort: 80, dnsMilliseconds: 14, tcpMilliseconds: 21,
-                tlsMilliseconds: nil, waitMilliseconds: 24, totalMilliseconds: 61),
+                tlsMilliseconds: nil, waitMilliseconds: 24, totalMilliseconds: 61,
+                headers: [HTTPHeader(name: "Location", value: "https://example.com/")]),
             HTTPTimingStep(
                 id: 1, url: "https://example.com/", statusCode: 200, networkProtocol: "h2",
                 remoteAddress: "93.184.216.34", remotePort: 443, dnsMilliseconds: 0.5, tcpMilliseconds: 20,
-                tlsMilliseconds: 31, waitMilliseconds: 30, totalMilliseconds: 82),
+                tlsMilliseconds: 31, waitMilliseconds: 30, totalMilliseconds: 82,
+                headers: [
+                    HTTPHeader(name: "Cache-Control", value: "max-age=3600"),
+                    HTTPHeader(name: "Content-Type", value: "text/html; charset=utf-8"),
+                    HTTPHeader(name: "Server", value: "ECS (nyd/D11E)"),
+                    HTTPHeader(name: "Strict-Transport-Security", value: "max-age=31536000"),
+                ]),
         ]
         return model
     }

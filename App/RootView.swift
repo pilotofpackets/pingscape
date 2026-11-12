@@ -25,6 +25,10 @@ struct RootView: View {
             Tab("About", systemImage: "info.circle", value: AppTab.about) { AboutView() }
         }
         .tabViewStyle(.sidebarAdaptable)
+        // Widgets and Control Center open a page with `pingscape://…`.
+        .onOpenURL { url in
+            if let page = AppPage(url: url) { navigation.open(page) }
+        }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
             Task {

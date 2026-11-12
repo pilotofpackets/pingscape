@@ -281,3 +281,186 @@ struct LoopbackToolTests {
         #expect(found == ["127.0.0.1"])
     }
 }
+
+@Suite("STUN")
+struct STUNTests {
+    private let transaction: [UInt8] = Array(1...12)
+
+    /// A binding success response with one attribute.
+    private func response(type: UInt16, value: [UInt8], transaction: [UInt8]? = nil) -> [UInt8] {
+        let attribute = [UInt8(type >> 8), UInt8(type & 0xFF), 0, UInt8(value.count)] + value
+        return [0x01, 0x01, 0, UInt8(attribute.count), 0x21, 0x12, 0xA4, 0x42] + (transaction ?? self.transaction)
+            + attribute
+    }
+
+    @Test func buildsABindingRequest() {
+        let request = STUNMessage.bindingRequest(transactionID: transaction)
+        #expect(request.count == 20)
+        #expect(Array(request[0..<8]) == [0, 1, 0, 0, 0x21, 0x12, 0xA4, 0x42])
+    }
+
+    @Test func readsAnXORMappedIPv4Address() {
+        // 203.0.113.5:40000, XORed with the cookie: port ^ 0x2112, address ^ 21 12 A4 42.
+        let value: [UInt8] = [0, 1, 0x9C ^ 0x21, 0x40 ^ 0x12, 203 ^ 0x21, 0 ^ 0x12, 113 ^ 0xA4, 5 ^ 0x42]
+        let found = STUNMessage.mappedAddress(in: response(type: 0x0020, value: value), transactionID: transaction)
+        #expect(found?.address == "203.0.113.5")
+        #expect(found?.port == 40000)
+        // Another transaction's answer is not ours.
+        #expect(STUNMessage.mappedAddress(in: response(type: 0x0020, value: value), transactionID: Array(repeating: 0, count: 12)) == nil)
+    }
+
+    @Test func readsAnXORMappedIPv6Address() {
+        let address: [UInt8] = [0x20, 0x01, 0x0D, 0xB8] + Array(repeating: 0, count: 11) + [1]
+        let key: [UInt8] = [0x21, 0x12, 0xA4, 0x42] + transaction
+        let xored = zip(address, key).map { $0 ^ $1 }
+        let value: [UInt8] = [0, 2, 0x13 ^ 0x21, 0x88 ^ 0x12] + xored
+        let found = STUNMessage.mappedAddress(in: response(type: 0x0020, value: value), transactionID: transaction)
+        #expect(found?.address == "2001:db8::1")
+        #expect(found?.port == 5000)
+    }
+
+    @Test func fallsBackToThePlainMappedAddress() {
+        let value: [UInt8] = [0, 1, 0x0D, 0x96, 198, 51, 100, 7]
+        let found = STUNMessage.mappedAddress(in: response(type: 0x0001, value: value), transactionID: transaction)
+        #expect(found?.address == "198.51.100.7")
+        #expect(found?.port == 3478)
+    }
+
+    private func mapping(_ server: String, at serverAddress: String, _ address: String, _ port: UInt16) -> STUNMapping {
+        STUNMapping(
+            server: STUNServer(host: server), serverAddress: serverAddress, publicAddress: address, publicPort: port,
+            milliseconds: 10, error: nil)
+    }
+
+    @Test func reportsTheFactsOfAMapping() {
+        let same = STUNReport(
+            localAddress: "192.168.1.20", localPort: 50000,
+            mappings: [mapping("a", at: "192.0.2.1", "203.0.113.5", 50000), mapping("b", at: "192.0.2.2", "203.0.113.5", 50000)])
+        #expect(same.isTranslated == true)
+        #expect(same.keepsPort == true)
+        #expect(same.sameMappingForAllServers == true)
+
+        let changing = STUNReport(
+            localAddress: "192.168.1.20", localPort: 50000,
+            mappings: [mapping("a", at: "192.0.2.1", "203.0.113.5", 61000), mapping("b", at: "192.0.2.2", "203.0.113.5", 61001)])
+        #expect(changing.keepsPort == false)
+        #expect(changing.sameMappingForAllServers == false)
+
+        let direct = STUNReport(
+            localAddress: "2001:db8::20", localPort: 50000,
+            mappings: [mapping("a", at: "2001:db8::1", "2001:db8::20", 50000)])
+        #expect(direct.isTranslated == false)
+        // One server cannot tell whether the mapping depends on the destination.
+        #expect(direct.sameMappingForAllServers == nil)
+    }
+}
+
+@Suite("MTR")
+struct MTRTests {
+    @Test func collectsStatisticsAndEveryAddressOfAHop() {
+        var hop = MTRHop(number: 3)
+        hop.record(("192.0.2.1", 10))
+        hop.record(nil)
+        hop.record(("192.0.2.2", 14))
+        hop.record(("192.0.2.1", 12))
+        #expect(hop.addresses == ["192.0.2.1", "192.0.2.2"])
+        #expect(hop.statistics.sent == 4)
+        #expect(hop.statistics.lostPercent == 25)
+        #expect(hop.statistics.minimum == 10)
+        #expect(hop.last == 12)
+        hop.record(nil)
+        #expect(hop.last == nil)
+    }
+
+    // Needs an ICMP datagram socket, which a locked-down CI machine may not give.
+    @Test(.enabled(if: ICMPEcho.isAvailable())) func tracesTheLoopbackInRounds() async {
+        let loopback = ResolvedAddress(literal: "127.0.0.1")!
+        var last: [MTRHop] = []
+        var reached = false
+        var rounds = 0
+        for await event in MTRTool.run(
+            address: loopback, settings: TracerouteSettings(maximumHops: 5, timeoutSeconds: 1, resolveNames: false),
+            intervalSeconds: 0.05)
+        {
+            if case .round(let number, let hops, let target) = event {
+                rounds = number
+                last = hops
+                reached = target
+                if number == 3 { break }
+            }
+            if case .failed = event { break }
+        }
+        #expect(rounds == 3)
+        #expect(reached)
+        #expect(last.count == 1)
+        #expect(last.first?.addresses == ["127.0.0.1"])
+        #expect(last.first?.statistics.received == 3)
+    }
+}
+
+@Suite("NTP")
+struct NTPTests {
+    @Test func roundTripsATimestamp() {
+        let date = Date(timeIntervalSince1970: 1_794_424_526.25)
+        let back = NTPPacket.date(NTPPacket.timestamp(date)[...])
+        #expect(abs(back.timeIntervalSince(date)) < 0.000_001)
+    }
+
+    @Test func computesOffsetAndDelay() throws {
+        // Sent at 0 s, the server received at 10.050 s and answered at
+        // 10.051 s, back at 0.101 s: 50 ms each way, the server 10 s ahead.
+        let base = Date(timeIntervalSince1970: 1_794_424_500)
+        let sentAt = base
+        let request = NTPPacket.request(sentAt: sentAt)
+        var reply = [UInt8](repeating: 0, count: 48)
+        reply[0] = 0x24  // version 4, mode 4 (server)
+        reply[1] = 1
+        reply.replaceSubrange(12..<16, with: Array("GPS".utf8) + [0])
+        reply.replaceSubrange(24..<32, with: Array(request[40..<48]))
+        reply.replaceSubrange(32..<40, with: NTPPacket.timestamp(base.addingTimeInterval(10.050)))
+        reply.replaceSubrange(40..<48, with: NTPPacket.timestamp(base.addingTimeInterval(10.051)))
+        let result = try #require(
+            NTPPacket.parse(reply, request: request, sentAt: sentAt, receivedAt: base.addingTimeInterval(0.101)))
+        #expect(abs(result.offsetMilliseconds - 10_000) < 0.01)
+        #expect(abs(result.delayMilliseconds - 100) < 0.01)
+        #expect(result.stratum == 1)
+        #expect(result.reference == "GPS")
+        // An answer to another request is not ours.
+        var other = reply
+        other[30] ^= 0xFF
+        #expect(NTPPacket.parse(other, request: request, sentAt: sentAt, receivedAt: base) == nil)
+    }
+}
+
+@Suite("Dual stack")
+struct DualStackTests {
+    @Test func namesTheFasterFamily() {
+        let four = DualStackFamily(address: "192.0.2.1", medianMilliseconds: 18, attempts: [18, 20, 17], error: nil)
+        let six = DualStackFamily(address: "2001:db8::1", medianMilliseconds: 12, attempts: [12, 11, 30], error: nil)
+        let none = DualStackFamily(address: nil, medianMilliseconds: nil, attempts: [], error: nil)
+        let both = DualStackReport(ipv4: four, ipv6: six, systemAddress: "2001:db8::1", systemUsedIPv6: true, systemMilliseconds: 14)
+        #expect(both.faster?.ipv6 == true)
+        #expect(both.faster?.byMilliseconds == 6)
+        let onlyFour = DualStackReport(ipv4: four, ipv6: none, systemAddress: nil, systemUsedIPv6: nil, systemMilliseconds: nil)
+        #expect(onlyFour.faster == nil)
+    }
+
+    // Needs a listening socket on the loopback, which every Mac gives.
+    @Test func connectsToALocalListener() async throws {
+        let listener = try POSIXSocket(family: AF_INET, type: SOCK_STREAM)
+        var address = sockaddr_in()
+        address.sin_family = sa_family_t(AF_INET)
+        address.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+        address.sin_addr.s_addr = inet_addr("127.0.0.1")
+        _ = withUnsafePointer(to: &address) {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(listener.fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) }
+        }
+        listen(listener.fd, 8)
+        let port = try #require(listener.localPort())
+        let report = try await DualStackTool.run(host: "127.0.0.1", port: port)
+        #expect(report.ipv4.address == "127.0.0.1")
+        #expect(report.ipv4.attempts.count == DualStackTool.attempts)
+        #expect(report.ipv4.medianMilliseconds != nil)
+        #expect(report.ipv6.address == nil)
+    }
+}

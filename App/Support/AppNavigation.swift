@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 enum ToolKind: String, CaseIterable, Identifiable {
-    case ping, traceroute, dns, whois, ports, tls, http, subnet, oui
+    case ping, traceroute, dns, whois, ports, tls, http, nat, ntp, dualstack, subnet, oui
 
     var id: String { rawValue }
 }
@@ -33,5 +33,16 @@ final class AppNavigation {
     func open(_ tool: ToolKind, target: String) {
         toolRequest = ToolRequest(tool: tool, target: target)
         tab = .tools
+    }
+
+    /// A page from a deep link. A tool opens with its field as it was.
+    func open(_ page: AppPage) {
+        switch page {
+        case .overview: tab = .overview
+        case .lan: tab = .lan
+        case .live: tab = .live
+        default:
+            if let tool = ToolKind(rawValue: page.rawValue) { open(tool, target: "") }
+        }
     }
 }
