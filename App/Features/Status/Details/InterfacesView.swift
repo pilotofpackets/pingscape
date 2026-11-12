@@ -92,8 +92,10 @@ struct InterfaceDetailView: View {
                         tone: interface.isRunning ? .good : .neutral)
                     let flags = interface.flags.names
                     if !flags.isEmpty {
+                        // Spaces, not commas: at AX5 a comma that no longer
+                        // fit after "BROADCAST" stood alone on a line (2026-11-12).
                         DataRow(
-                            label: "Flags", value: flags.joined(separator: ", "), monospaced: true,
+                            label: "Flags", value: flags.joined(separator: " "), monospaced: true,
                             stacked: true)
                     }
                     if let mtu = interface.mtu {

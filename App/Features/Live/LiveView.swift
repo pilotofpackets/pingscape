@@ -251,18 +251,34 @@ private struct ChartCard: View {
         }
     }
 
+    private var caption: some View {
+        Text(title)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.subdued)
+            .textCase(.uppercase)
+    }
+
+    private var value: some View {
+        Text(points.last.map { style.text($0.value) } ?? "–")
+            .font(.title3.weight(.semibold))
+            .monospacedDigit()
+            .contentTransition(.numericText())
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(title)
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.subdued)
-                    .textCase(.uppercase)
-                Spacer()
-                Text(points.last.map { style.text($0.value) } ?? "–")
-                    .font(.title3.weight(.semibold))
-                    .monospacedDigit()
-                    .contentTransition(.numericText())
+            // Side by side while both fit on one line. At AX5 on the iPhone SE
+            // "Receive" broke into "RE-/CEIVE" next to the value (2026-11-12).
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline) {
+                    caption.fixedSize()
+                    Spacer()
+                    value.fixedSize()
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    caption
+                    value
+                }
             }
             Chart(segmented, id: \.point.id) { item in
                 AreaMark(

@@ -14,6 +14,26 @@ final class OverviewScreenTests: UITestCase {
     func testExternal() { checkScreen("Overview › External", .overview(path: ["external"])) }
 }
 
+/// The same pages with the longest values a real network gives: a 32-byte
+/// network name without a space, full IPv6 addresses, five DNS servers, two
+/// VPNs, a long proxy address, two SIMs.
+@MainActor
+final class LongValueScreenTests: UITestCase {
+    let long = ["-demo-data", "long"]
+
+    func testOverview() { checkScreen("Long values › Overview", .overview(), extra: long) }
+    func testWiFi() { checkScreen("Long values › Wi-Fi", .overview(path: ["wifi"]), extra: long) }
+    func testVPN() { checkScreen("Long values › VPN", .overview(path: ["vpn"]), extra: long) }
+    func testCellular() { checkScreen("Long values › Cellular", .overview(path: ["cellular"]), extra: long) }
+    func testDNSAndProxy() { checkScreen("Long values › DNS and Proxy", .overview(path: ["dns"]), extra: long) }
+    func testRouting() { checkScreen("Long values › Routing", .overview(path: ["routing"]), extra: long) }
+    func testInterfaces() { checkScreen("Long values › Interfaces", .overview(path: ["interfaces"]), extra: long) }
+    func testInterfaceWiFi() {
+        checkScreen("Long values › Interface en0", .overview(path: ["interfaces", "interface:en0"]), extra: long)
+    }
+    func testLive() { checkScreen("Long values › Live", .live, extra: long) }
+}
+
 /// Split from the overview so the parallel clones share the work: they are
 /// handed out one class at a time.
 @MainActor

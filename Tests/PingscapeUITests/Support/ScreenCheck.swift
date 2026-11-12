@@ -351,9 +351,10 @@ extension XCTestCase {
     /// Launches at `start` and runs the screen checks on it.
     func checkScreen(
         _ name: String, _ start: Start, config: TestConfig = .current, scroll: Bool = true, maxPages: Int? = nil,
+        extra: [String] = [],
         wait: ((XCUIApplication) -> XCUIElement)? = nil, file: StaticString = #filePath, line: UInt = #line
     ) {
-        let app = launch(start, config: config)
+        let app = launch(start, config: config, extra: extra)
         let anchor = wait?(app) ?? app.navigationBars.firstMatch
         guard expect(anchor, "on \(name)", timeout: 15, file: file, line: line) else {
             ScreenCheck(test: self, app: app, config: config).attachScreenshot("\(name) (did not load)")

@@ -38,7 +38,9 @@ public struct LiveSnapshotProvider: NetworkSnapshotProviding {
 
 /// Serves fixtures. Launch the app with `-demo` to use it.
 public struct DemoSnapshotProvider: NetworkSnapshotProviding {
-    public init() {}
+    let fixture: NetworkSnapshot
 
-    public func snapshot() async -> NetworkSnapshot { DemoData.snapshot }
+    public init(_ fixture: NetworkSnapshot = DemoData.snapshot) { self.fixture = fixture }
+
+    public func snapshot() async -> NetworkSnapshot { fixture }
 }

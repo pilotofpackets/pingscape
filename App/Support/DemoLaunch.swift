@@ -1,4 +1,5 @@
 import Foundation
+import NetKit
 
 /// Launch arguments for the demo mode, for screenshots and UI checks.
 enum DemoLaunch {
@@ -10,6 +11,12 @@ enum DemoLaunch {
         guard arguments.contains("-demo"), let index = arguments.firstIndex(of: flag), index + 1 < arguments.count
         else { return nil }
         return arguments[index + 1]
+    }
+
+    /// `-demo -demo-data long` serves the longest values a real network
+    /// gives instead of the usual demo network.
+    static var snapshot: NetworkSnapshot {
+        value(after: "-demo-data") == "long" ? DemoData.longValues : DemoData.snapshot
     }
 
     /// `-demo -demo-tool dns` opens the Tools tab on that tool.

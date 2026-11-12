@@ -104,6 +104,24 @@ struct ShortcutsTests {
         }
     }
 
+    @Test("With the longest values every item is read and every identifier hidden")
+    func longValues() {
+        let long = DemoData.longValues
+        #expect((try? NetworkValue.dnsServers.read(from: long).get())?.count == 5)
+        #expect((try? NetworkValue.vpnInterface.read(from: long).get()) == ["utun4", "utun12"])
+        #expect((try? NetworkValue.wifiName.read(from: long).get()) == ["WLAN-Obergeschoss-5GHz-AX-Mesh-2"])
+
+        let defaults = UserDefaults.standard
+        let before = defaults.object(forKey: PrivacyMask.hideByDefaultKey)
+        defer { defaults.set(before, forKey: PrivacyMask.hideByDefaultKey) }
+        defaults.set(true, forKey: PrivacyMask.hideByDefaultKey)
+        let hidden = StatusText.make(long)
+        for secret in ["172.31.255.254", "255.255.240.0", "WLAN-Obergeschoss", "FE:DC:BA", "2001:db8:ffff", "fd00:ffff",
+                       "10.255.255.254", "192.168.255.254", "100.100.100.100", "172.31.240.1"] {
+            #expect(!hidden.contains(secret), "The hidden status text shows \(secret)")
+        }
+    }
+
     @Test("Every page's deep link opens that page", arguments: AppPage.allCases)
     func deepLinks(_ page: AppPage) {
         #expect(AppPage(url: page.url) == page)
