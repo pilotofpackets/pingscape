@@ -73,6 +73,10 @@ struct ScreenCheck {
         // the iPhone SE (iOS 27) on some pages, while each kind alone took a
         // second or two (found 2026-11-11).
         for type in AuditVerdict.kinds where config.auditTypes.contains(type) {
+            if let hang = AuditVerdict.knownHangs.first(where: { $0.screen == screen && $0.page == page && $0.type == type }) {
+                XCTContext.runActivity(named: "\(screen) page \(page): \(AuditVerdict.name(of: type)) audit skipped, \(hang.why)") { _ in }
+                continue
+            }
             audit(
                 type, screen: screen, page: page, pixelsMatch: pixelsMatch, pixels: pixels, bars: bars, window: window,
                 file: file, line: line)
@@ -287,6 +291,13 @@ enum AuditVerdict: Equatable {
     /// keep this list short.
     static let checkedByEye: [(type: XCUIAccessibilityAuditType, label: String, why: String)] = [
         (.textClipped, "Share as file", "wraps onto two lines at AX5 and is fully visible (2026-11-11)"),
+    ]
+
+    /// Pages where one kind of Apple's audit never returns while the app is
+    /// idle. Each cost five minutes per run; the same kinds of rows are
+    /// checked on every other page. Keep this list short.
+    static let knownHangs: [(screen: String, page: Int, type: XCUIAccessibilityAuditType, why: String)] = [
+        ("Tools › NTP", 2, .contrast, "never returned on iPhone 17 Pro (iOS 27) in three runs, the other kinds pass (2026-11-12)"),
     ]
 
     /// Every kind of check the audit has on iOS, one at a time.
