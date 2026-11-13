@@ -112,7 +112,8 @@ final class PrivacyFlowTests: UITestCase {
     static let identifying: [(String, NSRegularExpression)] = [
         ("IPv4 address or mask", try! NSRegularExpression(pattern: #"\b\d{1,3}(\.\d{1,3}){3}\b"#)),
         ("IPv6 address", try! NSRegularExpression(pattern: #"\b([0-9a-fA-F]{1,4}:){3,}[0-9a-fA-F]{1,4}\b|[0-9a-fA-F]{1,4}::[0-9a-fA-F]{0,4}|::1\b"#)),
-        ("network name", try! NSRegularExpression(pattern: "HomeNet")),
+        ("network name", try! NSRegularExpression(pattern: "HomeNet|WLAN-Obergeschoss")),
+        ("proxy", try! NSRegularExpression(pattern: #"department\.example\.com"#)),
     ]
 
     /// Every label and value on screen, page by page to the end.
@@ -158,6 +159,26 @@ final class PrivacyFlowTests: UITestCase {
             guard expect(app.navigationBars.firstMatch, name) else { continue }
             for leak in leaks(in: allText(app)) {
                 XCTFail("\(name) shows with hidden values: \(leak)")
+            }
+            app.terminate()
+        }
+    }
+
+    /// The same with the longest values: full IPv6 addresses, two VPNs, a
+    /// proxy, two SIMs. A long value must not slip past the mask.
+    func testHiddenLongValuesOnEveryOverviewPage() {
+        let pages: [(String, [String])] = [
+            ("Overview", []), ("Wi-Fi", ["wifi"]), ("VPN", ["vpn"]), ("Cellular", ["cellular"]),
+            ("Routing", ["routing"]), ("DNS and Proxy", ["dns"]), ("Interfaces", ["interfaces"]),
+            ("en0", ["interfaces", "interface:en0"]), ("utun4", ["interfaces", "interface:utun4"]),
+            ("utun12", ["interfaces", "interface:utun12"]), ("pdp_ip0", ["interfaces", "interface:pdp_ip0"]),
+            ("pdp_ip1", ["interfaces", "interface:pdp_ip1"]),
+        ]
+        for (name, path) in pages {
+            let app = launch(.overview(path: path), config: config, hideValues: .on, extra: ["-demo-data", "long"])
+            guard expect(app.navigationBars.firstMatch, name) else { continue }
+            for leak in leaks(in: allText(app)) {
+                XCTFail("\(name) shows long values with hidden values: \(leak)")
             }
             app.terminate()
         }
