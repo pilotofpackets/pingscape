@@ -13,6 +13,7 @@ struct PingView: View {
     @Bindable var model: PingModel
     let history: ToolHistory
     @Environment(PrivacyMask.self) private var mask
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         VStack(spacing: 16) {
@@ -52,29 +53,33 @@ struct PingView: View {
         }
     }
 
+    private var payloadField: some View {
+        TextField(text: $model.payloadText, prompt: Text(verbatim: "56")) { Text("Payload") }
+            .keyboardType(.numberPad)
+            .multilineTextAlignment(.trailing)
+            .font(.system(.body, design: .monospaced))
+            .accessibilityIdentifier("ping.payload")
+    }
+
     /// Packet size and "don't fragment". They apply from the next start.
     private var options: some View {
         InfoCard {
-            HStack(spacing: 8) {
+            // At the accessibility sizes "Payload" broke into "Pa/ylo/ad" next
+            // to the field; there the label goes above.
+            let layout = dynamicTypeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
+                : AnyLayout(HStackLayout(spacing: 8))
+            layout {
                 Text("Payload")
-                Spacer(minLength: 8)
-                TextField(text: $model.payloadText, prompt: Text(verbatim: "56")) { Text("Payload") }
-                    .keyboardType(.numberPad)
-                    .multilineTextAlignment(.trailing)
-                    .font(.system(.body, design: .monospaced))
-                    .frame(maxWidth: 90)
-                Text("bytes").foregroundStyle(.secondary)
-                Menu {
-                    Button("Default (56 bytes payload)") { model.payloadText = "" }
-                    Button("1280-byte packet (IPv6 minimum)") { model.setPacketSize(1280) }
-                    Button("1500-byte packet (Ethernet)") { model.setPacketSize(1500) }
-                    Button("9000-byte packet (jumbo frame)") { model.setPacketSize(9000) }
-                } label: {
-                    Image(systemName: "list.bullet.circle")
-                        .imageScale(.large)
-                        .frame(minWidth: 44, minHeight: 44)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, dynamicTypeSize.isAccessibilitySize ? 8 : 0)
+                if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
+                HStack(spacing: 8) {
+                    payloadField
+                        .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 90)
+                    Text("bytes").foregroundStyle(.subdued).fixedSize()
+                    packetSizes
                 }
-                .accessibilityLabel("Packet sizes")
             }
             .padding(.leading, 16)
             .padding(.trailing, 4)
@@ -84,6 +89,20 @@ struct PingView: View {
                 .frame(minHeight: 44)
         }
         .disabled(model.isRunning)
+    }
+
+    private var packetSizes: some View {
+        Menu {
+            Button("Default (56 bytes payload)") { model.payloadText = "" }
+            Button("1280-byte packet (IPv6 minimum)") { model.setPacketSize(1280) }
+            Button("1500-byte packet (Ethernet)") { model.setPacketSize(1500) }
+            Button("9000-byte packet (jumbo frame)") { model.setPacketSize(9000) }
+        } label: {
+            Image(systemName: "list.bullet.circle")
+                .imageScale(.large)
+                .frame(minWidth: 44, minHeight: 44)
+        }
+        .accessibilityLabel("Packet sizes")
     }
 
     private var mtuResult: some View {
@@ -287,11 +306,11 @@ private struct MTRHopRow: View {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 Text(verbatim: "\(hop.number)")
                     .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .frame(minWidth: 24, alignment: .trailing)
                 Text(addressText)
                     .font(hop.addresses.isEmpty ? .body : .system(.body, design: .monospaced))
-                    .foregroundStyle(hop.addresses.isEmpty ? .secondary : .primary)
+                    .foregroundStyle(hop.addresses.isEmpty ? Color.subdued : Color.primary)
                 Spacer(minLength: 8)
                 if hop.statistics.lostPercent > 0 {
                     StatusDot(tone: hop.statistics.received == 0 ? .critical : .warning)
@@ -300,12 +319,12 @@ private struct MTRHopRow: View {
             }
             Text(figures)
                 .font(.footnote.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
                 .padding(.leading, 36)
             ForEach(names, id: \.self) { name in
                 Text(mask.shown(name))
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .padding(.leading, 36)
             }
         }
@@ -339,20 +358,20 @@ private struct HopRow: View {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 Text(verbatim: "\(hop.number)")
                     .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .frame(minWidth: 24, alignment: .trailing)
                 Text(hop.address.map { mask.shown($0) } ?? address)
                     .font(hop.address == nil ? .body : .system(.body, design: .monospaced))
-                    .foregroundStyle(hop.address == nil ? .secondary : .primary)
+                    .foregroundStyle(hop.address == nil ? Color.subdued : Color.primary)
             }
             Text(verbatim: times)
                 .font(.system(.footnote, design: .monospaced))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
                 .padding(.leading, 36)
             if let name {
                 Text(mask.shown(name))
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .padding(.leading, 36)
             }
         }

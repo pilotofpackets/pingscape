@@ -81,10 +81,13 @@ struct LANDeviceView: View {
     private var actions: some View {
         InfoSection(title: "Actions") {
             ActionRow(title: "Ping", symbol: "dot.radiowaves.left.and.right") { navigation.open(.ping, target: ip) }
+                .accessibilityIdentifier("lan.action.ping")
             ActionRow(title: "Check ports", symbol: "door.left.hand.open") { navigation.open(.ports, target: ip) }
+                .accessibilityIdentifier("lan.action.ports")
             ActionRow(title: "Traceroute", symbol: "point.topleft.down.to.point.bottomright.curvepath") {
                 navigation.open(.traceroute, target: ip)
             }
+            .accessibilityIdentifier("lan.action.traceroute")
         }
     }
 }

@@ -23,7 +23,7 @@ struct ExternalView: View {
             reachability
             Text("Network data: RIPEstat, RIPE NCC")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
                 .frame(maxWidth: .infinity)
         }
         .toolbar {
@@ -100,7 +100,7 @@ struct ExternalView: View {
             }
             Text("Loads captive.apple.com and checks the answer – the page iOS itself uses to detect a Wi-Fi sign-in page. That host sees your public IP address.")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 4)
         }
@@ -174,7 +174,7 @@ private struct ExternalSourceSheet: View {
     private func source(_ host: String, detail: LocalizedStringResource) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(verbatim: host).font(.system(.body, design: .monospaced))
-            Text(detail).font(.footnote).foregroundStyle(.secondary)
+            Text(detail).font(.footnote).foregroundStyle(.subdued)
         }
         .padding(.vertical, 2)
     }

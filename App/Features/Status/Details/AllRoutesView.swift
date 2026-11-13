@@ -67,7 +67,7 @@ private struct RouteEntryRow: View {
                 Text(verbatim: route.flags)
             }
             .font(.system(.footnote, design: .monospaced))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.subdued)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
@@ -89,9 +89,9 @@ private struct RouteEntryRow: View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text(verbatim: route.interfaceName)
                 .font(.system(.body, design: .monospaced))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
             if let label = InterfaceKind(interfaceName: route.interfaceName).label {
-                Text(label).font(.footnote).foregroundStyle(.tertiary)
+                Text(label).font(.footnote).foregroundStyle(.subdued)
             }
         }
     }

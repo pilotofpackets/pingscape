@@ -103,10 +103,12 @@ struct ToolField: View {
     var keyboard: UIKeyboardType = .URL
     var monospaced = false
     var onSubmit: () -> Void = {}
+    @FocusState private var focused: Bool
 
     var body: some View {
         HStack(spacing: 8) {
             TextField(text: $text, prompt: Text(title)) { Text(title) }
+                .focused($focused)
                 .keyboardType(keyboard)
                 .textContentType(.URL)
                 .textInputAutocapitalization(.never)
@@ -114,13 +116,25 @@ struct ToolField: View {
                 .submitLabel(.go)
                 .font(monospaced ? .system(.body, design: .monospaced) : .body)
                 .onSubmit(onSubmit)
+                // SwiftUI does not stretch the UIKit field inside to a
+                // larger frame: at the smallest text size it stayed 18.5
+                // points high, too small a target for the accessibility
+                // audit (2026-11-12). From size L on it is large enough.
+                .dynamicTypeSize(.large...)
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("tool.field")
             if !text.isEmpty {
                 Button {
                     text = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        // The symbol alone was a target of about 20 points.
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
+                .padding(.trailing, -12)
                 .accessibilityLabel("Clear")
+                .accessibilityIdentifier("tool.clear")
             }
         }
         .padding(.horizontal, 16)
@@ -128,6 +142,10 @@ struct ToolField: View {
         .background(
             Color(.secondarySystemGroupedBackground),
             in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        // A tap anywhere on the capsule, not only on the line of text, puts
+        // the cursor into the field. The clear button keeps its own tap.
+        .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .onTapGesture { focused = true }
     }
 }
 
@@ -140,7 +158,7 @@ struct ToolNote: View {
     var body: some View {
         text
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.subdued)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
     }
@@ -190,6 +208,7 @@ struct RecentChips: View {
             }
             .scrollClipDisabled()
             .accessibilityLabel("Recent")
+            .accessibilityIdentifier("tool.recent")
         }
     }
 }
@@ -237,6 +256,7 @@ struct StartBar: View {
                 .glassSurface(cornerRadius: 25)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("tool.start")
         .disabled(!control.isRunning && !control.canStart)
         .opacity(!control.isRunning && !control.canStart ? 0.5 : 1)
         .padding(.bottom, 8)

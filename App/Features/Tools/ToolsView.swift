@@ -123,20 +123,42 @@ struct ToolsView: View {
     @ViewBuilder
     private var bottomBar: some View {
         if control != nil || keyboardShown {
-            ZStack(alignment: .bottomTrailing) {
-                if let control {
-                    StartBar(control: control) { history.remember(control.inputText, for: selected) }
-                }
+            Group {
                 if keyboardShown {
-                    KeyboardDoneBarButton()
-                        .padding(.trailing, 16)
-                        .padding(.bottom, 8)
-                        .transition(.opacity)
+                    // Side by side, level, never on top of each other: at the
+                    // accessibility sizes the centered Start ran under Done.
+                    // Where both do not fit in one row, Done goes above.
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .bottom, spacing: 12) {
+                            startBar
+                            done
+                        }
+                        VStack(alignment: .trailing, spacing: 8) {
+                            done
+                            startBar
+                        }
+                    }
+                    .padding(.trailing, 16)
+                } else {
+                    startBar
                 }
             }
             .frame(maxWidth: .infinity, alignment: .bottomTrailing)
             .animation(.default, value: keyboardShown)
         }
+    }
+
+    @ViewBuilder
+    private var startBar: some View {
+        if let control {
+            StartBar(control: control) { history.remember(control.inputText, for: selected) }
+        }
+    }
+
+    private var done: some View {
+        KeyboardDoneBarButton()
+            .padding(.bottom, 8)
+            .transition(.opacity)
     }
 
     /// What a copy or share of the result holds: the sections on screen.
@@ -164,10 +186,12 @@ struct ToolsView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(selected == tool ? .isSelected : [])
+                    .accessibilityIdentifier("tool.chip.\(tool.rawValue)")
                 }
             }
             .padding(.horizontal, 16)
         }
+        .accessibilityIdentifier("tool.chips")
     }
 
     // MARK: Content

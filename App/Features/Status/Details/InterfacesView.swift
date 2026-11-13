@@ -36,7 +36,7 @@ private struct InterfaceRow: View {
                 .font(.system(.body, design: .monospaced))
                 .foregroundStyle(.primary)
             if let label = interface.kind.label {
-                Text(label).font(.footnote).foregroundStyle(.secondary)
+                Text(label).font(.footnote).foregroundStyle(.subdued)
             }
         }
     }
@@ -45,7 +45,7 @@ private struct InterfaceRow: View {
         HStack(spacing: 6) {
             StatusDot(tone: interface.isRunning ? .good : .neutral)
             Text(interface.isRunning ? "Running" : "Not running")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
         }
         .font(.footnote)
     }
@@ -92,8 +92,10 @@ struct InterfaceDetailView: View {
                         tone: interface.isRunning ? .good : .neutral)
                     let flags = interface.flags.names
                     if !flags.isEmpty {
+                        // Spaces, not commas: at AX5 a comma that no longer
+                        // fit after "BROADCAST" stood alone on a line (2026-11-12).
                         DataRow(
-                            label: "Flags", value: flags.joined(separator: ", "), monospaced: true,
+                            label: "Flags", value: flags.joined(separator: " "), monospaced: true,
                             stacked: true)
                     }
                     if let mtu = interface.mtu {

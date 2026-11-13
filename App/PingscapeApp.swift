@@ -19,7 +19,7 @@ struct PingscapeApp: App {
         // screenshots and the simulator (which shows the Mac's network).
         let provider: any NetworkSnapshotProviding =
             ProcessInfo.processInfo.arguments.contains("-demo")
-            ? DemoSnapshotProvider()
+            ? DemoSnapshotProvider(DemoLaunch.snapshot)
             : LiveSnapshotProvider(locationAuthorized: { LocationAccess.isAuthorized })
         _store = State(initialValue: SnapshotStore(provider: provider))
     }

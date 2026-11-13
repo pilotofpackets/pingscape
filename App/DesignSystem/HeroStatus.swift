@@ -21,7 +21,7 @@ struct HeroStatus: View {
                     .accessibilityHidden(true)
             }
             if let subtitle {
-                Text(subtitle).foregroundStyle(.secondary)
+                Text(subtitle).foregroundStyle(.subdued)
             }
             if !chips.isEmpty {
                 FlowLayout(spacing: 8) {

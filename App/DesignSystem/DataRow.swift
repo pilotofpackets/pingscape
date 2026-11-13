@@ -12,6 +12,7 @@ import SwiftUI
 /// or hides just that one (independent of the "Hide values" toggle).
 struct DataRow: View {
     @Environment(PrivacyMask.self) private var mask
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let label: LocalizedStringResource
     let value: String
@@ -60,7 +61,7 @@ struct DataRow: View {
     /// broke one address in the middle and left a lone digit on a line. A
     /// line no wider than the halves of the others stays whole: the column
     /// is that wide anyway (an IPv4 server next to IPv6 ones).
-    private func wrapped(_ string: String) -> String {
+    nonisolated static func wrapped(_ string: String) -> String {
         let lines = string.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
         let split = lines.map(wrappedLine)
         let column = split.flatMap { $0.split(separator: "\n") }.map(\.count).max() ?? 0
@@ -68,7 +69,21 @@ struct DataRow: View {
             .joined(separator: "\n")
     }
 
-    private func wrappedLine(_ string: String) -> String {
+    /// `string` with an invisible break opportunity after every ".", ":" and
+    /// "_", for a value too long even for two lines (the accessibility text
+    /// sizes): it then wraps between groups, never inside one ("3C:A6:2F:" /
+    /// "1B:D3:22", not "3C:A" / "6:2F"). Only for display; copies, reports
+    /// and VoiceOver get the value as it is.
+    nonisolated static func breakable(_ string: String) -> String {
+        var result = ""
+        for character in string {
+            result.append(character)
+            if character == "." || character == ":" || character == "_" { result.append("\u{200B}") }
+        }
+        return result
+    }
+
+    nonisolated static func wrappedLine(_ string: String) -> String {
         // "_" too: a cipher suite (TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256)
         // otherwise got a hyphen from the system that is not in the name.
         let separators: Set<Character> = [".", ":", "_"]
@@ -89,7 +104,10 @@ struct DataRow: View {
 
     var body: some View {
         Group {
-            if stacked {
+            // At the accessibility sizes label and value do not fit side by
+            // side: the label was cut to "Name…" and an address broke after
+            // every few characters. Stacked, each gets the full width.
+            if stacked || dynamicTypeSize.isAccessibilitySize {
                 stackedLayout
             } else {
                 inlineLayout
@@ -132,11 +150,19 @@ struct DataRow: View {
     private var adaptiveValue: some View {
         ViewThatFits(in: .horizontal) {
             valueText(shown)
-            valueText(wrapped(shown))
+            valueText(Self.wrapped(shown))
                 .multilineTextAlignment(.trailing)
                 .minimumScaleFactor(0.85)
+            // The last resort, used when nothing fits: as many lines as it
+            // takes, broken only between groups.
+            valueText(Self.breakable(shown))
+                .multilineTextAlignment(.trailing)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .foregroundStyle(.secondary)
+        .foregroundStyle(.subdued)
+        // VoiceOver and the UI tests get the value without the line breaks
+        // and invisible break points added for display.
+        .accessibilityLabel(Text(verbatim: shown))
     }
 
     private var inlineLayout: some View {
@@ -161,7 +187,7 @@ struct DataRow: View {
             if let note {
                 Text(note)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .padding(.top, 2)
             }
         }
@@ -172,6 +198,7 @@ struct DataRow: View {
 /// A row whose value is a status: a dot and a short text. Like `DataRow`, the
 /// label shrinks rather than moving the status under it.
 struct StatusRow: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let label: LocalizedStringResource
     let text: String
     var tone: StatusDot.Tone = .good
@@ -188,21 +215,41 @@ struct StatusRow: View {
         }
     }
 
+    @ViewBuilder
+    private var actionButton: some View {
+        if let action {
+            Button(action: action.perform) {
+                Image(systemName: "arrow.clockwise")
+            }
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+            .accessibilityLabel(Text(action.title))
+        }
+    }
+
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 16) {
-            Text(label)
-                .lineLimit(1)
-                .minimumScaleFactor(0.85)
-                .layoutPriority(1)
-            Spacer(minLength: 8)
-            status
-            if let action {
-                Button(action: action.perform) {
-                    Image(systemName: "arrow.clockwise")
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                // Side by side the label was cut off at the largest sizes.
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(label)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        status
+                        Spacer(minLength: 0)
+                        actionButton
+                    }
                 }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.circle)
-                .accessibilityLabel(Text(action.title))
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 16) {
+                    Text(label)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                        .layoutPriority(1)
+                    Spacer(minLength: 8)
+                    status
+                    actionButton
+                }
             }
         }
         .padding(.horizontal, 16)
@@ -218,6 +265,7 @@ struct StatusRow: View {
 
 /// A row that asks for a permission.
 struct PermissionRow: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let label: LocalizedStringResource
     let buttonTitle: LocalizedStringResource
     /// Why a previous attempt failed, shown under the label so a retry that
@@ -226,28 +274,43 @@ struct PermissionRow: View {
     let action: () -> Void
 
     private var button: some View {
-        Button(buttonTitle, action: action)
-            .buttonStyle(.bordered)
-            .buttonBorderShape(.capsule)
-            // Next to a long detail it was squeezed into a tall empty capsule.
-            .fixedSize()
+        Button(action: action) {
+            Text(buttonTitle).multilineTextAlignment(.leading)
+        }
+        .buttonStyle(.bordered)
+        .buttonBorderShape(dynamicTypeSize.isAccessibilitySize ? .roundedRectangle : .capsule)
+        // Next to a long detail it was squeezed into a tall empty capsule, so
+        // it keeps its width. Not at the accessibility sizes: there "Measure
+        // response time" grew wider than the screen and pushed the whole page
+        // off its left edge; under the label it may wrap instead.
+        .fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize, vertical: true)
     }
 
     private var labelStack: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
             if let detail {
-                Text(detail).font(.footnote).foregroundStyle(.secondary)
+                Text(detail).font(.footnote).foregroundStyle(.subdued)
             }
         }
     }
 
     var body: some View {
-        HStack(spacing: 16) {
-            labelStack
-                .layoutPriority(1)
-            Spacer(minLength: 8)
-            button
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    labelStack
+                    button
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                HStack(spacing: 16) {
+                    labelStack
+                        .layoutPriority(1)
+                    Spacer(minLength: 8)
+                    button
+                }
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 6)

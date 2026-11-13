@@ -35,7 +35,7 @@ struct AboutView: View {
                             .foregroundStyle(.tint)
                             .accessibilityHidden(true)
                         Text("Pingscape").font(.title.bold())
-                        Text("Version \(version)").foregroundStyle(.secondary)
+                        Text("Version \(version)").foregroundStyle(.subdued)
                         Text("Open source. No account. No ads. No tracking.")
                             .multilineTextAlignment(.center)
                             .padding(.top, 4)
@@ -46,18 +46,21 @@ struct AboutView: View {
                 }
                 Section {
                     Toggle("External requests", isOn: $settings.externalLookups)
+                        .accessibilityIdentifier("about.externalRequests")
                     Toggle(isOn: $hideByDefault) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Hide values by default")
                             Text("Long press any value to hide just that one, for example before a screenshot.")
                                 .font(.footnote)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.subdued)
                         }
                     }
+                    .accessibilityIdentifier("about.hideByDefault")
                     Picker("Units", selection: $settings.rateUnit) {
                         Text("Mbit/s").tag(RateUnit.megabitPerSecond)
                         Text("MB/s").tag(RateUnit.megabytePerSecond)
                     }
+                    .accessibilityIdentifier("about.units")
                 } header: {
                     Text("Settings")
                 } footer: {
@@ -67,8 +70,11 @@ struct AboutView: View {
                 Section("More") {
                     NavigationLink("Shortcuts and Siri") { ShortcutsHelpView() }
                     Button("Show introduction again") { showsOnboarding = true }
+                        .accessibilityIdentifier("about.intro")
                     NavigationLink("Diagnostic dump") { DiagnosticDumpView() }
+                        .accessibilityIdentifier("about.dump")
                     NavigationLink("Licenses and sources") { LicensesView() }
+                        .accessibilityIdentifier("about.licenses")
                 }
                 Section {
                     Link("Source code on GitHub", destination: Self.repository)
@@ -158,6 +164,7 @@ struct DiagnosticDumpView: View {
         List {
             Section {
                 Toggle("Replace addresses and names", isOn: $anonymize)
+                    .accessibilityIdentifier("dump.anonymize")
             } footer: {
                 Text("Attach the file to an issue when Pingscape shows something wrong, for example the VPN state. With the switch on, addresses, the network name and names are replaced. The kind of address, the prefix length and which addresses belong together stay, so the reading can be checked.")
             }
@@ -234,7 +241,7 @@ struct LicensesView: View {
         } label: {
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: name).foregroundStyle(.primary)
-                Text(detail).font(.footnote).foregroundStyle(.secondary)
+                Text(detail).font(.footnote).foregroundStyle(.subdued)
             }
         }
     }

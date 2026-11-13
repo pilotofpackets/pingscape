@@ -22,7 +22,7 @@ struct WiFiPermissionPrompt: View {
             }
             Text("iOS only gives the name of your Wi-Fi network to apps that may use your location. Pingscape does not use your location.")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 12)
         }

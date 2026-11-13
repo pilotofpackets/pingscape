@@ -73,9 +73,9 @@ private struct RouteRow: View {
             Text(verbatim: route.isIPv6 ? "IPv6" : "IPv4")
             Text(verbatim: route.interfaceName)
                 .font(.system(.body, design: .monospaced))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.subdued)
             if let label = InterfaceKind(interfaceName: route.interfaceName).label {
-                Text(label).font(.footnote).foregroundStyle(.tertiary)
+                Text(label).font(.footnote).foregroundStyle(.subdued)
             }
         }
     }
@@ -133,7 +133,7 @@ private struct DataRowValue: View {
     let value: String
 
     private var labelText: some View {
-        Text(label).font(.footnote).foregroundStyle(.secondary)
+        Text(label).font(.footnote).foregroundStyle(.subdued)
     }
 
     private var valueText: some View {

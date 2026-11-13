@@ -22,7 +22,7 @@ struct InfoSection<Trailing: View, Content: View>: View {
             HStack(alignment: .firstTextBaseline) {
                 Text(title)
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.subdued)
                     .textCase(.uppercase)
                     .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 8)
@@ -84,7 +84,9 @@ struct DetailsLink<Value: Hashable>: View {
                     .font(.caption2.weight(.bold))
                     .accessibilityHidden(true)
             }
-            .font(.footnote.weight(.semibold))
+            // Bold: the thin strokes of semibold footnote text never reached
+            // the full accent color, and measured 4.3:1 against the background.
+            .font(.footnote.weight(.bold))
             // A comfortable tap target without making the header taller.
             .padding(.vertical, 10)
             .contentShape(Rectangle())

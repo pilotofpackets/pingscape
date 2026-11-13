@@ -162,6 +162,38 @@ targets:
       properties:
         com.apple.developer.networking.wifi-info: true
 
+  # Logic of the app itself and the string catalogs. Runs inside the app on a simulator.
+  PingscapeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/PingscapeTests
+    dependencies:
+      - target: Pingscape
+      - package: NetKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pingscape.ios.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+
+  # Every screen in demo mode: accessibility audit, layout checks, screenshots,
+  # and the flows a user goes through. scripts/ui-matrix.sh runs it on many
+  # simulators, text sizes, languages and appearances.
+  PingscapeUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/PingscapeUITests
+    dependencies:
+      - target: Pingscape
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pingscape.ios.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        TEST_TARGET_NAME: Pingscape
+
 schemes:
   Pingscape:
     build:
@@ -169,5 +201,13 @@ schemes:
         Pingscape: all
     run:
       config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: true
+      coverageTargets:
+        - Pingscape
+      targets:
+        - PingscapeTests
+        - PingscapeUITests
     archive:
       config: Release
