@@ -58,7 +58,15 @@ scripts/ui-matrix.sh quick --only ToolFlowTests --variants de:AX5:dark:portrait:
 
 It never runs more than 2 simulators at once (`PS_MAX_SIMULATORS` changes that; 4 overloaded a 32 GB Mac): the devices are tested in groups, and each group is shut down before the next boots. It creates the simulators it needs (named `PS …`) and writes `build/ui-matrix/<time>/report.md` (failures and accessibility findings, with the devices and variants where they occur) and `index.html` (all screenshots side by side, one row per screen). A UI test reads its variant from `PS_LANGUAGE`, `PS_TEXT_SIZE`, `PS_APPEARANCE`, `PS_ORIENTATION` and `PS_HIDE_VALUES`; set them in the scheme's environment to run one variant from Xcode.
 
-A new screen gets a test in `ScreenTests.swift`, reached through the demo launch arguments (`-demo-tab`, `-demo-path`, `-demo-tool`, `-demo-lan-device`). A control a flow test taps gets an `accessibilityIdentifier`, so the test does not depend on the language.
+A new screen gets a test in `ScreenTests.swift`, reached through the demo launch arguments (`-demo-tab`, `-demo-path`, `-demo-tool`, `-demo-lan-device`). `-demo-data long` swaps in the longest values a network can have (a 32-character SSID, full IPv6 addresses, five DNS servers, two VPNs, two SIMs), used by `LongValueScreenTests`. A control a flow test taps gets an `accessibilityIdentifier`, so the test does not depend on the language.
+
+Reading the report:
+
+- **Tests stopped after 5 minutes** are nearly always Apple's accessibility audit never returning while the app sits idle. They hit random pages and pass when the test runs again on its own.
+- **"Failed to synthesize event", "Timed out waiting for confirmation of orientation change" and "AX loaded notification"** are the simulator under load. They pass on a rerun too.
+- **Findings the screenshot shows to be fine** go into `AuditVerdict.checkedByEye` in `Tests/PingscapeUITests/Support/ScreenCheck.swift`, with the reason and the date.
+- **Pages where one kind of audit always hangs** go into `AuditVerdict.knownHangs` in the same file. Keep both lists short.
+- **Simulator limits:** a simulator cannot show cellular, VPN, the Wi-Fi name or the permission dialogs, so those need a device.
 
 ## Contributing
 
