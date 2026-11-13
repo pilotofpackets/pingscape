@@ -318,6 +318,7 @@ enum AuditVerdict: Equatable {
     /// keep this list short.
     static let checkedByEye: [(type: XCUIAccessibilityAuditType, label: String, why: String)] = [
         (.textClipped, "Share as file", "wraps onto two lines at AX5 and is fully visible (2026-11-11)"),
+        (.textClipped, "Live", "the system's tab sidebar on the iPad at AX5, fully visible after rotating (2026-11-13)"),
     ]
 
     /// Pages where one kind of Apple's audit never returns while the app is
