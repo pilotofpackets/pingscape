@@ -1,4 +1,5 @@
 import NetKit
+import StoreKit
 import SwiftUI
 
 extension ToolKind {
@@ -24,6 +25,7 @@ struct ToolsView: View {
     @Environment(SnapshotStore.self) private var store
     @Environment(AppNavigation.self) private var navigation
     @Environment(PrivacyMask.self) private var mask
+    @Environment(\.requestReview) private var requestReview
     @State private var selected: ToolKind
     @State private var history = ToolHistory()
     @State private var sections: [SectionRecord] = []
@@ -104,6 +106,17 @@ struct ToolsView: View {
             // A name that never resolved is no use as a recent target.
             .onChange(of: unresolvedTarget) { _, target in
                 if let target { history.forget(target, for: selected) }
+            }
+            // A run of the same tool that ended without an error counts
+            // towards asking for a rating (ReviewPrompt). The result shows
+            // first, the dialog a moment later.
+            .onChange(of: RunState(tool: selected, isRunning: control?.isRunning ?? false)) { old, new in
+                guard old.tool == new.tool, old.isRunning, !new.isRunning, control?.failure == nil else { return }
+                guard ReviewPrompt.recordSuccessfulRun() else { return }
+                Task {
+                    try? await Task.sleep(for: .seconds(1.5))
+                    requestReview()
+                }
             }
         }
     }
@@ -212,6 +225,11 @@ struct ToolsView: View {
         case .subnet: SubnetView(input: $subnetInput)
         case .oui: OUIView(input: $ouiInput)
         }
+    }
+
+    private struct RunState: Equatable {
+        let tool: ToolKind
+        let isRunning: Bool
     }
 
     private var control: (any ToolControl)? {
