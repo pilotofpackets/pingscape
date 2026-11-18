@@ -1,0 +1,11 @@
+# Proposes updates of the GitHub Actions in .github/workflows once a week,
+# as one pull request. The app and NetKit have no package dependencies.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
