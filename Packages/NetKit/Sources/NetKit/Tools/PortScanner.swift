@@ -14,6 +14,9 @@ public enum PortScanEvent: Sendable, Equatable {
     case started(address: String)
     case result(port: Int, state: PortState, milliseconds: Double?)
     case progress(done: Int, total: Int)
+    /// The interface the connections really ran on, when it is first known
+    /// or changes. Only a completed handshake tells.
+    case via(interface: String)
     /// Every probe failed for the same system reason, for example no route.
     case failed(ToolError)
     case finished
@@ -51,9 +54,15 @@ public enum PortScanner {
                         var done = 0
                         var failures: [ToolError] = []
                         var answered = false
+                        var used: String?
                         TCPProbe.run(
                             targets: targets, timeoutMilliseconds: timeoutMilliseconds,
-                            concurrency: concurrency, cancel: cancel
+                            concurrency: concurrency, cancel: cancel,
+                            onInterface: { _, interface in
+                                guard interface != used else { return }
+                                used = interface
+                                continuation.yield(.via(interface: interface))
+                            }
                         ) { id, result in
                             let port = ports[id]
                             done += 1

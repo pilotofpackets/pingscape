@@ -254,6 +254,10 @@ struct StartBar: View {
                 .padding(.horizontal, 32)
                 .frame(minHeight: 50)
                 .glassSurface(cornerRadius: 25)
+                // The glass does not take touches: without this only the word
+                // and the symbol did, and taps on the rest of the capsule were
+                // lost (iPhone 12 and iPad, 2026-11-18).
+                .contentShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("tool.start")
@@ -277,4 +281,64 @@ func byteCount(_ value: Int) -> String {
 func milliseconds(_ value: Double) -> String {
     if value >= 10 { return "\(Int(value.rounded())) ms" }
     return "\(value.formatted(.number.precision(.fractionLength(1)))) ms"
+}
+
+// MARK: Interface used
+
+/// The interfaces a run really used, as the sockets reported them, in the
+/// order first seen. Usually one. More when the path changed during the run,
+/// for example when a VPN on demand came up.
+struct InterfaceTrail: Equatable {
+    struct Entry: Equatable {
+        let name: String
+        /// The first attempt (`#n`) over this interface, where the tool counts them.
+        let from: Int?
+    }
+
+    private(set) var entries: [Entry] = []
+
+    init(_ names: [String] = []) {
+        for name in names { record(name) }
+    }
+
+    var isEmpty: Bool { entries.isEmpty }
+
+    /// Adds `name` unless it is the one already in use.
+    mutating func record(_ name: String, from attempt: Int? = nil) {
+        guard entries.last?.name != name else { return }
+        entries.append(Entry(name: name, from: attempt))
+    }
+}
+
+/// The row "Interface used": the name and what it is, for example
+/// "utun4 · VPN". Left out when the system named no interface.
+struct UsedInterfaceRow: View {
+    @Environment(SnapshotStore.self) private var store
+    let trail: InterfaceTrail
+
+    init(_ trail: InterfaceTrail) { self.trail = trail }
+    init(_ name: String?) { trail = InterfaceTrail(name.map { [$0] } ?? []) }
+
+    var body: some View {
+        if !trail.isEmpty {
+            DataRow(label: "Interface used", value: text)
+        }
+    }
+
+    private var text: String {
+        trail.entries.enumerated().map { index, entry in
+            let described = describe(entry.name)
+            guard index > 0, let from = entry.from else { return described }
+            return String(localized: "\(described) from #\(String(from))")
+        }
+        .joined(separator: " → ")
+    }
+
+    /// "VPN" only for a tunnel the system lists as a VPN service. Other
+    /// tunnels get the label their name allows, or none.
+    private func describe(_ name: String) -> String {
+        let isVPN = store.snapshot?.vpnInterfaces.contains { $0.name == name } == true
+        guard let label = isVPN ? "VPN" : InterfaceKind(interfaceName: name).label else { return name }
+        return "\(name) · \(label)"
+    }
 }

@@ -60,7 +60,7 @@ struct PortScannerTests {
 
     @Test func tcpPingFallbackMeasuresAHandshake() async throws {
         let listener = try LocalListener()
-        let result = try await TCPProbe.once(address: loopback, port: listener.port, timeoutMilliseconds: 500)
+        let result = try await TCPProbe.once(address: loopback, port: listener.port, timeoutMilliseconds: 500).result
         guard case .open(let milliseconds) = result else {
             Issue.record("expected open, got \(result)")
             return

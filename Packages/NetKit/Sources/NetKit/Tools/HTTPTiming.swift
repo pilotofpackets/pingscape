@@ -32,6 +32,9 @@ public struct HTTPTimingStep: Sendable, Equatable, Identifiable {
     public let totalMilliseconds: Double?
     /// The response headers, sorted by name.
     public let headers: [HTTPHeader]
+    /// The interface the request really ran on: the one holding the local
+    /// address the system reported for the connection.
+    public let interface: String?
 
     /// Where a redirect points to (the `Location` header).
     public var location: String? {
@@ -41,9 +44,10 @@ public struct HTTPTimingStep: Sendable, Equatable, Identifiable {
     public init(
         id: Int, url: String, statusCode: Int?, networkProtocol: String?, remoteAddress: String?, remotePort: Int?,
         dnsMilliseconds: Double?, tcpMilliseconds: Double?, tlsMilliseconds: Double?, waitMilliseconds: Double?,
-        totalMilliseconds: Double?, headers: [HTTPHeader] = []
+        totalMilliseconds: Double?, headers: [HTTPHeader] = [], interface: String? = nil
     ) {
         self.headers = headers
+        self.interface = interface
         self.id = id
         self.url = url
         self.statusCode = statusCode
@@ -187,7 +191,8 @@ public enum HTTPTimer {
                 tlsMilliseconds: milliseconds(transaction.secureConnectionStartDate, transaction.secureConnectionEndDate),
                 waitMilliseconds: milliseconds(transaction.requestStartDate, transaction.responseStartDate),
                 totalMilliseconds: milliseconds(transaction.fetchStartDate, transaction.responseStartDate),
-                headers: headers)
+                headers: headers,
+                interface: transaction.localAddress.flatMap(UsedInterface.holding(localAddress:)))
         }
     }
 

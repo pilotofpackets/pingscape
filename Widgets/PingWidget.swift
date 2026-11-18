@@ -93,7 +93,7 @@ struct PingProvider: AppIntentTimelineProvider {
                     return .failed(String(localized: "Local network access is not allowed"))
                 }
                 return .failed(error.widgetText)
-            case .started:
+            case .started, .via:
                 continue
             }
             if sent >= count { break }

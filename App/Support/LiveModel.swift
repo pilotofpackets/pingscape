@@ -156,7 +156,7 @@ final class LiveModel {
                 append(&latencyPoints, milliseconds, at: now)
             case .noReply, .failed, .tooBig:
                 latency.record(milliseconds: nil)
-            case .started:
+            case .started, .via:
                 break
             }
         }

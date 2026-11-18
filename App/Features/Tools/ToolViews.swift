@@ -115,6 +115,7 @@ struct PingView: View {
                     label: "Interface",
                     value: model.interfaceMTU.map { String(localized: "\(name) · MTU \(String($0))") } ?? name)
             }
+            UsedInterfaceRow(model.usedInterfaces)
             if case .some(let found) = model.pathMTU {
                 if let found, let address = model.current {
                     DataRow(label: "Path MTU", value: byteCount(found))
@@ -175,6 +176,7 @@ struct PingView: View {
             } else if model.method == .icmp {
                 DataRow(label: "Method", value: "ICMP")
             }
+            UsedInterfaceRow(model.usedInterfaces)
             DataRow(
                 label: "Payload",
                 value: byteCount(model.settings.payloadSize)
@@ -242,6 +244,7 @@ struct TracerouteView: View {
                 if !model.mtrHops.isEmpty { continuous }
             } else if !model.hops.isEmpty {
                 InfoSection(title: "Route") {
+                    UsedInterfaceRow(model.usedInterfaces)
                     ForEach(model.hops) { hop in
                         HopRow(hop: hop, name: model.names[hop.number])
                     }
@@ -266,6 +269,7 @@ extension TracerouteView {
 
     var continuous: some View {
         InfoSection(title: "Route") {
+            UsedInterfaceRow(model.usedInterfaces)
             ForEach(shownHops) { hop in
                 MTRHopRow(hop: hop, names: hop.addresses.compactMap { model.namesByAddress[$0] })
             }
@@ -503,6 +507,7 @@ struct DNSView: View {
                             label: "Response code", text: response.responseCodeName,
                             tone: response.responseCode == 0 ? .good : .warning)
                         DataRow(label: "Time", value: milliseconds(response.milliseconds))
+                        UsedInterfaceRow(response.interface)
                         if model.askedForDNSSEC { dnssecRow(response) }
                         DataRow(
                             label: "Records",
@@ -546,6 +551,7 @@ struct DNSView: View {
                 if model.askedForDNSSEC { dnssecRow(response) }
                 DataRow(label: "Transport", value: response.transport.rawValue)
                 DataRow(label: "Server", value: response.server, monospaced: true, sensitive: true)
+                UsedInterfaceRow(response.interface)
             }
             InfoSection(title: "Records") {
                 if response.answers.isEmpty && response.responseCode == 0 {
@@ -712,6 +718,7 @@ struct PortsView: View {
                 DataRow(
                     label: "Ports",
                     value: String(localized: "\(model.open.count) open · \(model.closedCount) closed · \(model.noResponseCount) no answer"))
+                UsedInterfaceRow(model.usedInterfaces)
                 if model.isRunning {
                     ProgressView(value: Double(progress.done), total: Double(max(progress.total, 1)))
                         .padding(.horizontal, 16)
@@ -751,6 +758,7 @@ struct TLSView: View {
                     if let address = report.remoteAddress {
                         DataRow(label: "Address", value: address, monospaced: true, sensitive: true)
                     }
+                    UsedInterfaceRow(report.interface)
                     if let version = report.protocolVersion { DataRow(label: "Protocol", value: version) }
                     if let suite = report.cipherSuite { DataRow(label: "Cipher suite", value: suite, monospaced: true, stacked: true) }
                     switch report.trust {
@@ -823,6 +831,7 @@ struct HTTPView: View {
                             label: "Remote", value: step.remotePort.map { "\(address):\($0)" } ?? address,
                             monospaced: true, sensitive: true)
                     }
+                    UsedInterfaceRow(step.interface)
                     if let value = step.dnsMilliseconds { DataRow(label: "DNS lookup", value: milliseconds(value)) }
                     if let value = step.tcpMilliseconds { DataRow(label: "TCP connection", value: milliseconds(value)) }
                     if let value = step.tlsMilliseconds { DataRow(label: "TLS handshake", value: milliseconds(value)) }

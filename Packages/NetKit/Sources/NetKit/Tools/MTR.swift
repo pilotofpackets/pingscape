@@ -36,6 +36,8 @@ public enum MTREvent: Sendable, Equatable {
     case round(number: Int, hops: [MTRHop], reachedTarget: Bool)
     /// The reverse DNS name of an address, once.
     case name(address: String, String)
+    /// The interface the answers really arrived on, when it is first known or changes.
+    case via(interface: String)
     case failed(ToolError)
 }
 
@@ -61,6 +63,7 @@ public enum MTRTool {
                 var named: Set<String> = []
                 var names: [Task<Void, Never>] = []
                 var round = 0
+                var arrival: String?
                 while !Task.isCancelled {
                     round += 1
                     let started = monotonicMilliseconds()
@@ -72,6 +75,11 @@ public enum MTRTool {
                         break
                     }
                     guard case .success(let results) = answers else { break }
+                    // The nearest hop that answered names the interface of this round.
+                    if let interface = results.lazy.compactMap({ $0?.interface }).first, interface != arrival {
+                        arrival = interface
+                        continuation.yield(.via(interface: interface))
+                    }
                     // The target's own answer ends the path. Later hops are
                     // the target answering again, not new routers.
                     if let target = results.firstIndex(where: { $0?.isTarget == true }) {
@@ -112,6 +120,7 @@ public enum MTRTool {
         let address: String
         let milliseconds: Double
         let isTarget: Bool
+        let interface: String?
     }
 
     /// One echo request per hop limit 1 through `hops`, in parallel. Each
@@ -131,9 +140,10 @@ public enum MTRTool {
                                 payloadSize: 32, cancel: cancel)
                         }
                         switch outcome {
-                        case .reply(let reply, let from, let milliseconds, _):
+                        case .reply(let reply, let from, let milliseconds, _, let interface):
                             return (hop, .success(Answer(
-                                address: from, milliseconds: milliseconds, isTarget: reply.kind == .echoReply)))
+                                address: from, milliseconds: milliseconds, isTarget: reply.kind == .echoReply,
+                                interface: interface)))
                         case .timeout, .tooBigToSend:
                             return (hop, .success(nil))
                         case .unsupported:

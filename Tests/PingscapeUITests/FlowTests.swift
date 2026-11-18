@@ -402,6 +402,57 @@ final class ToolFlowTests: UITestCase {
         }
     }
 
+    /// Start and Stop take a tap anywhere on their glass capsule, not only on
+    /// the word and the symbol: on an iPhone 12 and an iPad they needed
+    /// several taps or a long press (found 2026-11-18).
+    func testStartAndStopTakeATapAnywhereOnTheButton() {
+        let app = launch(.tool("ping"), config: config)
+        let clear = app.element("tool.clear")
+        guard expect(clear) else { return }
+        clear.tap()
+        let field = app.element("tool.field")
+        field.tap()
+        field.typeText("127.0.0.1")
+        app.dismissKeyboard()
+        let start = app.element("tool.start")
+        guard expect(start) else { return }
+        // Near the edges of the capsule, in its padding, and once in the middle.
+        let spots: [(String, CGVector)] = [
+            ("left edge", CGVector(dx: 0.06, dy: 0.5)), ("right edge", CGVector(dx: 0.94, dy: 0.5)),
+            ("top edge", CGVector(dx: 0.5, dy: 0.12)), ("bottom edge", CGVector(dx: 0.5, dy: 0.88)),
+            ("middle", CGVector(dx: 0.5, dy: 0.5)), ("lower left", CGVector(dx: 0.12, dy: 0.8)),
+        ]
+        var running = false
+        for (name, spot) in spots {
+            start.coordinate(withNormalizedOffset: spot).tap()
+            running.toggle()
+            let expected = app.buttons[running ? "Stop" : "Start"]
+            XCTAssertTrue(
+                expected.waitForExistence(timeout: 2),
+                "One tap on the \(name) of the button did not \(running ? "start" : "stop") the run [\(config)]")
+            // Go on from what the button shows, so one miss does not fail every later spot.
+            running = app.buttons["Stop"].exists
+        }
+        if running { start.tap() }
+    }
+
+    /// Done above the keyboard takes a tap on the edge of its capsule too.
+    func testDoneTakesATapOnItsEdge() {
+        let app = launch(.tool("ping"), config: config)
+        let field = app.element("tool.field")
+        guard expect(field) else { return }
+        field.tap()
+        let keyboard = app.keyboards.firstMatch
+        guard keyboard.waitForExistence(timeout: 5) else {
+            XCTFail("No software keyboard. Run scripts/ui-matrix.sh, which turns off the hardware keyboard of the simulator.")
+            return
+        }
+        let done = app.element("keyboard.done")
+        guard expect(done) else { return }
+        done.coordinate(withNormalizedOffset: CGVector(dx: 0.08, dy: 0.5)).tap()
+        expectGone(keyboard, "One tap on the edge of Done did not close the keyboard [\(config)]")
+    }
+
     /// Switching to another tab stops a running tool (found 2026-11-01).
     func testLeavingTheTabStopsARun() {
         let app = launch(.tool("ping"), config: config)

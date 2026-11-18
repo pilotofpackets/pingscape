@@ -177,7 +177,7 @@ final class RouterMeasurement {
                     case .failed(_, let error):
                         statistics.recordLoss()
                         failure = error
-                    case .started: break
+                    case .started, .via: break
                     }
                     if statistics.sent >= 10 { break }
                 }
