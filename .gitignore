@@ -18,6 +18,9 @@ Packages/*/.build/
 
 # Signing and secrets (never commit)
 *.p12
+*.p8
+*.pem
+*.key
 *.mobileprovision
 *.cer
 *.certSigningRequest

@@ -13,10 +13,14 @@ jobs:
     # Liquid Glass needs the iOS 26 SDK or newer, so use a macOS 26 image.
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      # Actions are pinned to a commit, so a moved tag cannot change what
+      # runs here. Dependabot (.github/dependabot.yml) proposes updates.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The build number is the commit count, which needs the full history.
           fetch-depth: 0
+          # Nothing here pushes: keep the token out of the checked-out repository.
+          persist-credentials: false
 
       - name: Toolchain
         run: |
