@@ -30,10 +30,18 @@ enum TCPProbe {
 
     /// Tries every target, at most `concurrency` at a time, and reports each
     /// result as soon as it is known. Blocks until all are done or cancelled.
+    /// With `onInterface`, a completed handshake also reports the interface
+    /// the connection ran on (see `UsedInterface`), before its result.
     static func run(
         targets: [Target], timeoutMilliseconds: Int, concurrency: Int, cancel: CancelFlag,
+        onInterface: ((_ id: Int, _ interface: String) -> Void)? = nil,
         onResult: (_ id: Int, _ result: Result) -> Void
     ) {
+        func reportInterface(of socket: POSIXSocket, id: Int) {
+            guard let onInterface, let name = socket.usedInterface() else { return }
+            onInterface(id, name)
+        }
+
         var active: [Int32: Attempt] = [:]
         var next = 0
 
@@ -54,6 +62,7 @@ enum TCPProbe {
                     Darwin.connect(socket.fd, sa, length)
                 }
                 if status == 0 {
+                    reportInterface(of: socket, id: target.id)
                     onResult(target.id, .open(milliseconds: monotonicMilliseconds() - started))
                 } else if errno == EINPROGRESS {
                     active[socket.fd] = Attempt(socket: socket, id: target.id, started: started)
@@ -69,6 +78,7 @@ enum TCPProbe {
                 guard let attempt = active.removeValue(forKey: descriptor.fd) else { continue }
                 do {
                     try attempt.socket.throwPendingError()
+                    reportInterface(of: attempt.socket, id: attempt.id)
                     onResult(attempt.id, .open(milliseconds: monotonicMilliseconds() - attempt.started))
                 } catch let error as ToolError {
                     onResult(attempt.id, classify(error, started: attempt.started))
@@ -85,17 +95,20 @@ enum TCPProbe {
         }
     }
 
-    /// One attempt, off the cooperative thread pool.
+    /// One attempt, off the cooperative thread pool. `interface` is the one
+    /// a completed handshake ran on.
     static func once(
         address: ResolvedAddress, port: UInt16, timeoutMilliseconds: Int
-    ) async throws -> Result {
+    ) async throws -> (result: Result, interface: String?) {
         try await Blocking.run { cancel in
             var outcome: Result = .noResponse
+            var interface: String?
             run(
                 targets: [Target(id: 0, address: address, port: port)],
-                timeoutMilliseconds: timeoutMilliseconds, concurrency: 1, cancel: cancel
+                timeoutMilliseconds: timeoutMilliseconds, concurrency: 1, cancel: cancel,
+                onInterface: { _, name in interface = name }
             ) { _, result in outcome = result }
-            return outcome
+            return (outcome, interface)
         }
     }
 }

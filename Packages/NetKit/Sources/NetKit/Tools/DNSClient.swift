@@ -18,11 +18,15 @@ public struct DNSResponse: Sendable, Equatable {
     public let flags: [String]
     public let answers: [DNSRecord]
     public let milliseconds: Double
+    /// The interface the query really ran on (see `UsedInterface`). `nil`
+    /// when the system did not tell, as for DNS over TLS and HTTPS.
+    public let interface: String?
 
     public init(
         server: String, transport: DNSTransport, responseCode: Int, responseCodeName: String, flags: [String],
-        answers: [DNSRecord], milliseconds: Double
+        answers: [DNSRecord], milliseconds: Double, interface: String? = nil
     ) {
+        self.interface = interface
         self.server = server
         self.transport = transport
         self.responseCode = responseCode
@@ -190,7 +194,7 @@ public enum DNSClient {
         return DNSResponse(
             server: first.server, transport: first.transport, responseCode: code,
             responseCodeName: DNSResponse.codeName(code), flags: flags, answers: ordered + signatures,
-            milliseconds: monotonicMilliseconds() - started)
+            milliseconds: monotonicMilliseconds() - started, interface: parts.lazy.compactMap(\.interface).first)
     }
 
     // MARK: One attempt
@@ -204,19 +208,21 @@ public enum DNSClient {
             id: identifier, name: name, type: type, ednsUDPSize: edns ? DNSMessage.ednsUDPSize : nil, dnssec: dnssec)
         let deadline = Deadline(afterMilliseconds: timeout)
 
-        let reply = try udpExchange(packet, identifier: identifier, server: server, deadline: deadline, cancel: cancel)
+        var (reply, interface) = try udpExchange(
+            packet, identifier: identifier, server: server, deadline: deadline, cancel: cancel)
         var parsed = try DNSMessage.parse(reply)
         var transport = DNSTransport.udp
         if needsTCP(parsed, replyBytes: reply.count, askedWithEDNS: edns) {
-            let tcpReply = try tcpExchange(packet, identifier: identifier, server: server, deadline: deadline, cancel: cancel)
-            parsed = try DNSMessage.parse(tcpReply)
+            (reply, interface) = try tcpExchange(
+                packet, identifier: identifier, server: server, deadline: deadline, cancel: cancel)
+            parsed = try DNSMessage.parse(reply)
             transport = .tcp
         }
         return DNSResponse(
             server: server.text, transport: transport, responseCode: parsed.responseCode,
             responseCodeName: DNSResponse.codeName(parsed.responseCode),
             flags: DNSResponse.flagNames(parsed.flags), answers: parsed.answers,
-            milliseconds: monotonicMilliseconds() - started)
+            milliseconds: monotonicMilliseconds() - started, interface: interface)
     }
 
     /// Whether the UDP answer has to be confirmed over TCP.
@@ -235,20 +241,22 @@ public enum DNSClient {
 
     private static func udpExchange(
         _ packet: [UInt8], identifier: UInt16, server: ResolvedAddress, deadline: Deadline, cancel: CancelFlag
-    ) throws -> [UInt8] {
+    ) throws -> ([UInt8], String?) {
         let socket = try POSIXSocket(family: server.family, type: SOCK_DGRAM)
         try socket.connect(to: server, port: 53, deadline: deadline, cancel: cancel)
         try socket.sendAll(packet, deadline: deadline, cancel: cancel)
         while true {
             let reply = try socket.receive(limit: 4096, deadline: deadline, cancel: cancel)
             // Ignore anything that is not the answer to our question.
-            if reply.count >= 12, UInt16(reply[0]) << 8 | UInt16(reply[1]) == identifier { return reply }
+            if reply.count >= 12, UInt16(reply[0]) << 8 | UInt16(reply[1]) == identifier {
+                return (reply, socket.usedInterface())
+            }
         }
     }
 
     private static func tcpExchange(
         _ packet: [UInt8], identifier: UInt16, server: ResolvedAddress, deadline: Deadline, cancel: CancelFlag
-    ) throws -> [UInt8] {
+    ) throws -> ([UInt8], String?) {
         let socket = try POSIXSocket(family: server.family, type: SOCK_STREAM)
         try socket.connect(to: server, port: 53, deadline: deadline, cancel: cancel)
         let framed = [UInt8(packet.count >> 8), UInt8(packet.count & 0xFF)] + packet
@@ -259,6 +267,6 @@ public enum DNSClient {
         guard reply.count >= 12, UInt16(reply[0]) << 8 | UInt16(reply[1]) == identifier else {
             throw DNSError.malformed
         }
-        return reply
+        return (reply, socket.usedInterface())
     }
 }

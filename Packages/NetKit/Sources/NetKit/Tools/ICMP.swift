@@ -120,7 +120,8 @@ enum ICMPPacket {
 /// One echo request and its answer.
 enum ICMPEcho {
     enum Outcome: Sendable {
-        case reply(ICMPReply, from: String, milliseconds: Double, bytes: Int)
+        /// `interface` is the one the answer arrived on, if the system said.
+        case reply(ICMPReply, from: String, milliseconds: Double, bytes: Int, interface: String?)
         case timeout
         /// The system did not send the packet: with "don't fragment" it is
         /// larger than the MTU of the interface it would leave on.
@@ -154,6 +155,7 @@ enum ICMPEcho {
         }
         socket.setTimeToLive(ttl, ipv6: address.isIPv6)
         if dontFragment { socket.setDontFragment(ipv6: address.isIPv6) }
+        socket.reportArrivalInterface(ipv6: address.isIPv6)
 
         let identifier = UInt16.random(in: 1...UInt16.max)
         let size = max(0, min(payloadSize, PingSettings.maximumPayloadSize))
@@ -182,12 +184,12 @@ enum ICMPEcho {
             } catch ToolError.timeout {
                 return .timeout
             }
-            guard let (bytes, from) = socket.receiveFrom(limit: max(receiveLimit, 2048)) else { continue }
+            guard let (bytes, from, interface) = socket.receiveMessage(limit: max(receiveLimit, 2048)) else { continue }
             let elapsed = monotonicMilliseconds() - started
             guard let reply = ICMPPacket.parse(bytes, ipv6: address.isIPv6, sequence: sequence, token: token)
             else { continue }
             let sender = ResolvedAddress.text(ofSockaddr: from) ?? address.text
-            return .reply(reply, from: sender, milliseconds: elapsed, bytes: bytes.count)
+            return .reply(reply, from: sender, milliseconds: elapsed, bytes: bytes.count, interface: interface)
         }
     }
 }

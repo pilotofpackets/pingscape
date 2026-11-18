@@ -44,6 +44,10 @@ public enum PingEvent: Sendable, Equatable {
     /// router that said so, with the MTU it named. Without `reportedBy` the
     /// device did not send it at all. Counts as lost.
     case tooBig(sequence: Int, mtu: Int?, reportedBy: String?)
+    /// The interface this attempt really ran on: where the ICMP answer
+    /// arrived, or the interface of the TCP connection. Comes before the
+    /// event of the same sequence, and only when the system named it.
+    case via(sequence: Int, interface: String)
 }
 
 /// Round-trip statistics over the replies of a run.
@@ -134,7 +138,7 @@ public enum PingTool {
             if case .tcp(let port) = method {
                 return tcpEvent(
                     try await TCPProbe.once(address: address, port: port, timeoutMilliseconds: timeout),
-                    sequence: sequence)
+                    sequence: sequence, announce: announce)
             }
             let payload = settings.payloadSize
             let dontFragment = settings.dontFragment
@@ -144,7 +148,8 @@ public enum PingTool {
                     payloadSize: payload, dontFragment: dontFragment, cancel: cancel)
             }
             switch outcome {
-            case .reply(let reply, let from, let milliseconds, let bytes):
+            case .reply(let reply, let from, let milliseconds, let bytes, let interface):
+                if let interface { announce(.via(sequence: sequence, interface: interface)) }
                 switch reply.kind {
                 case .echoReply:
                     return .reply(
@@ -167,7 +172,7 @@ public enum PingTool {
                 announce(.started(address: address.text, method: method))
                 return tcpEvent(
                     try await TCPProbe.once(address: address, port: port, timeoutMilliseconds: timeout),
-                    sequence: sequence)
+                    sequence: sequence, announce: announce)
             }
         } catch is CancellationError {
             return nil
@@ -176,8 +181,11 @@ public enum PingTool {
         }
     }
 
-    private static func tcpEvent(_ result: TCPProbe.Result, sequence: Int) -> PingEvent {
-        switch result {
+    private static func tcpEvent(
+        _ outcome: (result: TCPProbe.Result, interface: String?), sequence: Int, announce: (PingEvent) -> Void
+    ) -> PingEvent {
+        if let interface = outcome.interface { announce(.via(sequence: sequence, interface: interface)) }
+        return switch outcome.result {
         case .open(let milliseconds):
             .reply(sequence: sequence, bytes: nil, milliseconds: milliseconds, ttl: nil)
         // A refusal still crossed the network, but it is no handshake.

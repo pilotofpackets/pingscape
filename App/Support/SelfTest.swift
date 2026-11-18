@@ -200,6 +200,7 @@ enum SelfTest {
                         case .noReply: result = "noreply"
                         }
                         parts.append("\(probe.packetSize):\(result)")
+                    case .via(let interface): parts.append("via=\(interface)")
                     case .finished(let mtu): parts.append("pmtu=\(mtu ?? 0)")
                     case .failed(let error): parts.append("failed(\(error))")
                     }
@@ -215,6 +216,7 @@ enum SelfTest {
         settings.timeoutSeconds = 1
         var lines: [String] = []
         var method = "?"
+        var via: [String] = []
         for await event in PingTool.run(address: address, settings: settings) {
             switch event {
             case .started(_, let started): method = "\(started)"
@@ -222,10 +224,11 @@ enum SelfTest {
             case .noReply: lines.append("noreply")
             case .failed(_, let error): lines.append("failed(\(error))")
             case .tooBig(_, let mtu, _): lines.append("toobig(\(mtu ?? 0))")
+            case .via(_, let interface): if via.last != interface { via.append(interface) }
             }
             if lines.count >= 3 { break }
         }
-        return "method=\(method) \(lines.joined(separator: " "))"
+        return "method=\(method) via=\(via.isEmpty ? "-" : via.joined(separator: ">")) \(lines.joined(separator: " "))"
     }
 
     // MARK: Local network (asks the user)

@@ -72,6 +72,41 @@
         }
       }
     },
+    "%@ from #%@" : {
+      "comment" : "An interface a tool run switched to, and the first attempt over it, as in \"utun4 · VPN from #4\".",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ab #%2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ from #%2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ desde #%2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ à partir de #%2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ da #%2$@"
+          }
+        }
+      }
+    },
     "%@ ahead" : {
       "comment" : "NTP: the device's clock is ahead by this time (e.g. 6.8 ms).",
       "localizations" : {
@@ -5468,6 +5503,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Interfaccia"
+          }
+        }
+      }
+    },
+    "Interface used" : {
+      "comment" : "The interface a tool's packets really used, as the system reported it for the socket.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genutzte Schnittstelle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface used"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interfaz usada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface utilisée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interfaccia usata"
           }
         }
       }

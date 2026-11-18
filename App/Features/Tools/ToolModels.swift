@@ -46,6 +46,8 @@ final class PingModel: ToolControl {
     private(set) var method: PingMethod?
     private(set) var lines: [PingLine] = []
     private(set) var statistics = PingStatistics()
+    /// The interfaces the replies really came over, with the first reply of each.
+    private(set) var usedInterfaces = InterfaceTrail()
     /// The settings of the run on screen, which the fields may no longer show.
     private(set) var settings = PingSettings()
     // Path MTU
@@ -126,6 +128,7 @@ final class PingModel: ToolControl {
     private func clearResults() {
         lines = []
         statistics = PingStatistics()
+        usedInterfaces = InterfaceTrail()
         probes = []
         interfaceName = nil
         interfaceMTU = nil
@@ -161,6 +164,8 @@ final class PingModel: ToolControl {
             case .tooBig(let sequence, let mtu, let reportedBy):
                 statistics.recordLoss()
                 append(PingLine(id: sequence, kind: .tooBig(mtu: mtu, reportedBy: reportedBy)))
+            case .via(let sequence, let interface):
+                usedInterfaces.record(interface, from: sequence)
             }
         }
         if !Task.isCancelled { isRunning = false }
@@ -174,6 +179,7 @@ final class PingModel: ToolControl {
                 interfaceName = interface
                 interfaceMTU = mtu
             case .probe(let probe): probes.append(probe)
+            case .via(let interface): usedInterfaces.record(interface)
             case .finished(let mtu): pathMTU = .some(mtu)
             case .failed(let error): failure = .from(error, target: address)
             }
@@ -198,8 +204,10 @@ final class PingModel: ToolControl {
         }
         model.statistics.recordLoss()
         model.lines.append(PingLine(id: 6, kind: .noReply))
+        model.usedInterfaces.record("en0", from: 1)
         if DemoLaunch.pingMode == .pathMTU {
             model.mode = .pathMTU
+            model.usedInterfaces = InterfaceTrail(["utun4"])
             model.interfaceName = "utun4"
             model.interfaceMTU = 1420
             model.probes = [
@@ -240,6 +248,8 @@ final class TracerouteModel: ToolControl {
     private(set) var names: [Int: String] = [:]
     /// `nil` while running or before a run.
     private(set) var reachedTarget: Bool?
+    /// The interfaces the answers really came over, in both modes.
+    private(set) var usedInterfaces = InterfaceTrail()
     private var task: Task<Void, Never>?
 
     var inputText: String { input }
@@ -254,6 +264,7 @@ final class TracerouteModel: ToolControl {
             return
         } catch { return }
         isRunning = true
+        usedInterfaces = InterfaceTrail()
         hops = []
         names = [:]
         reachedTarget = nil
@@ -283,6 +294,7 @@ final class TracerouteModel: ToolControl {
                         mtrHops = hops
                         mtrReached = reached
                     case .name(let address, let name): namesByAddress[address] = name
+                    case .via(let interface): usedInterfaces.record(interface)
                     case .failed(let error): failure = .from(error, target: target)
                     }
                 }
@@ -294,6 +306,7 @@ final class TracerouteModel: ToolControl {
                 case .started: break
                 case .hop(let hop): hops.append(hop)
                 case .name(let hop, let name): names[hop] = name
+                case .via(let interface): usedInterfaces.record(interface)
                 case .finished(let reached): reachedTarget = reached
                 case .failed(let error): failure = .from(error, target: target)
                 }
@@ -321,6 +334,7 @@ final class TracerouteModel: ToolControl {
         ]
         model.names = [1: "fritz.box", 2: "edge1.example.net", 5: "one.one.one.one"]
         model.reachedTarget = true
+        model.usedInterfaces.record("en0")
         if DemoLaunch.value(after: "-demo-traceroute") == "mtr" {
             model.mode = .continuous
             model.mtrRounds = 60
@@ -551,7 +565,7 @@ final class DNSModel: ToolControl {
                 DNSRecord(name: "example.com", type: "MX", ttl: 3600, value: "10 mail.example.com"),
                 DNSRecord(name: "example.com", type: "MX", ttl: 3600, value: "20 backup.example.com"),
             ],
-            milliseconds: 13)
+            milliseconds: 13, interface: "en0")
         if DemoLaunch.value(after: "-demo-dns") == "compare" {
             model.type = .a
             model.input = "example.com"
@@ -694,6 +708,8 @@ final class PortsModel: ToolControl {
     private(set) var closedCount = 0
     private(set) var noResponseCount = 0
     private(set) var progress: (done: Int, total: Int)?
+    /// The interfaces the completed handshakes really ran on.
+    private(set) var usedInterfaces = InterfaceTrail()
     private var task: Task<Void, Never>?
     private var classifyTask: Task<Void, Never>?
 
@@ -727,6 +743,7 @@ final class PortsModel: ToolControl {
         closedCount = 0
         noResponseCount = 0
         progress = nil
+        usedInterfaces = InterfaceTrail()
         let host: String
         let ports: [Int]
         do {
@@ -755,6 +772,7 @@ final class PortsModel: ToolControl {
                     case .noResponse: noResponseCount += 1
                     }
                 case .progress(let done, let total): progress = (done, total)
+                case .via(let interface): usedInterfaces.record(interface)
                 case .failed(let error): failure = .from(error, target: target)
                 case .finished: break
                 }
@@ -779,6 +797,7 @@ final class PortsModel: ToolControl {
         model.closedCount = 60
         model.noResponseCount = 4
         model.progress = (67, 67)
+        model.usedInterfaces.record("en0")
         return model
     }
 }
@@ -846,7 +865,7 @@ final class TLSModel: ToolControl {
                     notBefore: now.addingTimeInterval(-900 * 86_400), notAfter: now.addingTimeInterval(3_000 * 86_400),
                     serialNumber: "01", alternativeNames: []),
             ],
-            trust: .trusted)
+            trust: .trusted, interface: "en0")
         return model
     }
 }
@@ -903,7 +922,7 @@ final class HTTPModel: ToolControl {
                 id: 0, url: "http://example.com/", statusCode: 301, networkProtocol: "http/1.1",
                 remoteAddress: "93.184.216.34", remotePort: 80, dnsMilliseconds: 14, tcpMilliseconds: 21,
                 tlsMilliseconds: nil, waitMilliseconds: 24, totalMilliseconds: 61,
-                headers: [HTTPHeader(name: "Location", value: "https://example.com/")]),
+                headers: [HTTPHeader(name: "Location", value: "https://example.com/")], interface: "en0"),
             HTTPTimingStep(
                 id: 1, url: "https://example.com/", statusCode: 200, networkProtocol: "h2",
                 remoteAddress: "93.184.216.34", remotePort: 443, dnsMilliseconds: 0.5, tcpMilliseconds: 20,
@@ -913,7 +932,7 @@ final class HTTPModel: ToolControl {
                     HTTPHeader(name: "Content-Type", value: "text/html; charset=utf-8"),
                     HTTPHeader(name: "Server", value: "ECS (nyd/D11E)"),
                     HTTPHeader(name: "Strict-Transport-Security", value: "max-age=31536000"),
-                ]),
+                ], interface: "en0"),
         ]
         return model
     }

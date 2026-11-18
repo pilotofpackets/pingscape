@@ -79,7 +79,7 @@ public enum DualStackTool {
 
     private static func handshake(_ address: ResolvedAddress?, port: UInt16, timeout: Int) async throws -> TCPProbe.Result? {
         guard let address else { return nil }
-        return try await TCPProbe.once(address: address, port: port, timeoutMilliseconds: timeout)
+        return try await TCPProbe.once(address: address, port: port, timeoutMilliseconds: timeout).result
     }
 
     private static func record(_ result: TCPProbe.Result?, into times: inout [Double?], error: inout ToolError?) {

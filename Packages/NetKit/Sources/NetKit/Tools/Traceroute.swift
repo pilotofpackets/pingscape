@@ -20,6 +20,8 @@ public enum TracerouteEvent: Sendable, Equatable {
     case hop(TracerouteHop)
     /// The reverse DNS name of a hop, which arrives after the hop itself.
     case name(hop: Int, String)
+    /// The interface the answers really arrived on, when it is first known or changes.
+    case via(interface: String)
     case finished(reachedTarget: Bool)
     case failed(ToolError)
 }
@@ -58,6 +60,7 @@ public enum TracerouteTool {
                 var reached = false
                 var names: [Task<Void, Never>] = []
                 var sequence = 0
+                var arrival: String?
                 hops: for number in 1...max(settings.maximumHops, 1) {
                     var times: [Double?] = []
                     var hopAddress: String?
@@ -78,7 +81,11 @@ public enum TracerouteTool {
                             break hops
                         }
                         switch outcome {
-                        case .reply(let reply, let from, let milliseconds, _):
+                        case .reply(let reply, let from, let milliseconds, _, let interface):
+                            if let interface, interface != arrival {
+                                arrival = interface
+                                continuation.yield(.via(interface: interface))
+                            }
                             hopAddress = hopAddress ?? from
                             times.append(milliseconds)
                             if reply.kind == .echoReply { reached = true }

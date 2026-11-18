@@ -116,7 +116,7 @@ struct CheckPortIntent: AppIntent {
                 }
             case .failed(let error):
                 throw IntentMessage(error, target: target.address)
-            case .started, .progress, .finished:
+            case .started, .progress, .via, .finished:
                 continue
             }
         }
@@ -216,7 +216,7 @@ struct TracerouteIntent: AppIntent {
                 reached = reachedTarget
             case .failed(let error):
                 throw IntentMessage(error, target: target.address)
-            case .started, .name:
+            case .started, .name, .via:
                 continue
             }
         }
@@ -249,7 +249,7 @@ struct PathMTUIntent: AppIntent {
                 return .result(value: mtu, dialog: IntentSupport.dialog(String(localized: "Path MTU to \(host): \(mtu) bytes")))
             case .failed(let error):
                 throw IntentMessage(error, target: target.address)
-            case .started, .probe:
+            case .started, .probe, .via:
                 continue
             }
         }

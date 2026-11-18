@@ -35,6 +35,8 @@ public enum PathMTUEvent: Sendable, Equatable {
     /// `interface` is the one the packets leave on, with its MTU, if it was found.
     case started(address: String, interface: String?, interfaceMTU: Int?)
     case probe(PathMTUProbe)
+    /// The interface the answers really arrived on, when it is first known or changes.
+    case via(interface: String)
     /// `pathMTU` is the largest packet that came back. `nil`: not even a small one did.
     case finished(pathMTU: Int?)
     case failed(ToolError)
@@ -67,13 +69,18 @@ public enum PathMTUTool {
                     interface?.mtu ?? fallbackCeiling, PingSettings.maximumPayloadSize + header)
                 var search = PathMTUSearch(small: smallPacket(ipv6: address.isIPv6), ceiling: ceiling)
                 var count = 0
+                var arrival: String?
                 while let size = search.next, !Task.isCancelled {
                     count += 1
                     guard
-                        let result = await probe(
+                        let (result, interface) = await probe(
                             address: address, packetSize: size, header: header, sequence: count,
                             timeout: Int(timeoutSeconds * 1000))
                     else { break }
+                    if let interface, interface != arrival {
+                        arrival = interface
+                        continuation.yield(.via(interface: interface))
+                    }
                     if case .failure(let error) = result {
                         continuation.yield(.failed(error))
                         break
@@ -89,10 +96,11 @@ public enum PathMTUTool {
         }
     }
 
-    /// One size, tried twice when nothing comes back. `nil` if cancelled.
+    /// One size, tried twice when nothing comes back, and the interface the
+    /// answer arrived on. `nil` if cancelled.
     private static func probe(
         address: ResolvedAddress, packetSize: Int, header: Int, sequence: Int, timeout: Int
-    ) async -> Result<PathMTUProbe.Result, ToolError>? {
+    ) async -> (Result<PathMTUProbe.Result, ToolError>, String?)? {
         for attempt in 0..<2 {
             let outcome: ICMPEcho.Outcome
             do {
@@ -105,22 +113,22 @@ public enum PathMTUTool {
             } catch is CancellationError {
                 return nil
             } catch {
-                return .failure(.failed("\(error)"))
+                return (.failure(.failed("\(error)")), nil)
             }
             switch outcome {
-            case .reply(let reply, let from, let milliseconds, _):
+            case .reply(let reply, let from, let milliseconds, _, let interface):
                 switch reply.kind {
-                case .echoReply: return .success(.passed(milliseconds: milliseconds))
-                case .tooBig(let mtu): return .success(.tooBig(mtu: mtu, reportedBy: from))
-                case .timeExceeded, .unreachable: return .failure(.noRoute)
+                case .echoReply: return (.success(.passed(milliseconds: milliseconds)), interface)
+                case .tooBig(let mtu): return (.success(.tooBig(mtu: mtu, reportedBy: from)), interface)
+                case .timeExceeded, .unreachable: return (.failure(.noRoute), interface)
                 }
-            case .tooBigToSend: return .success(.tooBigToSend)
+            case .tooBigToSend: return (.success(.tooBigToSend), nil)
             case .timeout: continue
-            case .unsupported: return .failure(.failed("ICMP not available"))
-            case .failed(let error): return .failure(error)
+            case .unsupported: return (.failure(.failed("ICMP not available")), nil)
+            case .failed(let error): return (.failure(error), nil)
             }
         }
-        return .success(.noReply)
+        return (.success(.noReply), nil)
     }
 }
 

@@ -21,11 +21,15 @@ public struct TLSReport: Sendable, Equatable {
     /// From the server's certificate to the top of the chain it sent.
     public let chain: [CertificateInfo]
     public let trust: TLSTrust
+    /// The interface the handshake really ran on: the one holding the local
+    /// address of the connection.
+    public let interface: String?
 
     public init(
         host: String, port: UInt16, remoteAddress: String?, protocolVersion: String?, cipherSuite: String?,
-        chain: [CertificateInfo], trust: TLSTrust
+        chain: [CertificateInfo], trust: TLSTrust, interface: String? = nil
     ) {
+        self.interface = interface
         self.host = host
         self.port = port
         self.remoteAddress = remoteAddress
@@ -152,10 +156,16 @@ public enum TLSInspector {
         if case .hostPort(let address, _)? = connection.currentPath?.remoteEndpoint {
             remote = "\(address)".split(separator: "%").first.map(String.init)
         }
+        var interface: String?
+        if case .hostPort(let address, _)? = connection.currentPath?.localEndpoint,
+            let local = "\(address)".split(separator: "%").first
+        {
+            interface = UsedInterface.holding(localAddress: String(local))
+        }
         let captured = capture.value.withLock { $0 }
         return TLSReport(
             host: host, port: port, remoteAddress: remote, protocolVersion: version, cipherSuite: suite,
-            chain: captured.chain, trust: captured.trust ?? .untrusted(""))
+            chain: captured.chain, trust: captured.trust ?? .untrusted(""), interface: interface)
     }
 
     private static func map(_ error: NWError) -> ToolError {
