@@ -4960,6 +4960,41 @@
         }
       }
     },
+    "Happy New Year %@!" : {
+      "comment" : "Title of the notification at midnight on 1 January. The placeholder is the new year, e.g. 2027.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frohes neues Jahr %@!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Happy New Year %@!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Feliz Año Nuevo %@!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bonne année %@ !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buon anno %@!"
+          }
+        }
+      }
+    },
     "Hide value" : {
       "localizations" : {
         "de" : {
@@ -15134,6 +15169,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il payload deve essere un numero da 0 a 65507"
+          }
+        }
+      }
+    },
+    "The Pingscape team wishes you a great start to the new year." : {
+      "comment" : "Text of the notification at midnight on 1 January.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Pingscape-Team wünscht dir einen guten Start ins neue Jahr."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Pingscape team wishes you a great start to the new year."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El equipo de Pingscape te desea un muy buen comienzo de año."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’équipe Pingscape vous souhaite un excellent début d’année."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il team di Pingscape ti augura un ottimo inizio d’anno."
           }
         }
       }

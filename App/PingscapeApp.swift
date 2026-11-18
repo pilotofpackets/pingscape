@@ -34,6 +34,7 @@ struct PingscapeApp: App {
                 .environment(navigation)
                 .environment(lan)
                 .task { await store.run() }
+                .task { await NewYearGreeting.schedule() }
                 #if DEBUG
                 .task { if SelfTest.isRequested { await SelfTest.run() } }
                 #endif
