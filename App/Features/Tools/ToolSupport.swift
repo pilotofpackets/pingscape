@@ -254,6 +254,10 @@ struct StartBar: View {
                 .padding(.horizontal, 32)
                 .frame(minHeight: 50)
                 .glassSurface(cornerRadius: 25)
+                // The glass does not take touches: without this only the word
+                // and the symbol did, and taps on the rest of the capsule were
+                // lost (iPhone 12 and iPad, 2026-11-18).
+                .contentShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("tool.start")

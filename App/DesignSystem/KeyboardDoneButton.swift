@@ -32,6 +32,8 @@ struct KeyboardDoneBarButton: View {
                 .padding(.horizontal, 20)
                 .frame(minHeight: 50)
                 .glassSurface(cornerRadius: 25)
+                // The whole capsule takes the tap, not only the word (see StartBar).
+                .contentShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("keyboard.done")
